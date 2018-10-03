@@ -1,3 +1,3 @@
 # go-api-ws
 
-Go api based webservice
+Bootstap project for golang api based webservice.
