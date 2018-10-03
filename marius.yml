@@ -1,0 +1,8 @@
+port: :8088
+db:
+  driverName: mysql
+  user: root
+  password:
+  dbname:   marius
+  charset:  utf8
+  server:   "tcp(localhost:3306)"

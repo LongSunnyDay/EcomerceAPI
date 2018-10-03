@@ -1,0 +1,8 @@
+port: :8080
+db:
+  driverName: mysql
+  user: root
+  password:
+  dbname:   vego
+  charset:  utf8
+  server:   "tcp(localhost:3306)"
