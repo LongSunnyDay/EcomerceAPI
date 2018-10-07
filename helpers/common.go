@@ -2,14 +2,14 @@ package helpers
 
 import (
 	"encoding/json"
+	fr "github.com/DATA-DOG/fastroute"
 	"log"
 	"net/http"
 	"strconv"
-	fr "github.com/DATA-DOG/fastroute"
 )
 
-const contentType = "Content-Type"
-const ContentTypeJson = "application/json"
+const HeaderContentType = "Content-Type"
+const MIMEApplicationJSON = "application/json"
 
 func CheckErr(err error) {
 	if err != nil {
@@ -28,7 +28,7 @@ func HttpError(err error, w http.ResponseWriter) {
 func WriteJsonResult(w http.ResponseWriter, data interface{}) {
 	jsonData, err := json.Marshal(data)
 	CheckErr(err)
-	w.Header().Set(contentType, ContentTypeJson)
+	w.Header().Set(HeaderContentType, MIMEApplicationJSON)
 	w.WriteHeader(http.StatusOK)
 	w.Write(jsonData)
 }
