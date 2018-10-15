@@ -6,7 +6,7 @@ import (
 	"errors"
 	"go-api-ws/config"
 	"log"
-	"ve-push-server/helpers"
+	"go-api-ws/helpers"
 )
 
 var ErrUserNotFound = errors.New("User not found!")
@@ -23,6 +23,6 @@ func CreateUsersTableIfNotExists() {
       password VARCHAR(512) NULL,
     PRIMARY KEY (id)
     )`)
-	helpers.LogErr(err)
+	helpers.CheckErr(err)
 }
 

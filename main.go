@@ -89,6 +89,10 @@ func processFlags() *config.FlagSettings {
 
 func main() {
 
+	var router = fr.RouterFunc(func(req *http.Request) http.Handler {
+		return routes[req.Method] // fastroute.Router is also http.Handler
+	})
+
 	p := "MyPassword"
 	password := []byte(p)
 	hash, err := bcrypt.GenerateFromPassword(password, bcrypt.DefaultCost)
