@@ -1,15 +1,15 @@
 package db
 
 import (
-	"go-api-ws/config"
-	"go-api-ws/helpers"
+	"../config"
+	"../helpers"
 )
 
 const sqlShowTables = "SHOW TABLES"
 const sqlShowDatabases = "SHOW DATABASES"
 const sqlGetDbServerVersion = "SELECT version()"
 
-func getVersion() (string, error) {
+func GetVersion() (string, error) {
 	db, err := config.Conf.GetDb()
 	helpers.CheckErr(err)
 

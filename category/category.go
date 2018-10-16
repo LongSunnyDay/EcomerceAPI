@@ -1,7 +1,7 @@
 package category
 
 import (
-	"go-api-ws/core"
+	"../core"
 )
 
 type Category struct {

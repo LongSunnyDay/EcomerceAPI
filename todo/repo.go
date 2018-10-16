@@ -1,9 +1,9 @@
 package todo
 
 import (
+	"../config"
+	"../helpers"
 	"fmt"
-	"go-api-ws/config"
-	"go-api-ws/helpers"
 )
 
 func createTodo(todo *Todo) *Todo{

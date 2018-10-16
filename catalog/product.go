@@ -1,10 +1,10 @@
 package catalog
 
 import (
+	"../core"
+	"../helpers"
 	"encoding/json"
 	fr "github.com/DATA-DOG/fastroute"
-	"go-api-ws/core"
-	"go-api-ws/helpers"
 	"net/http"
 )
 

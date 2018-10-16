@@ -1,12 +1,12 @@
 package auth
 
 import (
+	"../config"
+	"../helpers"
 	_ "database/sql"
-	_ "github.com/go-sql-driver/mysql"
 	"errors"
-	"go-api-ws/config"
+	_ "github.com/go-sql-driver/mysql"
 	"log"
-	"go-api-ws/helpers"
 )
 
 var ErrUserNotFound = errors.New("User not found!")

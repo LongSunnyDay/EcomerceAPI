@@ -1,6 +1,6 @@
 package user
 
 
-func findByUserName(userName string) User {
-
-}
+//func findByUserName(userName string) User {
+//
+//}

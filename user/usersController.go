@@ -2,9 +2,9 @@ package user
 
 import "net/http"
 
-func getUsersHandler(w http.ResponseWriter, r * *http.Request, user AuthorizedUser) {
-
-}
+//func getUsersHandler(w http.ResponseWriter, r * *http.Request, user AuthorizedUser) {
+//
+//}
 
 func getUserHandler(w http.ResponseWriter, r *http.Request) {
 
@@ -19,7 +19,7 @@ func postUserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func signUpHandler(w http.ResponseWriter, r *http.Request) {
-	username := r.URL.Query().Get("username")
+	// username := r.URL.Query().Get("username")
 }
 
 func updateUerPermissions(w http.ResponseWriter, r *http.Request) {
