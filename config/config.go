@@ -39,6 +39,7 @@ type FlagSettings struct {
 var Flags FlagSettings
 var Conf *Config
 
+var db *sql.DB
 var dbUri string
 var driverName string
 
@@ -56,15 +57,21 @@ func GetConfig(configFile string) *Config {
 }
 
 func (c *Config) GetDb() (*sql.DB, error) {
-	if dbUri == "" {
-		dbConfig := c.Db
-		driverName = dbConfig.DriverName
-		dbUri = fmt.Sprintf("%s:%s@%s/%s?charset=%s&parseTime=True",
-			dbConfig.User, dbConfig.Password,
-			dbConfig.Server, dbConfig.DbName, dbConfig.Charset)
-
+	if db == nil {
+		if dbUri == "" {
+			dbConfig := c.Db
+			driverName = dbConfig.DriverName
+			dbUri = fmt.Sprintf("%s:%s@%s/%s?charset=%s&parseTime=True",
+				dbConfig.User, dbConfig.Password,
+				dbConfig.Server, dbConfig.DbName, dbConfig.Charset)
+		}
+		ldb, err := sql.Open(driverName, dbUri)
+		if err != nil {
+			return nil, err
+		}
+		db = ldb
 	}
-	return sql.Open(driverName, dbUri)
+	return db, nil
 }
 
 func (c *Config) GetConfFromFile(fileName string) error {

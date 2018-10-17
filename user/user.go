@@ -29,8 +29,8 @@ func init() {
 }
 
 var users []m.User
+var user m.User
 var schemaLoader = gojsonschema.NewReferenceLoader("file://user/models/userRegister.schema.json")
-var db, _ = c.Conf.GetDb()
 
 func hashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
@@ -54,23 +54,19 @@ func UserRouter() http.Handler {
 
 // RegisterUser function
 func registerUser(w http.ResponseWriter, r *http.Request) {
-	var user m.User
 	_ = json.NewDecoder(r.Body).Decode(&user)
 	documentLoader := gojsonschema.NewGoLoader(user)
 	result, err := gojsonschema.Validate(schemaLoader, documentLoader)
 	helpers.CheckErr(err)
 
 	if result.Valid() {
-
 		id := betterguid.New()
 		user.ID = id
 		pswd, err := hashPassword(user.Password)
 		helpers.CheckErr(err)
-
 		user.Password = pswd
-
-
-
+		db, err := c.Conf.GetDb()
+		helpers.CheckErr(err)
 		result, err := db.Exec("INSERT INTO users(" +
 			"ID, " +
 			"First_name, " +
@@ -100,30 +96,51 @@ func registerUser(w http.ResponseWriter, r *http.Request) {
 // GetUser function
 func getUser(w http.ResponseWriter, r *http.Request) {
 	userID := chi.URLParam(r, "userID")
-	for _, user := range users {
-		if user.ID == userID {
-			json.NewEncoder(w).Encode(user)
-			return
-		}
+	db, err := c.Conf.GetDb()
+	helpers.CheckErr(err)
+	queryErr := db.QueryRow("SELECT * FROM users u WHERE id=?", userID).
+		Scan(&user.ID, &user.Customer.FirstName, &user.Customer.LastName, &user.Customer.Email, &user.Password)
+	if queryErr != nil {
+		json.NewEncoder(w).Encode("Got an error: " + queryErr.Error())
+		return
 	}
-	json.NewEncoder(w).Encode(&m.User{})
+	json.NewEncoder(w).Encode(user)
 }
 
 // RemoveUser function
 func removeUser(w http.ResponseWriter, r *http.Request) {
 	userID := chi.URLParam(r, "userID")
-	for index, user := range users {
-		if user.ID == userID {
-			users = append(users[:index], users[index+1:]...)
-			json.NewEncoder(w).Encode(users)
-			return
-		}
+	db, err := c.Conf.GetDb()
+	helpers.CheckErr(err)
+	queryErr := db.QueryRow("SELECT * FROM users u WHERE id=?", userID).
+		Scan(&user.ID, &user.Customer.FirstName, &user.Customer.LastName, &user.Customer.Email, &user.Password)
+	if queryErr != nil {
+		json.NewEncoder(w).Encode("Got an error: " + queryErr.Error())
+		return
 	}
-	json.NewEncoder(w).Encode(&m.User{})
-}
+	db.Exec("DELETE u FROM users u WHERE u.id=?", userID)
+	json.NewEncoder(w).Encode("User " + user.Customer.FirstName + " deleted")
+	}
 
 // GetAllUsers function
 func getAllUsers(w http.ResponseWriter, r *http.Request) {
+	db, err := c.Conf.GetDb()
+	helpers.CheckErr(err)
+	rows, err := db.Query("SELECT * FROM users")
+	helpers.CheckErr(err)
+	defer rows.Close()
+	for rows.Next() {
+		err := rows.Scan(
+			&user.ID,
+			&user.Customer.FirstName,
+			&user.Customer.LastName,
+			&user.Customer.Email,
+			&user.Password)
+			helpers.CheckErr(err)
+		users = append(users, user)
+	}
+	err = rows.Err()
+	helpers.CheckErr(err)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(users)
 }
