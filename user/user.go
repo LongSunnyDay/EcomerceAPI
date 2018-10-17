@@ -1,10 +1,10 @@
 package user
 
 import (
-	c "../config"
-	"../core"
-	"../helpers"
-	m "./models"
+	c "go-api-ws/config"
+	"go-api-ws/core"
+	"go-api-ws/helpers"
+	m "go-api-ws/user/models"
 	"encoding/json"
 	"fmt"
 	"github.com/go-chi/chi"
@@ -79,11 +79,11 @@ func registerUser(w http.ResponseWriter, r *http.Request) {
 			user.Customer.LastName,
 			user.Customer.Email,
 			user.Password)
-
+fmt.Println(result)
 		users = append(users, user)
 		w.Header().Set("Content-Type", "application/json")
-		//json.NewEncoder(w).Encode("User: " + user.Customer.FirstName + " has been registered. ID: " + user.ID)
-		json.NewEncoder(w).Encode(result)
+		json.NewEncoder(w).Encode("User: " + user.Customer.FirstName + " has been registered. ID: " + user.ID)
+		//json.NewEncoder(w).Encode(result)
 
 	} else {
 		json.NewEncoder(w).Encode("There is and error creating an user:")
@@ -125,6 +125,7 @@ func removeUser(w http.ResponseWriter, r *http.Request) {
 
 // GetAllUsers function
 func getAllUsers(w http.ResponseWriter, r *http.Request) {
+	users =[]m.User{}
 	db, err := c.Conf.GetDb()
 	helpers.CheckErr(err)
 	rows, err := db.Query("SELECT * FROM users")
@@ -155,14 +156,20 @@ func updateUser(w http.ResponseWriter, r *http.Request) {
 	helpers.CheckErr(err)
 
 	if result.Valid() {
+		db, err := c.Conf.GetDb()
+		helpers.CheckErr(err)
 		userID  := chi.URLParam(r, "userID")
-		for index, user := range users {
-			if user.ID == userID {
-				users[index] = updatedUser
-				json.NewEncoder(w).Encode(updatedUser)
-				return
-			}
+		queryErr := db.QueryRow("SELECT * FROM users u WHERE id=?", userID).
+			Scan(&user.ID, &user.Customer.FirstName, &user.Customer.LastName, &user.Customer.Email, &user.Password)
+		if queryErr != nil {
+			json.NewEncoder(w).Encode("Got an error: " + queryErr.Error())
+			return
 		}
+		res, err := db.Exec("UPDATE users u SET First_name = ?, Last_name = ?, Email = ? WHERE ID = ?", updatedUser.Customer.FirstName, updatedUser.Customer.LastName, updatedUser.Customer.Email, userID)
+		fmt.Println(res)
+		helpers.CheckErr(err)
+		return
+
 	}
 	json.NewEncoder(w).Encode(&m.User{})
 }
