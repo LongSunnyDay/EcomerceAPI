@@ -79,11 +79,12 @@ func registerUser(w http.ResponseWriter, r *http.Request) {
 			user.Customer.LastName,
 			user.Customer.Email,
 			user.Password)
-		fmt.Println(result)
 
 		users = append(users, user)
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode("User: " + user.Customer.FirstName + " has been registered. ID: " + user.ID)
+		//json.NewEncoder(w).Encode("User: " + user.Customer.FirstName + " has been registered. ID: " + user.ID)
+		json.NewEncoder(w).Encode(result)
+
 	} else {
 		json.NewEncoder(w).Encode("There is and error creating an user:")
 		fmt.Printf("The document is not valid. See errors :\n")
