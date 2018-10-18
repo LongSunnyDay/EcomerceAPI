@@ -1,8 +1,7 @@
 {
     "additionalProperties": true,
     "required": [
-        "customer",
-        "password"
+        "customer"
     ],
     "properties": {
         "customer": {
@@ -25,9 +24,6 @@
                     "pattern": "[a-zA-Z]+"
                 }
             }
-        },
-        "password": {
-            "type": "string"
         }
     }
 }

@@ -30,7 +30,7 @@ func init() {
 
 var users []m.User
 var user m.User
-var schemaLoader = gojsonschema.NewReferenceLoader("file://user/models/userRegister.schema.json")
+
 
 func hashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
@@ -49,11 +49,13 @@ func UserRouter() http.Handler {
 	r.Get("/user/{userID}", getUser)
 	r.Delete("/user/{userID}", removeUser)
 	r.Put("/user/{userID}", updateUser)
+	r.Put("/userp/{userID}", updatePassword)
 	return r
 }
 
 // RegisterUser function
 func registerUser(w http.ResponseWriter, r *http.Request) {
+	var schemaLoader = gojsonschema.NewReferenceLoader("file://user/models/userRegister.schema.json")
 	_ = json.NewDecoder(r.Body).Decode(&user)
 	documentLoader := gojsonschema.NewGoLoader(user)
 	result, err := gojsonschema.Validate(schemaLoader, documentLoader)
@@ -62,9 +64,8 @@ func registerUser(w http.ResponseWriter, r *http.Request) {
 	if result.Valid() {
 		id := betterguid.New()
 		user.ID = id
-		pswd, err := hashPassword(user.Password)
+		user.Password, err = hashPassword(user.Password)
 		helpers.CheckErr(err)
-		user.Password = pswd
 		db, err := c.Conf.GetDb()
 		helpers.CheckErr(err)
 		result, err := db.Exec("INSERT INTO users(" +
@@ -149,6 +150,7 @@ func getAllUsers(w http.ResponseWriter, r *http.Request) {
 
 // UpdateUser function
 func updateUser(w http.ResponseWriter, r *http.Request) {
+	var schemaLoader = gojsonschema.NewReferenceLoader("file://user/models/userUpdate.schema.json")
 	var updatedUser m.User
 	_ = json.NewDecoder(r.Body).Decode(&updatedUser)
 	documentLoader := gojsonschema.NewGoLoader(updatedUser)
@@ -159,10 +161,10 @@ func updateUser(w http.ResponseWriter, r *http.Request) {
 		db, err := c.Conf.GetDb()
 		helpers.CheckErr(err)
 		userID  := chi.URLParam(r, "userID")
-		queryErr := db.QueryRow("SELECT * FROM users u WHERE id=?", userID).
+		err = db.QueryRow("SELECT * FROM users u WHERE id=?", userID).
 			Scan(&user.ID, &user.Customer.FirstName, &user.Customer.LastName, &user.Customer.Email, &user.Password)
-		if queryErr != nil {
-			json.NewEncoder(w).Encode("Got an error: " + queryErr.Error())
+		if err != nil {
+			json.NewEncoder(w).Encode("Got an error: " + err.Error())
 			return
 		}
 		res, err := db.Exec("UPDATE users u SET First_name = ?, Last_name = ?, Email = ? WHERE ID = ?", updatedUser.Customer.FirstName, updatedUser.Customer.LastName, updatedUser.Customer.Email, userID)
@@ -172,4 +174,42 @@ func updateUser(w http.ResponseWriter, r *http.Request) {
 
 	}
 	json.NewEncoder(w).Encode(&m.User{})
+}
+
+func updatePassword(w http.ResponseWriter, r *http.Request){
+	var schemaLoader = gojsonschema.NewReferenceLoader("file://user/models/userPassword.schema.json")
+	var password m.UpdatePassword
+
+	_ = json.NewDecoder(r.Body).Decode(&password)
+	fmt.Println(password)
+	documentLoader := gojsonschema.NewGoLoader(password)
+	result, err := gojsonschema.Validate(schemaLoader, documentLoader)
+	helpers.CheckErr(err)
+
+	if result.Valid(){
+		db, err := c.Conf.GetDb()
+		helpers.CheckErr(err)
+		userID := chi.URLParam(r, "userID")
+		err = db.QueryRow("SELECT Password FROM users u WHERE id=?", userID).
+			Scan(&user.Password)
+		if err != nil {
+			json.NewEncoder(w).Encode("Got an error: " + err.Error())
+			return
+		}
+		if checkPasswordHash(password.Password, user.Password) {
+
+			password.NewPassword, err = hashPassword(password.NewPassword)
+			_, err := db.Exec("UPDATE users u SET Password = ? WHERE ID = ?", password.NewPassword, userID)
+			helpers.CheckErr(err)
+
+		}
+	} else {
+		json.NewEncoder(w).Encode("There is and error updating your password:")
+		fmt.Printf("The document is not valid. See errors :\n")
+		for _, desc := range result.Errors() {
+			fmt.Printf("- %s\n", desc)
+		}
+	}
+
+
 }

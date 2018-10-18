@@ -11,3 +11,8 @@ type Customer struct {
 	LastName  string `json:"last_name,omitempty"`
 	Email     string `json:"email,omitempty"`
 }
+
+type UpdatePassword struct {
+	Password string   `json:"password,omitempty"`
+	NewPassword string   `json:"newPassword,omitempty"`
+}
