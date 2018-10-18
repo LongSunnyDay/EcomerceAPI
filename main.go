@@ -1,8 +1,8 @@
 package main
 
 import (
-	"go-api-ws/user"
-	"go-api-ws/config"
+	"./config"
+	"./user"
 	_ "github.com/go-sql-driver/mysql"
 	"net/http"
 )

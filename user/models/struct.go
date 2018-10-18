@@ -16,3 +16,7 @@ type UpdatePassword struct {
 	Password string   `json:"password,omitempty"`
 	NewPassword string   `json:"newPassword,omitempty"`
 }
+type JwtToken struct {
+	Token string `json:"token,omitempty"`
+}
+

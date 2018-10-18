@@ -1,10 +1,10 @@
 package user
 
 import (
-	c "go-api-ws/config"
-	"go-api-ws/core"
-	"go-api-ws/helpers"
-	m "go-api-ws/user/models"
+	c "../config"
+	"../core"
+	"../helpers"
+	m "./models"
 	"encoding/json"
 	"fmt"
 	"github.com/go-chi/chi"
@@ -31,7 +31,6 @@ func init() {
 var users []m.User
 var user m.User
 
-
 func hashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 	return string(bytes), err
@@ -50,6 +49,9 @@ func UserRouter() http.Handler {
 	r.Delete("/user/{userID}", removeUser)
 	r.Put("/user/{userID}", updateUser)
 	r.Put("/userp/{userID}", updatePassword)
+
+	r.Post("/login", LoginEndpoint)
+	r.Get("/protected", ProtectedEndpoint)
 	return r
 }
 
