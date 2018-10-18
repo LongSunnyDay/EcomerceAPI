@@ -1,0 +1,33 @@
+{
+    "additionalProperties": true,
+    "required": [
+        "customer",
+        "password"
+    ],
+    "properties": {
+        "customer": {
+            "required": [
+                "email",
+                "first_name",
+                "last_name"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "pattern": "[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?"
+                },
+                "first_name": {
+                    "type": "string",
+                    "pattern": "[a-zA-Z]+"
+                },
+                "last_name": {
+                    "type": "string",
+                    "pattern": "[a-zA-Z]+"
+                }
+            }
+        },
+        "password": {
+            "type": "string"
+        }
+    }
+}
