@@ -1,10 +1,11 @@
 package main
 
 import (
-	"./config"
-	"./user"
+	"go-api-ws/config"
+	//"./user"
 	_ "github.com/go-sql-driver/mysql"
 	"net/http"
+	"go-api-ws/todo"
 )
 
 func init()  {
@@ -12,6 +13,9 @@ func init()  {
 }
 
 func main()  {
-	r := user.UserRouter()
+	//r := user.UserRouter()
+	r := todo.TodoRouter()
+
+
 	http.ListenAndServe(":8080", r)
 }

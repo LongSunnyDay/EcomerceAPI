@@ -1,0 +1,23 @@
+{
+  "additionalProperties": true,
+  "required": [
+    "Title",
+    "Category",
+    "Content",
+    "State"
+  ],
+  "properties": {
+    "Title": {
+      "type": "string"
+    },
+    "Category": {
+      "type": "string"
+    },
+    "Content": {
+      "type": "string"
+    },
+    "State": {
+      "type": "string"
+    }
+  }
+}
