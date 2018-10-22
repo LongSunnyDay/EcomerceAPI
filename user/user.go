@@ -51,13 +51,13 @@ func UserRouter() http.Handler {
 	r.Put("/userp/{userID}", updatePassword)
 
 	r.Post("/login", LoginEndpoint)
-	r.Get("/protected", ProtectedEndpoint)
+	r.Get("/protected", ProtectedEndpoint(getAllUsers))
 	return r
 }
 
 // RegisterUser function
 func registerUser(w http.ResponseWriter, r *http.Request) {
-	var schemaLoader = gojsonschema.NewReferenceLoader("file://user/models/userRegister.schema.json")
+	schemaLoader := gojsonschema.NewReferenceLoader("file://user/models/userRegister.schema.json")
 	_ = json.NewDecoder(r.Body).Decode(&user)
 	documentLoader := gojsonschema.NewGoLoader(user)
 	result, err := gojsonschema.Validate(schemaLoader, documentLoader)
@@ -179,7 +179,7 @@ func updateUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func updatePassword(w http.ResponseWriter, r *http.Request){
-	var schemaLoader = gojsonschema.NewReferenceLoader("file://user/models/userPassword.schema.json")
+	schemaLoader := gojsonschema.NewReferenceLoader("file://user/models/userPassword.schema.json")
 	var password m.UpdatePassword
 
 	_ = json.NewDecoder(r.Body).Decode(&password)
