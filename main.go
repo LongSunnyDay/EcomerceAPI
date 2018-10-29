@@ -5,7 +5,8 @@ import (
 	//"./user"
 	_ "github.com/go-sql-driver/mysql"
 	"net/http"
-	"go-api-ws/todo"
+
+	"go-api-ws/todoMongo"
 )
 
 func init()  {
@@ -14,7 +15,7 @@ func init()  {
 
 func main()  {
 	//r := user.UserRouter()
-	r := todo.TodoRouter()
+	r := todoMongo.TodoRouter()
 
 
 	http.ListenAndServe(":8080", r)

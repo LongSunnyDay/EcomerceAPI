@@ -9,13 +9,14 @@ import (
 	m "go-api-ws/todo/models"
 	c "go-api-ws/config"
 	"fmt"
-)
+	"github.com/go-chi/chi"
+	)
 
 var todo m.Todo
 var todos[]m.Todo
 
 func createTodo(w http.ResponseWriter, r *http.Request){
-	var schemaLoader = gojsonschema.NewReferenceLoader("file://todo/models/todoCreate.json")
+	var schemaLoader = gojsonschema.NewReferenceLoader("file://todo/models/todoSchema.json")
 	_ = json.NewDecoder(r.Body).Decode(&todo)
 	documentLoader := gojsonschema.NewGoLoader(todo)
 	result, err := gojsonschema.Validate(schemaLoader, documentLoader)
@@ -30,15 +31,13 @@ func createTodo(w http.ResponseWriter, r *http.Request){
 			"Title, " +
 			"Category, " +
 			"Content, " +
-			"Creation_time, " +
 			"Modification_time, " +
 			"State)" +
-			" VALUES(?, ?, ?, ?, ?, ?, ?)",
+			" VALUES(?, ?, ?, ?, ?, ?)",
 			todo.ID,
 			todo.Title,
 			todo.Category,
 			todo.Content,
-			todo.Created,
 			todo.Modified,
 			todo.State)
 		fmt.Println(result)
@@ -54,5 +53,77 @@ func createTodo(w http.ResponseWriter, r *http.Request){
 			fmt.Printf("- %s\n", desc)
 		}
 	}
+
+}
+
+func getTodo(w http.ResponseWriter, r *http.Request){
+todoID := chi.URLParam(r, "todoID")
+	db, err := c.Conf.GetDb()
+	helpers.CheckErr(err)
+
+	queryErr := db.QueryRow("SELECT * FROM todos t WHERE ID=?", todoID).
+		Scan(&todo.ID, &todo.Title, &todo.Category, &todo.Content, &todo.Created, &todo.Modified, &todo.State)
+	if queryErr != nil {
+		json.NewEncoder(w).Encode("Got an error: " + queryErr.Error())
+		return
+	}
+	json.NewEncoder(w).Encode(todo)
+
+}
+
+func removeTodo(w http.ResponseWriter, r *http.Request) {
+	todoID := chi.URLParam(r, "todoID")
+	db, err := c.Conf.GetDb()
+	helpers.CheckErr(err)
+
+	queryErr := db.QueryRow("SELECT * FROM todos t WHERE id=?", todoID).
+		Scan(&todo.ID, &todo.Title, &todo.Category, &todo.Content, &todo.Created, &todo.Modified, &todo.State)
+
+	if queryErr != nil {
+		json.NewEncoder(w).Encode("Got an error: " + queryErr.Error())
+		return
+	}
+	db.Exec("DELETE u FROM todos t WHERE t.id=?", todoID)
+	json.NewEncoder(w).Encode("Todo " + todo.Title + " has been deleted")
+}
+
+
+func editTodo(w http.ResponseWriter, r *http.Request) {
+	//var schemaLoader = gojsonschema.NewReferenceLoader("file://user/models/userUpdate.schema.json")
+	//var updatedUser m.Todo
+	//_ = json.NewDecoder(r.Body).Decode(&updatedUser)
+	//documentLoader := gojsonschema.NewGoLoader(updatedUser)
+	//result, err := gojsonschema.Validate(schemaLoader, documentLoader)
+	//helpers.CheckErr(err)
+
+	var schemaLoader= gojsonschema.NewReferenceLoader("file://todo/models/todoSchema.json")
+	_ = json.NewDecoder(r.Body).Decode(&todo)
+	documentLoader := gojsonschema.NewGoLoader(todo)
+	result, err := gojsonschema.Validate(schemaLoader, documentLoader)
+	helpers.CheckErr(err)
+
+	if result.Valid() {
+
+	todoID := chi.URLParam(r, "todoID")
+	db, err := c.Conf.GetDb()
+	helpers.CheckErr(err)
+
+	queryErr := db.QueryRow("SELECT * FROM todos t WHERE id=?", todoID).
+		Scan(&todo.ID, &todo.Title, &todo.Category, &todo.Content, &todo.Created, &todo.Modified, &todo.State)
+
+	if queryErr != nil {
+		json.NewEncoder(w).Encode("Got an error: " + queryErr.Error())
+		return
+	}
+
+	res, err := db.Exec("UPDATE todos t SET Title = ?, Category = ?, Content = ?, State = ?,")
+		fmt.Println(res)
+		helpers.CheckErr(err)
+		return
+}
+
+}
+
+func getAllTodos(){
 
 }
