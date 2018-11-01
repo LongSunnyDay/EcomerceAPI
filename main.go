@@ -1,12 +1,13 @@
 package main
 
 import (
-	"go-api-ws/config"
-	//"./user"
+	"./cart"
+	"./config"
+	"./todoMongo"
+	"./user"
+	"github.com/go-chi/chi"
 	_ "github.com/go-sql-driver/mysql"
 	"net/http"
-
-	"go-api-ws/todoMongo"
 )
 
 func init()  {
@@ -14,9 +15,10 @@ func init()  {
 }
 
 func main()  {
-	//r := user.UserRouter()
-	r := todoMongo.TodoRouter()
 
-
+	r := chi.NewRouter()
+	r.Mount("/api/user", user.UserRouter())
+	r.Mount("/api/cart", cart.CartRouter())
+	r.Mount("/api", todoMongo.TodoRouter())
 	http.ListenAndServe(":8080", r)
 }

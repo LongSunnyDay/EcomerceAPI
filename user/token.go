@@ -3,7 +3,7 @@ package user
 import (
 	"../config"
 	"../helpers"
-	m "./models"
+	m "../models"
 	"encoding/json"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
@@ -12,42 +12,77 @@ import (
 	"time"
 )
 
-var mySecret = "senelismegstamociutesapvalumus"
+var MySecret = "SenelisMegstaMociutesApvalumus"
 
 func LoginEndpoint(w http.ResponseWriter, req *http.Request) {
-	var user m.LoginForm
+	var userLogin m.LoginForm
 	var dbData m.User
-	_ = json.NewDecoder(req.Body).Decode(&user)
-	schemaLoader := gojsonschema.NewReferenceLoader("file://user/models/userLogin.schema.json")
-	documentLoader := gojsonschema.NewGoLoader(user)
+	var response m.Response
+	_ = json.NewDecoder(req.Body).Decode(&userLogin)
+	schemaLoader := gojsonschema.NewReferenceLoader("file://models/userLogin.schema.json")
+	documentLoader := gojsonschema.NewGoLoader(userLogin)
 	result, err := gojsonschema.Validate(schemaLoader, documentLoader)
-	pswd := user.Password
-	user.Password = ""
+	pswd := userLogin.Password
+	userLogin.Password = ""
 	helpers.CheckErr(err)
 	if result.Valid() {
 		db, err := config.Conf.GetDb()
 		helpers.CheckErr(err)
-		err = db.QueryRow("SELECT ID, Password FROM users u WHERE email = ?", user.Email).Scan(&dbData.ID, &dbData.Password)
+		err = db.QueryRow("SELECT ID, Password, Group_id FROM users u WHERE email = ?", userLogin.Username).Scan(&dbData.ID, &dbData.Password, &dbData.GroupId)
 		if err != nil {
-			json.NewEncoder(w).Encode("Got an error: " + err.Error())
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(404)
+			response.Code = 404
+			response.Result = err.Error()
+			json.NewEncoder(w).Encode(response)
 			return
 		}
 
 		if checkPasswordHash(pswd, dbData.Password) {
-			user.Password = ""
+			userLogin.Password = ""
+			var role string
+			if dbData.GroupId < 1 {
+				role = "admin"
+			} else {
+				role = "user"
+			}
 			token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-				"id":  dbData.ID,
-				"exp": time.Now().Add(time.Hour * 1).Unix(),
-				"user_type": "admin",
+				"sub":  dbData.ID,
+				"exp":  time.Now().Add(time.Hour * 1).Unix(),
+				"role": role,
 			})
-			tokenString, err := token.SignedString([]byte(mySecret))
+			authToken, err := token.SignedString([]byte(MySecret))
 			helpers.CheckErr(err)
-			json.NewEncoder(w).Encode(tokenString)
+			token = jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+				"sub": dbData.ID,
+				"exp": time.Now().Add(time.Hour * 4).Unix(),
+			})
+			refreshToken, err := token.SignedString([]byte(MySecret))
+			helpers.CheckErr(err)
+			response.Code = 200
+			response.Result = authToken
+			response.Meta = map[string]string{
+				"refreshToken": refreshToken,
+			}
+			json.NewEncoder(w).Encode(response)
 		} else {
-			json.NewEncoder(w).Encode("Invalid password")
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(401)
+			response.Code = 401
+			response.Result = "Password is invalid"
+			json.NewEncoder(w).Encode(response)
+
+			fmt.Println("Password is invalid")
 		}
 	} else {
-		json.NewEncoder(w).Encode("There is and error:")
+
+		w.Header().Set("content-type", "application/json")
+		w.WriteHeader(400)
+
+		response.Code = 400
+		response.Result = result.Errors()
+		json.NewEncoder(w).Encode(response)
+
 		fmt.Printf("The document is not valid. See errors :\n")
 		for _, desc := range result.Errors() {
 			fmt.Printf("- %s\n", desc)
@@ -56,25 +91,104 @@ func LoginEndpoint(w http.ResponseWriter, req *http.Request) {
 }
 
 func ProtectedEndpoint(handlerFunc http.HandlerFunc) http.HandlerFunc {
-	return func(writer http.ResponseWriter, request *http.Request) {
-		params := request.Header.Get("Authorization")
-		paramsFmt := params[7:]
-		fmt.Println(paramsFmt)
-		token, _ := jwt.Parse(paramsFmt, func(token *jwt.Token) (interface{}, error) {
+	return func(w http.ResponseWriter, req *http.Request) {
+		urlToken := req.URL.Query()["token"][0]
+		token, _ := jwt.Parse(urlToken, func(token *jwt.Token) (interface{}, error) {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, fmt.Errorf("There is an error")
 			}
-			return []byte(mySecret), nil
+			return []byte(MySecret), nil
 		})
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-			if claims["user_type"] == "admin" && claims.VerifyExpiresAt(time.Now().Unix(), true){
-				handlerFunc.ServeHTTP(writer, request)
+			if claims["role"] == "admin" && claims.VerifyExpiresAt(time.Now().Unix(), true) {
+				handlerFunc.ServeHTTP(w, req)
 			} else {
-				json.NewEncoder(writer).Encode("Not authorized")
+				response := m.Response{
+					Code:   403,
+					Result: "Token expired"}
+				w.Header().Set("content-type", "application/json")
+				w.WriteHeader(403)
+				json.NewEncoder(w).Encode(response)
 			}
 		} else {
-			json.NewEncoder(writer).Encode("Invalid authorization token")
+			response := m.Response{
+				Code:   400,
+				Result: "Invalid token"}
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(400)
+			json.NewEncoder(w).Encode(response)
 		}
 	}
 
+}
+
+func RefreshToken(w http.ResponseWriter, req *http.Request) {
+	var jsonBody map[string]string
+	_ = json.NewDecoder(req.Body).Decode(&jsonBody)
+	token, _ := jwt.Parse(jsonBody["refreshToken"], func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("There is an error")
+		}
+		return []byte(MySecret), nil
+	})
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		if claims.VerifyExpiresAt(time.Now().Unix(), true) {
+			db, err := config.Conf.GetDb()
+			helpers.CheckErr(err)
+			var groupId int
+			err = db.QueryRow("SELECT Group_id FROM users u WHERE ID = ?", claims["sub"]).Scan(&groupId)
+			if err != nil {
+				w.Header().Set("content-type", "application/json")
+				w.WriteHeader(404)
+				response := m.Response{
+					Code:   404,
+					Result: err.Error()}
+				json.NewEncoder(w).Encode(response)
+			}
+			var role string
+			if groupId < 1 {
+				role = "admin"
+			} else {
+				role = "user"
+			}
+			token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+				"sub":  claims["sub"],
+				"exp":  time.Now().Add(time.Hour * 1).Unix(),
+				"role": role,
+			})
+			newAuthToken, err := token.SignedString([]byte(MySecret))
+			helpers.CheckErr(err)
+
+			token = jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+				"sub": claims["sub"],
+				"exp": time.Now().Add(time.Hour * 4).Unix(),
+			})
+			newRefreshToken, err := token.SignedString([]byte(MySecret))
+			helpers.CheckErr(err)
+
+			response := m.Response{
+				Code:   200,
+				Result: newAuthToken,
+				Meta: map[string]string{
+					"refreshToken": newRefreshToken}}
+
+			w.WriteHeader(200)
+			w.Header().Set("content-type", "application/json")
+			json.NewEncoder(w).Encode(response)
+		} else {
+			response := m.Response{
+				Code:   403,
+				Result: "Token expired"}
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(403)
+			json.NewEncoder(w).Encode(response)
+		}
+	} else {
+		response := m.Response{
+			Code:   400,
+			Result: "Invalid token"}
+		w.Header().Set("content-type", "application/json")
+		w.WriteHeader(400)
+		json.NewEncoder(w).Encode(response)
+	}
 }

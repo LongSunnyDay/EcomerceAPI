@@ -8,19 +8,19 @@
         "customer": {
             "required": [
                 "email",
-                "first_name",
-                "last_name"
+                "firstname",
+                "lastname"
             ],
             "properties": {
                 "email": {
                     "type": "string",
                     "pattern": "[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?"
                 },
-                "first_name": {
+                "firstname": {
                     "type": "string",
                     "pattern": "[a-zA-Z]+"
                 },
-                "last_name": {
+                "lastname": {
                     "type": "string",
                     "pattern": "[a-zA-Z]+"
                 }
