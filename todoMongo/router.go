@@ -1,22 +1,19 @@
 package todoMongo
 
 import (
-	"net/http"
 	"github.com/go-chi/chi"
-
-			)
+	"net/http"
+)
 
 
 
 func TodoRouter() http.Handler{
 	router := chi.NewRouter()
-	router.Post("/todo", CreateTodo)
-	router.Get("/todo/{todoID}", GetTodo)
-	router.Get("/todo", ListTodos)
-	router.Delete("/todo/{todoID}", RemoveTodo)
-	router.Put("/todo/{todoID}", UpdateTodo)
+	router.Post("/create", CreateTodo)
+	router.Get("/getTodo", GetTodo)
+	router.Get("/getList", ListTodos)
+	router.Delete("/remove", RemoveTodo)
+	router.Put("/update", UpdateTodo)
 	return router
-
-
 
 }

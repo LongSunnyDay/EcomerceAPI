@@ -1,16 +1,17 @@
 package todoMongo
 
 import (
-	"github.com/mongodb/mongo-go-driver/mongo"
-		"context"
+	"../helpers"
+	"../todoMongo/models"
+	"context"
 	"fmt"
-	"go-api-ws/todoMongo/models"
-	"go-api-ws/helpers"
 	"github.com/mongodb/mongo-go-driver/bson"
+	"github.com/mongodb/mongo-go-driver/bson/objectid"
+	"github.com/mongodb/mongo-go-driver/mongo"
 )
 
 // CONNECTIONSTRING DB connection string
-const CONNECTIONSTRING = "mongodb://localhost:27017"
+const CONNECTIONSTRING = "mongodb://localhost:32777"
 
 // DBNAME Database name
 const DBNAME = "go-api-ws"
@@ -60,8 +61,11 @@ func GetAllTodos() []models.Todo {
 }
 
 // deletes an existing todo
-func DeleteTodo(todo models.Todo) {
-	_, err := db.Collection(COLLNAME).DeleteOne(context.Background(), todo, nil)
+func DeleteTodo(todoId string) {
+	objectIDS, err := objectid.FromHex(todoId)
+	helpers.CheckErr(err)
+	idDoc := bson.NewDocument(bson.EC.ObjectID("_id", objectIDS))
+	_, err = db.Collection(COLLNAME).DeleteOne(context.Background(), idDoc, nil)
 	helpers.CheckErr(err)
 }
 
@@ -73,10 +77,10 @@ func UpdateTodoByID(todo models.Todo, todoID string) {
 		),
 		bson.NewDocument(
 			bson.EC.SubDocumentFromElements("$set",
-				bson.EC.String("Title", todo.Title),
-				bson.EC.String("Category", todo.Category),
-				bson.EC.String("Content", todo.Content),
-				bson.EC.String("State", todo.State)),
+				bson.EC.String("title", todo.Title),
+				bson.EC.String("category", todo.Category),
+				bson.EC.String("content", todo.Content),
+				bson.EC.String("state", todo.State)),
 			),
 			nil)
 	fmt.Println(doc)

@@ -2,15 +2,15 @@
 package todo
 
 import (
-	"net/http"
-	"github.com/xeipuuv/gojsonschema"
+	c "../config"
+	"../helpers"
+	m "../todo/models"
 	"encoding/json"
-	"go-api-ws/helpers"
-	m "go-api-ws/todo/models"
-	c "go-api-ws/config"
 	"fmt"
 	"github.com/go-chi/chi"
-	)
+	"github.com/xeipuuv/gojsonschema"
+	"net/http"
+)
 
 var todo m.Todo
 var todos[]m.Todo

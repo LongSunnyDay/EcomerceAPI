@@ -41,23 +41,6 @@ func checkPasswordHash(password, hash string) bool {
 	return err == nil
 }
 
-func UserRouter() http.Handler {
-	r := chi.NewRouter()
-	r.Post("/create", registerUser)
-	r.Post("/login", LoginEndpoint)
-	r.Get("/me", meEndpoint)
-	r.Get("/order-history", getOrderHistory)
-	r.Post("/refresh", RefreshToken)
-
-	//r.Get("/user/list", getAllUsers)
-	//r.Get("/user/{userID}", getUser)
-	//r.Delete("/user/{userID}", removeUser)
-	//r.Put("/user/{userID}", updateUser)
-	//r.Put("/userp/{userID}", updatePassword)
-	//r.Get("/protected", ProtectedEndpoint(getAllUsers))
-	return r
-}
-
 //Get Order History
 func getOrderHistory(w http.ResponseWriter, r *http.Request) {
 	urlToken := r.URL.Query()["token"][0]

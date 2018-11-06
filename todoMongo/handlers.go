@@ -1,12 +1,10 @@
 package todoMongo
 
 import (
-	"net/http"
+	"../todoMongo/models"
 	"encoding/json"
-	"go-api-ws/todoMongo/models"
-
-	"github.com/gorilla/mux"
-	)
+	"net/http"
+)
 
 var todos []models.Todo
 
@@ -24,14 +22,11 @@ func ListTodos(w http.ResponseWriter, r *http.Request) {
 
 //  gets a todo
 func GetTodo(w http.ResponseWriter, r *http.Request) {
-
-
-	params := mux.Vars(r)
-
+	urlTodoId := r.URL.Query()["todoId"][0]
 
 	payload := GetAllTodos()
 	for _, t := range payload {
-		if t.ID == params["_id"] {
+		if t.ID == urlTodoId {
 			json.NewEncoder(w).Encode(t)
 			return
 		}
@@ -40,14 +35,14 @@ func GetTodo(w http.ResponseWriter, r *http.Request) {
 }
 
 func RemoveTodo(w http.ResponseWriter, r *http.Request) {
-	var todo models.Todo
-	_ = json.NewDecoder(r.Body).Decode(&todo)
-	DeleteTodo(todo)
+	urlTodoId := r.URL.Query()["todoId"][0]
+	//_ = json.NewDecoder(r.Body).Decode(&todo)
+	DeleteTodo(urlTodoId)
 }
 
 func UpdateTodo(w http.ResponseWriter, r *http.Request) {
-	todoID := mux.Vars(r)["_id"]
+	urlTodoId := r.URL.Query()["todoId"][0]
 	var todo models.Todo
 	_ = json.NewDecoder(r.Body).Decode(&todo)
-	UpdateTodoByID(todo, todoID)
+	UpdateTodoByID(todo, urlTodoId)
 }

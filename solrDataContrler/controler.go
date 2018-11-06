@@ -1,11 +1,11 @@
 package solrDataContrler
 
 import (
+	"../helpers"
+	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strings"
-	"io/ioutil"
-	"fmt"
-	"go-api-ws/helpers"
 )
 
 func cmdDeleteAll (){
