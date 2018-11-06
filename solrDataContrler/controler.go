@@ -13,7 +13,7 @@ func cmdDeleteAll (){
 	deleteCmd := "<delete><query>*:*</query></delete>"
 	resp, err := http.Post(deleteUrl, "text/xml", strings.NewReader(deleteCmd))
 	defer resp.Body.Close()
-	helpers.CheckErr(err)
+	helpers.PanicErr(err)
 	bodyBytes, _ := ioutil.ReadAll(resp.Body)
 	fmt.Printf("success response code: %d %v", resp.StatusCode, string(bodyBytes))
 }

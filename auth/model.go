@@ -23,6 +23,6 @@ func CreateUsersTableIfNotExists() {
       password VARCHAR(512) NULL,
     PRIMARY KEY (id)
     )`)
-	helpers.CheckErr(err)
+	helpers.PanicErr(err)
 }
 

@@ -1,7 +1,13 @@
 package user
 
-import "net/http"
+import (
+	"../config"
+	"../helpers"
+	"github.com/kjk/betterguid"
+	"net/http"
+)
 
+// Data models
 type User struct {
 	ID       string   `json:"id,omitempty"`
 	Customer Customer `json:"customer,omitempty"`
@@ -18,9 +24,6 @@ type Customer struct {
 type UpdatePassword struct {
 	Password    string `json:"password,omitempty"`
 	NewPassword string `json:"newPassword,omitempty"`
-}
-type JwtAuthToken struct {
-	Token string `json:"token,omitempty"`
 }
 
 type LoginForm struct {
@@ -43,28 +46,11 @@ type Response struct {
 	Meta         interface{}   `json:"meta,omitempty"`
 }
 
-type Order struct {
-	BaseGrandTotal int      `json:"base_grand_total,omitempty"`
-	GrandTotal     int      `json:"grand_total,omitempty"`
-	Items          []string `json:"items"`
-	TotalCount     int      `json:"total_count,omitempty"`
-}
-
-type Item struct {
-	SKU string `json:"sku,omitempty"`
-}
-
-type Info struct {
-	NameSpaced string `json:"name_spaced"`
-	State      struct {
-		Token string `json:"token"`
-	}
-}
-
 type MeUser struct {
 	Code   int    `json:"code"`
 	Result Result `json:"result,omitempty"`
 }
+
 type Result struct {
 	Addresses              interface{} `json:"addresses"`
 	CreatedAt              string      `json:"created_at,omitempty"`
@@ -78,4 +64,58 @@ type Result struct {
 	StoreID                int         `json:"store_id,omitempty"`
 	UpdatedAt              string      `json:"updated_at,omitempty"`
 	WebsiteID              int         `json:"website_id,omitempty"`
+}
+
+// Database operations
+func sendNewUserToDb(user User)  {
+	id := betterguid.New()
+	user.ID = id
+	passwordHash, err := hashPassword(user.Password)
+	helpers.PanicErr(err)
+	user.Password = passwordHash
+	db, err := config.Conf.GetDb()
+	helpers.PanicErr(err)
+	_, err = db.Exec("INSERT INTO users("+
+		"ID, "+
+		"First_name, "+
+		"Last_name, "+
+		"Email, "+
+		"Password)"+
+		" VALUES(?, ?, ?, ?, ?)",
+		user.ID,
+		user.Customer.FirstName,
+		user.Customer.LastName,
+		user.Customer.Email,
+		user.Password)
+	helpers.PanicErr(err)
+}
+
+func getUserDataFromDbByEmail(email string) (User) {
+	db, err := config.Conf.GetDb()
+	helpers.PanicErr(err)
+	var userFromDb User
+	err = db.QueryRow("SELECT ID, Password, Group_id FROM users u WHERE email = ?", email).Scan(&userFromDb.ID, &userFromDb.Password, &userFromDb.GroupId)
+	helpers.PanicErr(err)
+
+	return userFromDb
+}
+
+func getUserDataFromDbById(id interface{}) (Customer) {
+	db, err := config.Conf.GetDb()
+	helpers.PanicErr(err)
+	var userFromDb Customer
+	err = db.QueryRow("SELECT First_name, Last_name, Email FROM users u WHERE ID = ?", id).Scan(&userFromDb.FirstName, &userFromDb.LastName, &userFromDb.Email)
+	helpers.PanicErr(err)
+
+	return userFromDb
+}
+
+func getGroupIdFromDbById(id interface{}) (int) {
+	db, err := config.Conf.GetDb()
+	helpers.PanicErr(err)
+	var groupId int
+	err = db.QueryRow("SELECT Group_id FROM users u WHERE ID = ?", id).Scan(&groupId)
+	helpers.PanicErr(err)
+
+	return groupId
 }

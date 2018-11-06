@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-var checkErr = helpers.CheckErr
+var checkErr = helpers.PanicErr
 var productList []Product
 
 type Product struct {

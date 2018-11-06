@@ -1,7 +1,6 @@
 package cart
 
 import (
-	m "../models"
 	"../user"
 	"encoding/json"
 	"fmt"
@@ -33,7 +32,7 @@ func createCart(w http.ResponseWriter, req *http.Request) {
 				result := map[string]interface{}{
 					"items": items,
 				}
-				response := m.Response{
+				response := user.Response{
 					Code:   200,
 					Result: result}
 				w.Header().Set("content-type", "application/json")
@@ -43,7 +42,7 @@ func createCart(w http.ResponseWriter, req *http.Request) {
 		}
 	} else {
 		result := "a1a1a1a1a1a1"
-		response := m.Response{
+		response := user.Response{
 			Code:   200,
 			Result: result}
 		w.Header().Set("content-type", "application/json")

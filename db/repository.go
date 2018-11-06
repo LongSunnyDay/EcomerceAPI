@@ -11,18 +11,18 @@ const sqlGetDbServerVersion = "SELECT version()"
 
 func GetVersion() (string, error) {
 	db, err := config.Conf.GetDb()
-	helpers.CheckErr(err)
+	helpers.PanicErr(err)
 
 	row := db.QueryRow(sqlGetDbServerVersion)
 	var version string
 	err = row.Scan(&version)
-	helpers.CheckErr(err)
+	helpers.PanicErr(err)
 	return version, nil
 }
 
 func showDatabases() ([]string, error) {
 	db, err := config.Conf.GetDb()
-	helpers.CheckErr(err)
+	helpers.PanicErr(err)
 
 	databases := make([]string, 0)
 
@@ -31,7 +31,7 @@ func showDatabases() ([]string, error) {
 	for res.Next() {
 		var database string
 		err = res.Scan(&database)
-		helpers.CheckErr(err)
+		helpers.PanicErr(err)
 		databases = append(databases, database)
 	}
 	return databases, nil
@@ -40,7 +40,7 @@ func showDatabases() ([]string, error) {
 func showTables() ([]string, error) {
 
 	db, err := config.Conf.GetDb()
-	helpers.CheckErr(err)
+	helpers.PanicErr(err)
 
 	tables := make([]string, 0)
 
@@ -49,7 +49,7 @@ func showTables() ([]string, error) {
 	for res.Next() {
 		var table string
 		err = res.Scan(&table)
-		helpers.CheckErr(err)
+		helpers.PanicErr(err)
 		tables = append(tables, table)
 	}
 	return tables, nil

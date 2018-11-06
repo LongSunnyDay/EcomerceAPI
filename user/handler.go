@@ -4,14 +4,11 @@ import (
 	c "../config"
 	"../core"
 	"../helpers"
-	m "../models"
 	"encoding/json"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/go-chi/chi"
-	"github.com/kjk/betterguid"
 	"github.com/xeipuuv/gojsonschema"
-	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"time"
 )
@@ -23,27 +20,18 @@ func init() {
 		Name:        "User module",
 		Description: "User module. Supports username and email authentication. Categories are stored as a flat list.",
 		Version:     "0.1",
-		Author:      "Remigijus Bauzys @ JivaLabs",
+		Author:      "Matas Cereskevicius @ JivaLabs",
 	}
 
 }
 
-var users []m.User
-var user m.User
-
-func hashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
-	return string(bytes), err
-}
-
-func checkPasswordHash(password, hash string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-	return err == nil
-}
+var users []User
+var user User
 
 //Get Order History
 func getOrderHistory(w http.ResponseWriter, r *http.Request) {
-	urlToken := r.URL.Query()["token"][0]
+	urlToken, err := helpers.GetTokenFromUrl(r)
+	helpers.PanicErr(err)
 	token, _ := jwt.Parse(urlToken, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("There is an error")
@@ -52,7 +40,7 @@ func getOrderHistory(w http.ResponseWriter, r *http.Request) {
 	})
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		if claims.VerifyExpiresAt(time.Now().Unix(), true) {
-			response := m.Response{
+			response := Response{
 				Code:200,
 				Result: map[string]interface{}{
 					"items":[]string{},
@@ -71,7 +59,8 @@ func getOrderHistory(w http.ResponseWriter, r *http.Request) {
 
 // Me endpoint
 func meEndpoint(w http.ResponseWriter, r *http.Request) {
-	urlToken := r.URL.Query()["token"][0]
+	urlToken, err := helpers.GetTokenFromUrl(r)
+	helpers.PanicErr(err)
 	token, _ := jwt.Parse(urlToken, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("There is an error")
@@ -80,8 +69,9 @@ func meEndpoint(w http.ResponseWriter, r *http.Request) {
 	})
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		if claims.VerifyExpiresAt(time.Now().Unix(), true) {
+			//Some hard coded data to send back to client
 			addresses := [0]string{}
-			me := &m.MeUser{Code: 200, Result: m.Result{
+			me := &MeUser{Code: 200, Result: Result{
 				Addresses:              addresses,
 				CreatedAt:              "2018-10-25 12:55:40",
 				CreatedIn:              "Default Store View",
@@ -91,19 +81,18 @@ func meEndpoint(w http.ResponseWriter, r *http.Request) {
 				WebsiteID:              1,
 				UpdatedAt:              "2018-10-29 08:44:13",
 				StoreID:                1}}
-			db, err := c.Conf.GetDb()
-			helpers.CheckErr(err)
-			err = db.QueryRow("SELECT First_name, Last_name, Email FROM users u WHERE ID = ?", claims["sub"]).Scan(&me.Result.FirstName, &me.Result.LastName, &me.Result.Email)
-			if err != nil {
-				json.NewEncoder(w).Encode("Got an error: " + err.Error())
-				fmt.Println(err.Error())
-				return
-			}
+
+			userFromDb := getUserDataFromDbById(claims["sub"])
+
+			me.Result.FirstName = userFromDb.FirstName
+			me.Result.LastName = userFromDb.LastName
+			me.Result.Email = userFromDb.Email
+
 			w.Header().Set("content-type", "application/json")
 			w.WriteHeader(200)
 			json.NewEncoder(w).Encode(me)
 		} else {
-			response := m.Response{
+			response := Response{
 				Code:   403,
 				Result: "Token expired"}
 			w.Header().Set("content-type", "application/json")
@@ -111,7 +100,7 @@ func meEndpoint(w http.ResponseWriter, r *http.Request) {
 			json.NewEncoder(w).Encode(response)
 		}
 	} else {
-		response := m.Response{
+		response := Response{
 			Code:   400,
 			Result: "Invalid token"}
 		w.Header().Set("content-type", "application/json")
@@ -122,33 +111,13 @@ func meEndpoint(w http.ResponseWriter, r *http.Request) {
 
 // RegisterUser function
 func registerUser(w http.ResponseWriter, r *http.Request) {
-	schemaLoader := gojsonschema.NewReferenceLoader("file://models/userRegister.schema.json")
 	_ = json.NewDecoder(r.Body).Decode(&user)
-	documentLoader := gojsonschema.NewGoLoader(user)
-	result, err := gojsonschema.Validate(schemaLoader, documentLoader)
-	helpers.CheckErr(err)
+	validationResult := helpers.CheckJSONSchemaWithGoStruct("file://userRole/jsonSchemaModels/userRegister.schema.json", user)
 
-	if result.Valid() {
-		id := betterguid.New()
-		user.ID = id
-		user.Password, err = hashPassword(user.Password)
-		helpers.CheckErr(err)
-		db, err := c.Conf.GetDb()
-		helpers.CheckErr(err)
-		_, err = db.Exec("INSERT INTO users("+
-			"ID, "+
-			"First_name, "+
-			"Last_name, "+
-			"Email, "+
-			"Password)"+
-			" VALUES(?, ?, ?, ?, ?)",
-			user.ID,
-			user.Customer.FirstName,
-			user.Customer.LastName,
-			user.Customer.Email,
-			user.Password)
-		helpers.CheckErr(err)
-		var response m.Response
+	if validationResult.Valid() {
+		sendNewUserToDb(user)
+
+		var response Response
 		w.Header().Set("content-type", "application/json")
 		response.Code = 200
 		response.Result = "ok"
@@ -158,13 +127,13 @@ func registerUser(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("content-type", "application/json")
 		w.WriteHeader(400)
 
-		var response m.Response
+		var response Response
 		response.Code = 400
-		response.Result = result.Errors()
+		response.Result = validationResult.Errors()
 		json.NewEncoder(w).Encode(response)
 
 		fmt.Printf("The document is not valid. See errors :\n")
-		for _, desc := range result.Errors() {
+		for _, desc := range validationResult.Errors() {
 			fmt.Printf("- %s\n", desc)
 		}
 	}
@@ -174,7 +143,7 @@ func registerUser(w http.ResponseWriter, r *http.Request) {
 func getUser(w http.ResponseWriter, r *http.Request) {
 	userID := chi.URLParam(r, "userID")
 	db, err := c.Conf.GetDb()
-	helpers.CheckErr(err)
+	helpers.PanicErr(err)
 	queryErr := db.QueryRow("SELECT * FROM users u WHERE id=?", userID).
 		Scan(&user.ID, &user.Customer.FirstName, &user.Customer.LastName, &user.Customer.Email, &user.Password)
 	if queryErr != nil {
@@ -188,7 +157,7 @@ func getUser(w http.ResponseWriter, r *http.Request) {
 func removeUser(w http.ResponseWriter, r *http.Request) {
 	userID := chi.URLParam(r, "userID")
 	db, err := c.Conf.GetDb()
-	helpers.CheckErr(err)
+	helpers.PanicErr(err)
 	queryErr := db.QueryRow("SELECT * FROM users u WHERE id=?", userID).
 		Scan(&user.ID, &user.Customer.FirstName, &user.Customer.LastName, &user.Customer.Email, &user.Password)
 	if queryErr != nil {
@@ -201,11 +170,11 @@ func removeUser(w http.ResponseWriter, r *http.Request) {
 
 // GetAllUsers function
 func getAllUsers(w http.ResponseWriter, r *http.Request) {
-	users = []m.User{}
+	users = []User{}
 	db, err := c.Conf.GetDb()
-	helpers.CheckErr(err)
+	helpers.PanicErr(err)
 	rows, err := db.Query("SELECT * FROM users")
-	helpers.CheckErr(err)
+	helpers.PanicErr(err)
 	defer rows.Close()
 	for rows.Next() {
 		err := rows.Scan(
@@ -214,27 +183,27 @@ func getAllUsers(w http.ResponseWriter, r *http.Request) {
 			&user.Customer.LastName,
 			&user.Customer.Email,
 			&user.Password)
-		helpers.CheckErr(err)
+		helpers.PanicErr(err)
 		users = append(users, user)
 	}
 	err = rows.Err()
-	helpers.CheckErr(err)
+	helpers.PanicErr(err)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(users)
 }
 
 // UpdateUser function
 func updateUser(w http.ResponseWriter, r *http.Request) {
-	var schemaLoader = gojsonschema.NewReferenceLoader("file://user/models/userUpdate.schema.json")
-	var updatedUser m.User
+	var schemaLoader = gojsonschema.NewReferenceLoader("file://userRole/jsonSchemaModels/userUpdate.schema.json")
+	var updatedUser User
 	_ = json.NewDecoder(r.Body).Decode(&updatedUser)
 	documentLoader := gojsonschema.NewGoLoader(updatedUser)
 	result, err := gojsonschema.Validate(schemaLoader, documentLoader)
-	helpers.CheckErr(err)
+	helpers.PanicErr(err)
 
 	if result.Valid() {
 		db, err := c.Conf.GetDb()
-		helpers.CheckErr(err)
+		helpers.PanicErr(err)
 		userID := chi.URLParam(r, "userID")
 		err = db.QueryRow("SELECT * FROM users u WHERE id=?", userID).
 			Scan(&user.ID, &user.Customer.FirstName, &user.Customer.LastName, &user.Customer.Email, &user.Password)
@@ -244,27 +213,27 @@ func updateUser(w http.ResponseWriter, r *http.Request) {
 		}
 		res, err := db.Exec("UPDATE users u SET First_name = ?, Last_name = ?, Email = ? WHERE ID = ?", updatedUser.Customer.FirstName, updatedUser.Customer.LastName, updatedUser.Customer.Email, userID)
 		fmt.Println(res)
-		helpers.CheckErr(err)
+		helpers.PanicErr(err)
 		return
 
 	}
-	json.NewEncoder(w).Encode(&m.User{})
+	json.NewEncoder(w).Encode(&User{})
 }
 
 // Update password
 func updatePassword(w http.ResponseWriter, r *http.Request) {
-	schemaLoader := gojsonschema.NewReferenceLoader("file://user/models/userPassword.schema.json")
-	var password m.UpdatePassword
+	schemaLoader := gojsonschema.NewReferenceLoader("file://userRole/jsonSchemaModels/userPassword.schema.json")
+	var password UpdatePassword
 
 	_ = json.NewDecoder(r.Body).Decode(&password)
 	fmt.Println(password)
 	documentLoader := gojsonschema.NewGoLoader(password)
 	result, err := gojsonschema.Validate(schemaLoader, documentLoader)
-	helpers.CheckErr(err)
+	helpers.PanicErr(err)
 
 	if result.Valid() {
 		db, err := c.Conf.GetDb()
-		helpers.CheckErr(err)
+		helpers.PanicErr(err)
 		userID := chi.URLParam(r, "userID")
 		err = db.QueryRow("SELECT Password FROM users u WHERE id=?", userID).
 			Scan(&user.Password)
@@ -276,7 +245,7 @@ func updatePassword(w http.ResponseWriter, r *http.Request) {
 
 			password.NewPassword, err = hashPassword(password.NewPassword)
 			_, err := db.Exec("UPDATE users u SET Password = ? WHERE ID = ?", password.NewPassword, userID)
-			helpers.CheckErr(err)
+			helpers.PanicErr(err)
 
 		}
 	} else {
@@ -300,7 +269,7 @@ func orderHistory(w http.ResponseWriter, r *http.Request) {
 		return []byte(MySecret), nil
 	})
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		if claims["user_type"] == "admin" && claims.VerifyExpiresAt(time.Now().Unix(), true) {
+		if claims["user_type"] == "adminRole" && claims.VerifyExpiresAt(time.Now().Unix(), true) {
 
 		} else {
 			json.NewEncoder(w).Encode("Not authorized")

@@ -24,10 +24,10 @@ var db *mongo.Database
 // Connect establish a connection to database
 func init() {
 	client, err := mongo.NewClient(CONNECTIONSTRING)
-	helpers.CheckErr(err)
+	helpers.PanicErr(err)
 
 	err = client.Connect(context.Background())
-	helpers.CheckErr(err)
+	helpers.PanicErr(err)
 
 	// Collection types can be used to access the database
 	db = client.Database(DBNAME)
@@ -37,24 +37,24 @@ func InsertTodo(todo models.Todo) {
 	fmt.Println(todo)
 	_, err := db.Collection(COLLNAME).InsertOne(context.Background(), todo)
 
-	helpers.CheckErr(err)
+	helpers.PanicErr(err)
 
 }
 
 func GetAllTodos() []models.Todo {
 	cur, err := db.Collection(COLLNAME).Find(context.Background(), nil, nil)
-	helpers.CheckErr(err)
+	helpers.PanicErr(err)
 
 	var elements []models.Todo
 	var elem models.Todo
 	// Get the next result from the cursor
 	for cur.Next(context.Background()) {
 		err := cur.Decode(&elem)
-		helpers.CheckErr(err)
+		helpers.PanicErr(err)
 
 		elements = append(elements, elem)
 	}
-	helpers.CheckErr(err)
+	helpers.PanicErr(err)
 
 	cur.Close(context.Background())
 	return elements
@@ -63,10 +63,10 @@ func GetAllTodos() []models.Todo {
 // deletes an existing todo
 func DeleteTodo(todoId string) {
 	objectIDS, err := objectid.FromHex(todoId)
-	helpers.CheckErr(err)
+	helpers.PanicErr(err)
 	idDoc := bson.NewDocument(bson.EC.ObjectID("_id", objectIDS))
 	_, err = db.Collection(COLLNAME).DeleteOne(context.Background(), idDoc, nil)
-	helpers.CheckErr(err)
+	helpers.PanicErr(err)
 }
 
 func UpdateTodoByID(todo models.Todo, todoID string) {
@@ -128,11 +128,11 @@ func UpdateTodoByID(todo models.Todo, todoID string) {
 //	inventory := db.Collection("todos")
 //
 //
-//	var schemaLoader = gojsonschema.NewReferenceLoader("file://todo/models/todoSchema.json")
+//	var schemaLoader = gojsonschema.NewReferenceLoader("file://todo/jsonSchemaModels/todoSchema.json")
 //	_ = json.NewDecoder(r.Body).Decode(&todo)
 //	documentLoader := gojsonschema.NewGoLoader(todo)
 //	result, err := gojsonschema.Validate(schemaLoader, documentLoader)
-//	helpers.CheckErr(err)
+//	helpers.PanicErr(err)
 //
 //	if  result.Valid(){
 //		inventory.InsertOne(context.Background(), result)
@@ -145,7 +145,7 @@ func UpdateTodoByID(todo models.Todo, todoID string) {
 //
 //
 //
-////	if err := models.Insert(movie); err != nil {
+////	if err := jsonSchemaModels.Insert(movie); err != nil {
 ////		respondWithError(w, http.StatusInternalServerError, err.Error())
 ////		return
 ////	}
