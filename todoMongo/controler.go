@@ -1,13 +1,13 @@
 package todoMongo
 
 import (
-	"../helpers"
-	"../todoMongo/models"
 	"context"
 	"fmt"
 	"github.com/mongodb/mongo-go-driver/bson"
 	"github.com/mongodb/mongo-go-driver/bson/objectid"
 	"github.com/mongodb/mongo-go-driver/mongo"
+	"go-api-ws/helpers"
+	"go-api-ws/todoMongo/models"
 )
 
 // CONNECTIONSTRING DB connection string

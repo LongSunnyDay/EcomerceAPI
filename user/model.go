@@ -1,9 +1,9 @@
 package user
 
 import (
-	"../config"
-	"../helpers"
 	"github.com/kjk/betterguid"
+	"go-api-ws/config"
+	"go-api-ws/helpers"
 	"net/http"
 )
 
@@ -12,7 +12,7 @@ type User struct {
 	ID       string   `json:"id,omitempty"`
 	Customer Customer `json:"customer,omitempty"`
 	Password string   `json:"password,omitempty"`
-	GroupId int `json:"group_id:omitmepty"`
+	GroupId  int      `json:"group_id,omitempty"`
 }
 
 type Customer struct {
@@ -67,7 +67,7 @@ type Result struct {
 }
 
 // Database operations
-func sendNewUserToDb(user User)  {
+func sendNewUserToDb(user User) {
 	id := betterguid.New()
 	user.ID = id
 	passwordHash, err := hashPassword(user.Password)

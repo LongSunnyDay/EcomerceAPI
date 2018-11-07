@@ -1,11 +1,11 @@
 package cart
 
 import (
-	"../user"
 	"encoding/json"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/go-chi/chi"
+	"go-api-ws/user"
 	"net/http"
 	"time"
 )

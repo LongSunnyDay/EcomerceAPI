@@ -1,14 +1,14 @@
 package user
 
 import (
-	c "../config"
-	"../core"
-	"../helpers"
 	"encoding/json"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/go-chi/chi"
 	"github.com/xeipuuv/gojsonschema"
+	"go-api-ws/config"
+	"go-api-ws/core"
+	"go-api-ws/helpers"
 	"net/http"
 	"time"
 )
@@ -112,7 +112,7 @@ func meEndpoint(w http.ResponseWriter, r *http.Request) {
 // RegisterUser function
 func registerUser(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewDecoder(r.Body).Decode(&user)
-	validationResult := helpers.CheckJSONSchemaWithGoStruct("file://userRole/jsonSchemaModels/userRegister.schema.json", user)
+	validationResult := helpers.CheckJSONSchemaWithGoStruct("file://user/jsonSchemaModels/userRegister.schema.json", user)
 
 	if validationResult.Valid() {
 		sendNewUserToDb(user)
@@ -142,7 +142,7 @@ func registerUser(w http.ResponseWriter, r *http.Request) {
 // GetUser function
 func getUser(w http.ResponseWriter, r *http.Request) {
 	userID := chi.URLParam(r, "userID")
-	db, err := c.Conf.GetDb()
+	db, err := config.Conf.GetDb()
 	helpers.PanicErr(err)
 	queryErr := db.QueryRow("SELECT * FROM users u WHERE id=?", userID).
 		Scan(&user.ID, &user.Customer.FirstName, &user.Customer.LastName, &user.Customer.Email, &user.Password)
@@ -156,7 +156,7 @@ func getUser(w http.ResponseWriter, r *http.Request) {
 // RemoveUser function
 func removeUser(w http.ResponseWriter, r *http.Request) {
 	userID := chi.URLParam(r, "userID")
-	db, err := c.Conf.GetDb()
+	db, err := config.Conf.GetDb()
 	helpers.PanicErr(err)
 	queryErr := db.QueryRow("SELECT * FROM users u WHERE id=?", userID).
 		Scan(&user.ID, &user.Customer.FirstName, &user.Customer.LastName, &user.Customer.Email, &user.Password)
@@ -171,7 +171,7 @@ func removeUser(w http.ResponseWriter, r *http.Request) {
 // GetAllUsers function
 func getAllUsers(w http.ResponseWriter, r *http.Request) {
 	users = []User{}
-	db, err := c.Conf.GetDb()
+	db, err := config.Conf.GetDb()
 	helpers.PanicErr(err)
 	rows, err := db.Query("SELECT * FROM users")
 	helpers.PanicErr(err)
@@ -202,7 +202,7 @@ func updateUser(w http.ResponseWriter, r *http.Request) {
 	helpers.PanicErr(err)
 
 	if result.Valid() {
-		db, err := c.Conf.GetDb()
+		db, err := config.Conf.GetDb()
 		helpers.PanicErr(err)
 		userID := chi.URLParam(r, "userID")
 		err = db.QueryRow("SELECT * FROM users u WHERE id=?", userID).
@@ -232,7 +232,7 @@ func updatePassword(w http.ResponseWriter, r *http.Request) {
 	helpers.PanicErr(err)
 
 	if result.Valid() {
-		db, err := c.Conf.GetDb()
+		db, err := config.Conf.GetDb()
 		helpers.PanicErr(err)
 		userID := chi.URLParam(r, "userID")
 		err = db.QueryRow("SELECT Password FROM users u WHERE id=?", userID).

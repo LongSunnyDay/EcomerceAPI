@@ -1,10 +1,10 @@
 package user
 
 import (
-	"../helpers"
 	"encoding/json"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
+	"go-api-ws/helpers"
 	"net/http"
 	"time"
 )
@@ -18,7 +18,7 @@ func LoginEndpoint(w http.ResponseWriter, req *http.Request) {
 	var response Response
 
 	_ = json.NewDecoder(req.Body).Decode(&userLogin)
-	validationResult := helpers.CheckJSONSchemaWithGoStruct("file://userRole/jsonSchemaModels/userLogin.schema.json", userLogin)
+	validationResult := helpers.CheckJSONSchemaWithGoStruct("file://user/jsonSchemaModels/userLogin.schema.json", userLogin)
 
 	pswd := userLogin.Password
 	userLogin.Password = ""
@@ -34,23 +34,19 @@ func LoginEndpoint(w http.ResponseWriter, req *http.Request) {
 			} else {
 				role = userRole
 			}
-			token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-				"sub":  userFromDb.ID,
-				"exp":  time.Now().Add(time.Hour * 1).Unix(),
-				"role": role,
-			})
-			authToken, err := token.SignedString([]byte(MySecret))
+
+			authToken := GetNewAuthToken(userFromDb.ID, role)
+			authTokenString, err := authToken.SignedString([]byte(MySecret))
 			helpers.PanicErr(err)
-			token = jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-				"sub": userFromDb.ID,
-				"exp": time.Now().Add(time.Hour * 4).Unix(),
-			})
-			refreshToken, err := token.SignedString([]byte(MySecret))
+
+			refreshToken := GetNewRefreshToken(userFromDb.ID)
+			refreshTokenString, err := refreshToken.SignedString([]byte(MySecret))
 			helpers.PanicErr(err)
+
 			response.Code = 200
-			response.Result = authToken
+			response.Result = authTokenString
 			response.Meta = map[string]string{
-				"refreshToken": refreshToken,
+				"refreshToken": refreshTokenString,
 			}
 			json.NewEncoder(w).Encode(response)
 		} else {
@@ -130,26 +126,20 @@ func RefreshToken(w http.ResponseWriter, req *http.Request) {
 			} else {
 				role = userRole
 			}
-			token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-				"sub":  claims["sub"],
-				"exp":  time.Now().Add(time.Hour * 1).Unix(),
-				"role": role,
-			})
-			newAuthToken, err := token.SignedString([]byte(MySecret))
+
+			authToken := GetNewAuthToken(claims["sub"].(string), role)
+			authTokenString, err := authToken.SignedString([]byte(MySecret))
 			helpers.PanicErr(err)
 
-			token = jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-				"sub": claims["sub"],
-				"exp": time.Now().Add(time.Hour * 4).Unix(),
-			})
-			newRefreshToken, err := token.SignedString([]byte(MySecret))
+			refreshToken := GetNewRefreshToken(claims["sub"].(string))
+			refreshTokenString, err := refreshToken.SignedString([]byte(MySecret))
 			helpers.PanicErr(err)
 
 			response := Response{
 				Code:   200,
-				Result: newAuthToken,
+				Result: authTokenString,
 				Meta: map[string]string{
-					"refreshToken": newRefreshToken}}
+					"refreshToken": refreshTokenString}}
 
 			w.WriteHeader(200)
 			w.Header().Set("content-type", "application/json")

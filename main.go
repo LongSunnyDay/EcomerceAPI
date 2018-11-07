@@ -1,12 +1,12 @@
 package main
 
 import (
-	"./cart"
-	"./config"
-	"./todoMongo"
-	"./user"
 	"github.com/go-chi/chi"
 	_ "github.com/go-sql-driver/mysql"
+	"go-api-ws/cart"
+	"go-api-ws/config"
+	"go-api-ws/todoMongo"
+	"go-api-ws/user"
 	"net/http"
 )
 

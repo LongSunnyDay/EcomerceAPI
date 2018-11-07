@@ -1,8 +1,8 @@
 package todoMongo
 
 import (
-	"../todoMongo/models"
 	"encoding/json"
+	"go-api-ws/todoMongo/models"
 	"net/http"
 )
 
