@@ -15,7 +15,6 @@ const userRole = "user"
 
 func LoginEndpoint(w http.ResponseWriter, req *http.Request) {
 	var userLogin LoginForm
-	var response Response
 
 	_ = json.NewDecoder(req.Body).Decode(&userLogin)
 	validationResult := helpers.CheckJSONSchemaWithGoStruct("file://user/jsonSchemaModels/userLogin.schema.json", userLogin)
@@ -43,25 +42,20 @@ func LoginEndpoint(w http.ResponseWriter, req *http.Request) {
 			refreshTokenString, err := refreshToken.SignedString([]byte(MySecret))
 			helpers.PanicErr(err)
 
-			response.Code = 200
-			response.Result = authTokenString
+			response := Response{Code: http.StatusOK, Result: authTokenString}
 			response.Meta = map[string]string{
 				"refreshToken": refreshTokenString,
 			}
 
 			helpers.WriteResultWithStatusCode(w, response, response.Code)
 		} else {
-			response.Code = 401
-			response.Result = "Password is invalid"
-
+			response := Response{Code: http.StatusUnauthorized, Result: "Password is invalid"}
 			helpers.WriteResultWithStatusCode(w, response, response.Code)
 
 			fmt.Println("Password is invalid")
 		}
 	} else {
-		response.Code = 400
-		response.Result = validationResult.Errors()
-
+		response := Response{Code: http.StatusBadRequest, Result: validationResult.Errors()}
 		helpers.WriteResultWithStatusCode(w, response, response.Code)
 
 		fmt.Printf("The document is not valid. See errors :\n")
@@ -71,7 +65,7 @@ func LoginEndpoint(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func ProtectedEndpointMiddleware(handlerFunc http.HandlerFunc) http.HandlerFunc {
+func protectedEndpointMiddleware(handlerFunc http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		urlToken := req.URL.Query()["token"][0]
 		token, _ := jwt.Parse(urlToken, func(token *jwt.Token) (interface{}, error) {
