@@ -57,4 +57,8 @@ func GetTokenFromUrl(r *http.Request) (string, error) {
 	return "", errors.New("Token not found")
 }
 
-
+func WriteResultWithStatusCode(w http.ResponseWriter, data interface{}, errorCode int)  {
+	w.Header().Set(HeaderContentType, MIMEApplicationJSON)
+	w.WriteHeader(errorCode)
+	json.NewEncoder(w).Encode(data)
+}

@@ -48,24 +48,21 @@ func LoginEndpoint(w http.ResponseWriter, req *http.Request) {
 			response.Meta = map[string]string{
 				"refreshToken": refreshTokenString,
 			}
-			json.NewEncoder(w).Encode(response)
+
+			helpers.WriteResultWithStatusCode(w, response, response.Code)
 		} else {
-			w.Header().Set("content-type", "application/json")
-			w.WriteHeader(401)
 			response.Code = 401
 			response.Result = "Password is invalid"
-			json.NewEncoder(w).Encode(response)
+
+			helpers.WriteResultWithStatusCode(w, response, response.Code)
 
 			fmt.Println("Password is invalid")
 		}
 	} else {
-
-		w.Header().Set("content-type", "application/json")
-		w.WriteHeader(400)
-
 		response.Code = 400
 		response.Result = validationResult.Errors()
-		json.NewEncoder(w).Encode(response)
+
+		helpers.WriteResultWithStatusCode(w, response, response.Code)
 
 		fmt.Printf("The document is not valid. See errors :\n")
 		for _, desc := range validationResult.Errors() {
@@ -90,17 +87,13 @@ func ProtectedEndpointMiddleware(handlerFunc http.HandlerFunc) http.HandlerFunc 
 				response := Response{
 					Code:   403,
 					Result: "Token expired"}
-				w.Header().Set("content-type", "application/json")
-				w.WriteHeader(403)
-				json.NewEncoder(w).Encode(response)
+				helpers.WriteResultWithStatusCode(w, response, response.Code)
 			}
 		} else {
 			response := Response{
 				Code:   400,
 				Result: "Invalid token"}
-			w.Header().Set("content-type", "application/json")
-			w.WriteHeader(400)
-			json.NewEncoder(w).Encode(response)
+			helpers.WriteResultWithStatusCode(w, response, response.Code)
 		}
 	}
 
@@ -118,7 +111,7 @@ func RefreshToken(w http.ResponseWriter, req *http.Request) {
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		if claims.VerifyExpiresAt(time.Now().Unix(), true) {
 
-			groupId := getGroupIdFromDbById(claims["sub"])
+			groupId := getGroupIdFromDbById(claims["sub"].(string))
 
 			var role string
 			if groupId < 1 {
@@ -140,24 +133,17 @@ func RefreshToken(w http.ResponseWriter, req *http.Request) {
 				Result: authTokenString,
 				Meta: map[string]string{
 					"refreshToken": refreshTokenString}}
-
-			w.WriteHeader(200)
-			w.Header().Set("content-type", "application/json")
-			json.NewEncoder(w).Encode(response)
+			helpers.WriteResultWithStatusCode(w, response, response.Code)
 		} else {
 			response := Response{
 				Code:   403,
 				Result: "Token expired"}
-			w.Header().Set("content-type", "application/json")
-			w.WriteHeader(403)
-			json.NewEncoder(w).Encode(response)
+			helpers.WriteResultWithStatusCode(w, response, response.Code)
 		}
 	} else {
 		response := Response{
 			Code:   400,
 			Result: "Invalid token"}
-		w.Header().Set("content-type", "application/json")
-		w.WriteHeader(400)
-		json.NewEncoder(w).Encode(response)
+		helpers.WriteResultWithStatusCode(w, response, response.Code)
 	}
 }

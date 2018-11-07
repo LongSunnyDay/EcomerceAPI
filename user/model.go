@@ -100,7 +100,7 @@ func getUserDataFromDbByEmail(email string) (User) {
 	return userFromDb
 }
 
-func getUserDataFromDbById(id interface{}) (Customer) {
+func getUserDataFromDbById(id string) (Customer) {
 	db, err := config.Conf.GetDb()
 	helpers.PanicErr(err)
 	var userFromDb Customer
@@ -110,7 +110,7 @@ func getUserDataFromDbById(id interface{}) (Customer) {
 	return userFromDb
 }
 
-func getGroupIdFromDbById(id interface{}) (int) {
+func getGroupIdFromDbById(id string) (int) {
 	db, err := config.Conf.GetDb()
 	helpers.PanicErr(err)
 	var groupId int

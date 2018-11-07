@@ -41,18 +41,15 @@ func getOrderHistory(w http.ResponseWriter, r *http.Request) {
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		if claims.VerifyExpiresAt(time.Now().Unix(), true) {
 			response := Response{
-				Code:200,
+				Code: 200,
 				Result: map[string]interface{}{
-					"items":[]string{},
+					"items":           []string{},
 					"search_criteria": "",
-					"total_count": 0}}
-
-			w.Header().Set("content-type", "application/json")
-			w.WriteHeader(200)
-			json.NewEncoder(w).Encode(response)
+					"total_count":     0}}
+			helpers.WriteResultWithStatusCode(w, response, response.Code)
 		}
 	} else {
-		json.NewEncoder(w).Encode("Invalid authorization token")
+		helpers.WriteResultWithStatusCode(w, "Invalid token", 403)
 		fmt.Println("Invalid token")
 	}
 }
@@ -82,30 +79,23 @@ func meEndpoint(w http.ResponseWriter, r *http.Request) {
 				UpdatedAt:              "2018-10-29 08:44:13",
 				StoreID:                1}}
 
-			userFromDb := getUserDataFromDbById(claims["sub"])
+			userFromDb := getUserDataFromDbById(claims["sub"].(string))
 
 			me.Result.FirstName = userFromDb.FirstName
 			me.Result.LastName = userFromDb.LastName
 			me.Result.Email = userFromDb.Email
-
-			w.Header().Set("content-type", "application/json")
-			w.WriteHeader(200)
-			json.NewEncoder(w).Encode(me)
+			helpers.WriteResultWithStatusCode(w, me, me.Code)
 		} else {
 			response := Response{
 				Code:   403,
 				Result: "Token expired"}
-			w.Header().Set("content-type", "application/json")
-			w.WriteHeader(403)
-			json.NewEncoder(w).Encode(response)
+			helpers.WriteResultWithStatusCode(w, response, response.Code)
 		}
 	} else {
 		response := Response{
 			Code:   400,
 			Result: "Invalid token"}
-		w.Header().Set("content-type", "application/json")
-		w.WriteHeader(400)
-		json.NewEncoder(w).Encode(response)
+		helpers.WriteResultWithStatusCode(w, response, response.Code)
 	}
 }
 
@@ -118,20 +108,16 @@ func registerUser(w http.ResponseWriter, r *http.Request) {
 		sendNewUserToDb(user)
 
 		var response Response
-		w.Header().Set("content-type", "application/json")
 		response.Code = 200
 		response.Result = "ok"
-		json.NewEncoder(w).Encode(response)
+		helpers.WriteResultWithStatusCode(w, response, response.Code)
 	} else {
-
-		w.Header().Set("content-type", "application/json")
-		w.WriteHeader(400)
 
 		var response Response
 		response.Code = 400
 		response.Result = validationResult.Errors()
-		json.NewEncoder(w).Encode(response)
 
+		helpers.WriteResultWithStatusCode(w, response, response.Code)
 		fmt.Printf("The document is not valid. See errors :\n")
 		for _, desc := range validationResult.Errors() {
 			fmt.Printf("- %s\n", desc)
