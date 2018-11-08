@@ -5,12 +5,12 @@ import (
 	"net/http"
 )
 
-func UserRouter() http.Handler {
+func RouterUser() http.Handler {
 	r := chi.NewRouter()
 	r.Post("/create", registerUser)
-	r.Post("/login", LoginEndpoint)
+	r.Post("/login", loginEndpoint)
 	r.Get("/me", meEndpoint)
 	r.Get("/order-history", getOrderHistory)
-	r.Post("/refresh", RefreshToken)
+	r.Post("/refresh", refreshToken)
 	return r
 }

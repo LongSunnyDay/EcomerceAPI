@@ -67,7 +67,7 @@ type Result struct {
 }
 
 // Database operations
-func sendNewUserToDb(user User) {
+func insertUserIntoDb(user User) {
 	id := betterguid.New()
 	user.ID = id
 	passwordHash, err := hashPassword(user.Password)
@@ -90,7 +90,7 @@ func sendNewUserToDb(user User) {
 	helpers.PanicErr(err)
 }
 
-func getUserDataFromDbByEmail(email string) (User) {
+func getUserFromDbByEmail(email string) (User) {
 	db, err := config.Conf.GetDb()
 	helpers.PanicErr(err)
 	var userFromDb User
@@ -100,7 +100,7 @@ func getUserDataFromDbByEmail(email string) (User) {
 	return userFromDb
 }
 
-func getUserDataFromDbById(id string) (Customer) {
+func getUserFromDbById(id string) (Customer) {
 	db, err := config.Conf.GetDb()
 	helpers.PanicErr(err)
 	var userFromDb Customer
