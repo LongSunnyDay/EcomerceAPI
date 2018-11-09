@@ -11,7 +11,7 @@ import (
 
 // Data models
 type User struct {
-	ID       int64    `json:"id,omitempty"`
+	ID       string    `json:"id,omitempty"`
 	Customer Customer `json:"customer,omitempty"`
 	Password string   `json:"password,omitempty"`
 	GroupId  int      `json:"group_id,omitempty"`
@@ -61,7 +61,7 @@ type Result struct {
 	Email                  string      `json:"email,omitempty" bson:"email"`
 	FirstName              string      `json:"firstname,omitempty" bson:"firstname"`
 	GroupID                int32       `json:"group_id,omitempty" bson:"group_id"`
-	ID                     int64       `json:"id,omitempty" bson:"id"`
+	ID                     string       `json:"id,omitempty" bson:"id"`
 	LastName               string      `json:"lastname,omitempty" bson:"lastname"`
 	StoreID                int32       `json:"store_id,omitempty" bson:"store_id"`
 	UpdatedAt              int64       `json:"updated_at,omitempty" bson:"updated_at"`
@@ -129,10 +129,10 @@ func getUserFromDbByEmail(email string) (User) {
 	return userFromDb
 }
 
-func getUserIdFromDbByEmail(email string) (int64) {
+func getUserIdFromDbByEmail(email string) (string) {
 	db, err := config.Conf.GetDb()
 	helpers.PanicErr(err)
-	var id int64
+	var id string
 	err = db.QueryRow("SELECT ID FROM users u WHERE email = ?", email).Scan(&id)
 	helpers.PanicErr(err)
 
@@ -171,7 +171,7 @@ func insertUserIntoMongo(userInfo Result) {
 			bson.EC.String("firstname", userInfo.FirstName),
 			bson.EC.String("lastname", userInfo.LastName),
 			bson.EC.Int32("group_id", userInfo.GroupID),
-			bson.EC.Int64("id", userInfo.ID),
+			bson.EC.String("id", userInfo.ID),
 			bson.EC.Int32("store_id", userInfo.StoreID),
 			bson.EC.Int64("updated_at", userInfo.UpdatedAt),
 			bson.EC.Int32("website_id", userInfo.WebsiteID),
@@ -179,7 +179,7 @@ func insertUserIntoMongo(userInfo Result) {
 	helpers.PanicErr(err)
 }
 
-func getUserFromMongo(id float64) (Result) {
+func getUserFromMongo(id string) (Result) {
 	cur, err := db.Collection(COLLNAME).Find(context.Background(), bson.NewDocument(
 		bson.EC.Interface("id", id),
 		bson.EC.String("type", "User info")))
@@ -193,7 +193,7 @@ func getUserFromMongo(id float64) (Result) {
 	return userInfo
 }
 
-func getUserOrderHistoryFromMongo(id float64) (OrderHistory) {
+func getUserOrderHistoryFromMongo(id string) (OrderHistory) {
 	cur, err := db.Collection(COLLNAME).Find(context.Background(), bson.NewDocument(
 		bson.EC.Interface("id", id),
 		bson.EC.String("type", "Order history")))

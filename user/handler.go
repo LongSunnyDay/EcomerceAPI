@@ -35,7 +35,7 @@ func getOrderHistory(w http.ResponseWriter, r *http.Request) {
 	token, _ := auth.ParseToken(urlToken)
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		if claims.VerifyExpiresAt(time.Now().Unix(), true) {
-			orderHistory := getUserOrderHistoryFromMongo(claims["sub"].(float64))
+			orderHistory := getUserOrderHistoryFromMongo(claims["sub"].(string))
 			response := Response{
 				Code:   http.StatusOK,
 				Result: orderHistory}
@@ -55,7 +55,7 @@ func meEndpoint(w http.ResponseWriter, r *http.Request) {
 	token, _ := auth.ParseToken(urlToken)
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		if claims.VerifyExpiresAt(time.Now().Unix(), true) {
-			userInfo := getUserFromMongo(claims["sub"].(float64))
+			userInfo := getUserFromMongo(claims["sub"].(string))
 			me := MeUser{
 				Code:   http.StatusOK,
 				Result: userInfo}
@@ -126,11 +126,11 @@ func refreshToken(w http.ResponseWriter, req *http.Request) {
 
 			role := roleByGroupId(groupId)
 
-			authToken := auth.GetNewAuthToken(claims["sub"].(int64), role)
+			authToken := auth.GetNewAuthToken(claims["sub"].(string), role)
 			authTokenString, err := authToken.SignedString([]byte(auth.MySecret))
 			helpers.PanicErr(err)
 
-			refreshToken := auth.GetNewRefreshToken(claims["sub"].(int64))
+			refreshToken := auth.GetNewRefreshToken(claims["sub"].(string))
 			refreshTokenString, err := refreshToken.SignedString([]byte(auth.MySecret))
 			helpers.PanicErr(err)
 

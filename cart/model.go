@@ -24,12 +24,33 @@ type Response struct {
 	Meta         interface{}   `json:"meta,omitempty"`
 }
 
-type Cart struct {
-	Items []item `json:"items" bson:"items"`
+type cartData struct {
+	ObjectId string `json:"_id,omitempty" bson:"_id"`
+	ID       string `json:"id,omitempty" bson:"id"`
 }
 
-type item struct {
-	sku string `json:"sku,omitempty" bson:"sku"`
+type Cart struct {
+	Items []Item `json:"items" bson:"items"`
+}
+
+type Item struct {
+	SKU           string `json:"sku,omitempty" bson:"sku"`
+	QTY           int    `json:"qty,omitempty" bson:"qty"`
+	Price         int    `json:"price,omitempty" bson:"price"`
+	ProductType   string `json:"product_type,omitempty" bson:"product_type"`
+	Name          string `json:"name,omitempty" bson:"name"`
+	ItemID        int    `json:"item_id,omitempty" bson:"item_id"`
+	QuoteId       string `json:"quote_id,omitempty" bson:"quote_id"`
+	ProductOption struct {
+		ExtensionAttributes struct {
+			ConfigurableItemOptions []Options `json:"configurable_item_options,omitempty" bson:"configurable_item_options"`
+		} `json:"extension_attributes,omitempty" bson:"extension_attributes"`
+	} `json:"product_option,omitempty" bson:"product_options"`
+}
+
+type Options struct {
+	OptionsID   string `json:"option_id,omitempty" bson:"option_id"`
+	OptionValue int    `json:"option_value,omitempty" bson:"option_value"`
 }
 
 // CONNECTIONSTRING DB connection string
@@ -55,28 +76,53 @@ func init() {
 	db = client.Database(DBNAME)
 }
 
-func getUserCartFromMongo(userId float64) (Cart) {
+func getCartIDFromMongo(userId string, userType string) (string) {
 	cur, err := db.Collection(COLLNAME).Find(context.Background(), bson.NewDocument(
-		bson.EC.Interface("userId", userId),
-		bson.EC.String("type", "User cart")))
+		bson.EC.Interface("_id", userId)))
 	helpers.PanicErr(err)
-	var cart Cart
+	bsonData := bson.NewDocument()
 	for cur.Next(context.Background()) {
-		err := cur.Decode(&cart)
+		err := cur.Decode(&bsonData)
 		helpers.PanicErr(err)
 	}
-	fmt.Println(cart)
 	cur.Close(context.Background())
-	return cart
+	if userType == "" {
+		cartID := bsonData.LookupElement("_id").Value().ObjectID().Hex()
+		return cartID
+	}
+	cartID := bsonData.LookupElement("_id").Value().StringValue()
+	return cartID
 }
 
-func CreateUserCartInMongo(id interface{})  {
+func CreateUserCartInMongo(id string) {
 	_, err := db.Collection(COLLNAME).InsertOne(context.Background(),
 		bson.NewDocument(
-			bson.EC.Interface("id", id)))
+			bson.EC.Interface("_id", id)))
 	helpers.PanicErr(err)
 }
 
-func updateUserCartInMongo(userId float64)  {
-	//cur, err := db.Collection(.)
+func createGuestCartInMongo(id string) (string) {
+	_, err := db.Collection(COLLNAME).InsertOne(context.Background(), bson.NewDocument(
+		bson.EC.String("id", id)))
+	helpers.PanicErr(err)
+
+	cur, err := db.Collection(COLLNAME).Find(context.Background(), bson.NewDocument(
+		bson.EC.String("id", id)))
+	helpers.PanicErr(err)
+	bsonData := bson.NewDocument()
+	for cur.Next(context.Background()) {
+		err := cur.Decode(&bsonData)
+		helpers.PanicErr(err)
+	}
+	cur.Close(context.Background())
+	idFromMongo := bsonData.LookupElement("_id").Value().ObjectID().Hex()
+	return idFromMongo
+}
+
+func getCartFromMongoByID(userId string) {
+	var cart Cart
+	err := db.Collection(COLLNAME).FindOne(context.Background(), bson.NewDocument(
+		bson.EC.String("_id", userId))).Decode(&cart)
+	helpers.PanicErr(err)
+	fmt.Println(cart)
 }

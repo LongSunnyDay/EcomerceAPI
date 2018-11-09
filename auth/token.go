@@ -20,7 +20,7 @@ func ParseToken(tokenString string) (*jwt.Token, error) {
 	return token, nil
 }
 
-func GetNewAuthToken(sub int64, role string) (*jwt.Token) {
+func GetNewAuthToken(sub string, role string) (*jwt.Token) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"sub":  sub,
 		"exp":  time.Now().Add(time.Hour * 1).Unix(),
@@ -29,7 +29,7 @@ func GetNewAuthToken(sub int64, role string) (*jwt.Token) {
 	return token
 }
 
-func GetNewRefreshToken(sub int64) (*jwt.Token) {
+func GetNewRefreshToken(sub string) (*jwt.Token) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"sub": sub,
 		"exp": time.Now().Add(time.Hour * 4).Unix(),
