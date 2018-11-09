@@ -8,10 +8,11 @@ import (
 	"github.com/mongodb/mongo-go-driver/mongo"
 	"go-api-ws/helpers"
 	"go-api-ws/todoMongo/models"
-)
+	)
+
 
 // CONNECTIONSTRING DB connection string
-const CONNECTIONSTRING = "mongodb://localhost:32777"
+const CONNECTIONSTRING = "mongodb://localhost:27017"
 
 // DBNAME Database name
 const DBNAME = "go-api-ws"
@@ -40,6 +41,30 @@ func InsertTodo(todo models.Todo) {
 	helpers.PanicErr(err)
 
 }
+func GetOneTodo() interface{}{
+	client, err := mongo.NewClient("mongodb://localhost:27017")
+	helpers.PanicErr(err)
+
+	err = client.Connect(context.Background())
+	helpers.PanicErr(err)
+
+	collection := client.Database("go-api-ws").Collection("todos")
+
+	result := bson.NewDocument()
+	objId, err := objectid.FromHex("5bd810c4ef7adf8fe3e1865d")
+	filter := bson.NewDocument(bson.EC.ObjectID("_id", objId))
+	fmt.Println(filter)
+
+
+
+	err = collection.FindOne(context.Background(), filter).Decode(result)
+	helpers.PanicErr(err)
+
+fmt.Println(collection.FindOne(context.Background(), filter).Decode(result))
+	
+	return  collection.FindOne(context.Background(), filter).Decode(result)
+	//fmt.Println(bson.Marshal(resp))
+}
 
 func GetAllTodos() []models.Todo {
 	cur, err := db.Collection(COLLNAME).Find(context.Background(), nil, nil)
@@ -59,6 +84,41 @@ func GetAllTodos() []models.Todo {
 	cur.Close(context.Background())
 	return elements
 }
+
+
+//mariaus query testas
+//func ListAllTodos() {
+//	client, err := mongo.NewClient("mongodb://localhost:27017")
+//	helpers.PanicErr(err)
+//
+//	err = client.Connect(context.TODO())
+//	helpers.PanicErr(err)
+//
+//	collection := client.Database("go-api-ws").Collection("todos")
+//	fmt.Println(collection)
+//
+//	cur, err := collection.Find(context.Background(), nil)
+//	helpers.PanicErr(err)
+//
+//	defer cur.Close(context.Background())
+//
+//	for cur.Next(context.Background()) {
+//		elem := bson.NewDocument()
+//		err := collection.Find(context.Background(), _).Decode(elem)
+//
+//
+//		//err := cur.Decode(&elem)
+//		helpers.PanicErr(err)
+//
+//		return bson.elem
+//	}
+//
+//	if err := cur.Err(); err != nil {
+//		log.Fatal(err)
+//	}
+//
+//
+//}
 
 // deletes an existing todo
 func DeleteTodo(todoId string) {
@@ -85,9 +145,6 @@ func UpdateTodoByID(todo models.Todo, todoID string) {
 			nil)
 	fmt.Println(doc)
 }
-
-
-
 
 
 

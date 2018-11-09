@@ -14,6 +14,8 @@ func TodoRouter() http.Handler{
 	router.Get("/getList", ListTodos)
 	router.Delete("/remove", RemoveTodo)
 	router.Put("/update", UpdateTodo)
+
+	//router.Get("/getAll", GetListTodos)
 	return router
 
 }
