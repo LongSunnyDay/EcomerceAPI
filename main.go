@@ -18,7 +18,7 @@ func main()  {
 
 	r := chi.NewRouter()
 	r.Mount("/api/user", user.RouterUser())
-	r.Mount("/api/cart", cart.CartRouter())
+	r.Mount("/api/cart", cart.RouterCart())
 	r.Mount("/api/todo", todoMongo.TodoRouter())
 	http.ListenAndServe(":8080", r)
 }

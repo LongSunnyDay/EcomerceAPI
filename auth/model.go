@@ -1,11 +1,11 @@
 package auth
 
 import (
-	"../config"
-	"../helpers"
 	_ "database/sql"
 	"errors"
 	_ "github.com/go-sql-driver/mysql"
+	"go-api-ws/config"
+	"go-api-ws/helpers"
 	"log"
 )
 

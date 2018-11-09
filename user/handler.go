@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
+	"go-api-ws/auth"
+	"go-api-ws/cart"
 	"go-api-ws/core"
 	"go-api-ws/helpers"
 	"net/http"
@@ -22,7 +24,6 @@ func init() {
 
 }
 
-const MySecret = "SenelisMegstaMociutesApvalumus"
 const adminRole = "admin"
 const userRole = "user"
 
@@ -31,15 +32,13 @@ const userRole = "user"
 func getOrderHistory(w http.ResponseWriter, r *http.Request) {
 	urlToken, err := helpers.GetTokenFromUrl(r)
 	helpers.PanicErr(err)
-	token, _ := parseToken(urlToken)
+	token, _ := auth.ParseToken(urlToken)
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		if claims.VerifyExpiresAt(time.Now().Unix(), true) {
+			orderHistory := getUserOrderHistoryFromMongo(claims["sub"].(float64))
 			response := Response{
-				Code: http.StatusOK,
-				Result: map[string]interface{}{
-					"items":           []string{},
-					"search_criteria": "",
-					"total_count":     0}}
+				Code:   http.StatusOK,
+				Result: orderHistory}
 			helpers.WriteResultWithStatusCode(w, response, response.Code)
 		}
 	} else {
@@ -53,28 +52,13 @@ func getOrderHistory(w http.ResponseWriter, r *http.Request) {
 func meEndpoint(w http.ResponseWriter, r *http.Request) {
 	urlToken, err := helpers.GetTokenFromUrl(r)
 	helpers.PanicErr(err)
-	token, _ := parseToken(urlToken)
+	token, _ := auth.ParseToken(urlToken)
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		if claims.VerifyExpiresAt(time.Now().Unix(), true) {
-			userFromDb := getUserFromDbById(claims["sub"].(string))
-			//Some hard coded data to send back to client
-			addresses := [0]string{}
-			me := &MeUser{
-				Code: http.StatusOK,
-				Result: Result{
-					Addresses:              addresses,
-					CreatedAt:              "2018-10-25 12:55:40",
-					CreatedIn:              "Default Store View",
-					DisableAutoGroupChange: 0,
-					GroupID:                1,
-					ID:                     1646,
-					WebsiteID:              1,
-					UpdatedAt:              "2018-10-29 08:44:13",
-					StoreID:                1,
-					FirstName:              userFromDb.FirstName,
-					LastName:               userFromDb.LastName,
-					Email:                  userFromDb.Email}}
-
+			userInfo := getUserFromMongo(claims["sub"].(float64))
+			me := MeUser{
+				Code:   http.StatusOK,
+				Result: userInfo}
 			helpers.WriteResultWithStatusCode(w, me, me.Code)
 		} else {
 			response := Response{
@@ -99,7 +83,23 @@ func registerUser(w http.ResponseWriter, r *http.Request) {
 
 	if validationResult.Valid() {
 		insertUserIntoDb(user)
-
+		user.ID = getUserIdFromDbByEmail(user.Customer.Email)
+		userInfo := Result{
+			Addresses:              []string{},
+			CreatedAt:              time.Now().Unix(),
+			CreatedIn:              "Default Store View",
+			DisableAutoGroupChange: 0,
+			GroupID:                1,
+			ID:                     user.ID,
+			WebsiteID:              1,
+			UpdatedAt:              time.Now().Unix(),
+			StoreID:                1,
+			FirstName:              user.Customer.FirstName,
+			LastName:               user.Customer.LastName,
+			Email:                  user.Customer.Email,
+		}
+		insertUserIntoMongo(userInfo)
+		cart.CreateUserCartInMongo(user.ID)
 		response := Response{
 			Code:   http.StatusOK,
 			Result: "ok"}
@@ -118,20 +118,20 @@ func registerUser(w http.ResponseWriter, r *http.Request) {
 func refreshToken(w http.ResponseWriter, req *http.Request) {
 	var jsonBody map[string]string
 	_ = json.NewDecoder(req.Body).Decode(&jsonBody)
-	token, _ := parseToken(jsonBody["refreshToken"])
+	token, _ := auth.ParseToken(jsonBody["refreshToken"])
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		if claims.VerifyExpiresAt(time.Now().Unix(), true) {
 
-			groupId := getGroupIdFromDbById(claims["sub"].(string))
+			groupId := getGroupIdFromDbById(claims["sub"].(int))
 
 			role := roleByGroupId(groupId)
 
-			authToken := getNewAuthToken(claims["sub"].(string), role)
-			authTokenString, err := authToken.SignedString([]byte(MySecret))
+			authToken := auth.GetNewAuthToken(claims["sub"].(int64), role)
+			authTokenString, err := authToken.SignedString([]byte(auth.MySecret))
 			helpers.PanicErr(err)
 
-			refreshToken := getNewRefreshToken(claims["sub"].(string))
-			refreshTokenString, err := refreshToken.SignedString([]byte(MySecret))
+			refreshToken := auth.GetNewRefreshToken(claims["sub"].(int64))
+			refreshTokenString, err := refreshToken.SignedString([]byte(auth.MySecret))
 			helpers.PanicErr(err)
 
 			response := Response{
@@ -171,12 +171,12 @@ func loginEndpoint(w http.ResponseWriter, req *http.Request) {
 
 			role := roleByGroupId(userFromDb.GroupId)
 
-			authToken := getNewAuthToken(userFromDb.ID, role)
-			authTokenString, err := authToken.SignedString([]byte(MySecret))
+			authToken := auth.GetNewAuthToken(userFromDb.ID, role)
+			authTokenString, err := authToken.SignedString([]byte(auth.MySecret))
 			helpers.PanicErr(err)
 
-			refreshToken := getNewRefreshToken(userFromDb.ID)
-			refreshTokenString, err := refreshToken.SignedString([]byte(MySecret))
+			refreshToken := auth.GetNewRefreshToken(userFromDb.ID)
+			refreshTokenString, err := refreshToken.SignedString([]byte(auth.MySecret))
 			helpers.PanicErr(err)
 
 			response := Response{
@@ -205,7 +205,7 @@ func loginEndpoint(w http.ResponseWriter, req *http.Request) {
 func protectedEndpointMiddleware(handlerFunc http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		urlToken := req.URL.Query()["token"][0]
-		token, _ := parseToken(urlToken)
+		token, _ := auth.ParseToken(urlToken)
 
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 			if claims["role"] == "adminRole" && claims.VerifyExpiresAt(time.Now().Unix(), true) {
