@@ -1,7 +1,7 @@
 package models
 
 type Todo struct {
-	ObjectId string `json:"ObjectId" bson:"ObjectId"`
+	ObjectId string `json:"ObjectID" bson:"ObjectID"`
 	ID       string `json:"id,omitempty" bson:"id"`
 	Title    string `json:"title,omitempty" bson:"title"`
 	Category string `json:"category,omitempty" bson:"category"`

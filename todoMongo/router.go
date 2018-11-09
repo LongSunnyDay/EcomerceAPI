@@ -5,17 +5,13 @@ import (
 	"net/http"
 )
 
-
-
 func TodoRouter() http.Handler{
 	router := chi.NewRouter()
 	router.Post("/create", CreateTodo)
-	router.Get("/getTodo", GetTodo)
+	router.Get("/getTodo/{id}", GetTodo)
 	router.Get("/getList", ListTodos)
 	router.Delete("/remove", RemoveTodo)
 	router.Put("/update", UpdateTodo)
-
-	//router.Get("/getAll", GetListTodos)
 	return router
 
 }

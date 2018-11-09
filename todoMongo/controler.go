@@ -41,36 +41,20 @@ func InsertTodo(todo m.Todo) {
 	helpers.PanicErr(err)
 
 }
-func GetOneTodo() interface{}{
+func GetOneTodo(todoId string) interface{}{
 	var todo m.Todo
 
-	client, err := mongo.NewClient("mongodb://localhost:27017")
-	helpers.PanicErr(err)
-
-	err = client.Connect(context.Background())
-	helpers.PanicErr(err)
-
-	collection := client.Database("go-api-ws").Collection("todos")
-
-	//result := bson.NewDocument()
-	objId, err := objectid.FromHex("5bd810c4ef7adf8fe3e1865d")
+	objId, err := objectid.FromHex(todoId)
 	filter := bson.NewDocument(bson.EC.ObjectID("_id", objId))
 	fmt.Println(filter)
 
-
-
-	err = collection.FindOne(context.Background(), filter).Decode(&todo)
+	err = db.Collection(COLLNAME).FindOne(context.Background(), filter).Decode(&todo)
 	helpers.PanicErr(err)
 	fmt.Println(todo)
 
-	//todo.ObjectId = result.LookupElement("_id").Value().ObjectID().Hex()
-
 	fmt.Println(todo.ObjectId)
 
-
-	
 	return  todo
-	//fmt.Println(bson.Marshal(resp))
 }
 
 func GetAllTodos() []m.Todo {
@@ -91,41 +75,6 @@ func GetAllTodos() []m.Todo {
 	cur.Close(context.Background())
 	return elements
 }
-
-
-//mariaus query testas
-//func ListAllTodos() {
-//	client, err := mongo.NewClient("mongodb://localhost:27017")
-//	helpers.PanicErr(err)
-//
-//	err = client.Connect(context.TODO())
-//	helpers.PanicErr(err)
-//
-//	collection := client.Database("go-api-ws").Collection("todos")
-//	fmt.Println(collection)
-//
-//	cur, err := collection.Find(context.Background(), nil)
-//	helpers.PanicErr(err)
-//
-//	defer cur.Close(context.Background())
-//
-//	for cur.Next(context.Background()) {
-//		elem := bson.NewDocument()
-//		err := collection.Find(context.Background(), _).Decode(elem)
-//
-//
-//		//err := cur.Decode(&elem)
-//		helpers.PanicErr(err)
-//
-//		return bson.elem
-//	}
-//
-//	if err := cur.Err(); err != nil {
-//		log.Fatal(err)
-//	}
-//
-//
-//}
 
 // deletes an existing todo
 func DeleteTodo(todoId string) {
@@ -152,87 +101,3 @@ func UpdateTodoByID(todo m.Todo, todoID string) {
 			nil)
 	fmt.Println(doc)
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//var todo m.Todo
-//
-//// connect to MongoDB
-////func connection() {
-////
-////	client, err := mongo.Connect(context.Background(), "mongodb://localhost:32768", nil)
-////	if err != nil {
-////		log.Fatal(err)
-////	}
-////	db := client.Database("go-api-ws")
-////	inventory := db.Collection("todos")
-////}
-//
-//func InsertTodo(w http.ResponseWriter, r *http.Request) {
-//
-//
-//	client, err := mongo.Connect(context.Background(), "mongodb://localhost:32768", nil)
-//	if err != nil {
-//		log.Fatal(err)
-//	}
-//	db := client.Database("go-api-ws")
-//	inventory := db.Collection("todos")
-//
-//
-//	var schemaLoader = gojsonschema.NewReferenceLoader("file://todo/jsonSchemaModels/todoSchema.json")
-//	_ = json.NewDecoder(r.Body).Decode(&todo)
-//	documentLoader := gojsonschema.NewGoLoader(todo)
-//	result, err := gojsonschema.Validate(schemaLoader, documentLoader)
-//	helpers.PanicErr(err)
-//
-//	if  result.Valid(){
-//		inventory.InsertOne(context.Background(), result)
-//	}
-//	w.Header().Set("Content-Type", "application/json")
-//	json.NewEncoder(w).Encode("Todo: " + todo.Title + " has been registered. " )
-//
-//
-//
-//
-//
-//
-////	if err := jsonSchemaModels.Insert(movie); err != nil {
-////		respondWithError(w, http.StatusInternalServerError, err.Error())
-////		return
-////	}
-////	respondWithJson(w, http.StatusCreated, movie)
-//}
-//
-//
-//
-//func AllMoviesEndPoint(w http.ResponseWriter, r *http.Request) {
-//	fmt.Fprintln(w, "not implemented yet !")
-//}
-//
-//func FindMovieEndpoint(w http.ResponseWriter, r *http.Request) {
-//	fmt.Fprintln(w, "not implemented yet !")
-//}
-//
-//
-//func UpdateMovieEndPoint(w http.ResponseWriter, r *http.Request) {
-//	fmt.Fprintln(w, "not implemented yet !")
-//}
-//
-//func DeleteMovieEndPoint(w http.ResponseWriter, r *http.Request) {
-//	fmt.Fprintln(w, "not implemented yet !")
-//}
-
-
