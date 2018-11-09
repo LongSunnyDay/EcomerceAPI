@@ -7,7 +7,7 @@ import (
 	"github.com/mongodb/mongo-go-driver/bson/objectid"
 	"github.com/mongodb/mongo-go-driver/mongo"
 	"go-api-ws/helpers"
-	"go-api-ws/todoMongo/models"
+	m "go-api-ws/todoMongo/models"
 	)
 
 
@@ -34,7 +34,7 @@ func init() {
 	db = client.Database(DBNAME)
 }
 
-func InsertTodo(todo models.Todo) {
+func InsertTodo(todo m.Todo) {
 	fmt.Println(todo)
 	_, err := db.Collection(COLLNAME).InsertOne(context.Background(), todo)
 
@@ -42,6 +42,8 @@ func InsertTodo(todo models.Todo) {
 
 }
 func GetOneTodo() interface{}{
+	var todo m.Todo
+
 	client, err := mongo.NewClient("mongodb://localhost:27017")
 	helpers.PanicErr(err)
 
@@ -50,28 +52,33 @@ func GetOneTodo() interface{}{
 
 	collection := client.Database("go-api-ws").Collection("todos")
 
-	result := bson.NewDocument()
+	//result := bson.NewDocument()
 	objId, err := objectid.FromHex("5bd810c4ef7adf8fe3e1865d")
 	filter := bson.NewDocument(bson.EC.ObjectID("_id", objId))
 	fmt.Println(filter)
 
 
 
-	err = collection.FindOne(context.Background(), filter).Decode(result)
+	err = collection.FindOne(context.Background(), filter).Decode(&todo)
 	helpers.PanicErr(err)
+	fmt.Println(todo)
 
-fmt.Println(collection.FindOne(context.Background(), filter).Decode(result))
+	//todo.ObjectId = result.LookupElement("_id").Value().ObjectID().Hex()
+
+	fmt.Println(todo.ObjectId)
+
+
 	
-	return  collection.FindOne(context.Background(), filter).Decode(result)
+	return  todo
 	//fmt.Println(bson.Marshal(resp))
 }
 
-func GetAllTodos() []models.Todo {
+func GetAllTodos() []m.Todo {
 	cur, err := db.Collection(COLLNAME).Find(context.Background(), nil, nil)
 	helpers.PanicErr(err)
 
-	var elements []models.Todo
-	var elem models.Todo
+	var elements []m.Todo
+	var elem m.Todo
 	// Get the next result from the cursor
 	for cur.Next(context.Background()) {
 		err := cur.Decode(&elem)
@@ -129,7 +136,7 @@ func DeleteTodo(todoId string) {
 	helpers.PanicErr(err)
 }
 
-func UpdateTodoByID(todo models.Todo, todoID string) {
+func UpdateTodoByID(todo m.Todo, todoID string) {
 	doc := db.Collection(COLLNAME).FindOneAndUpdate(
 		context.Background(),
 		bson.NewDocument(

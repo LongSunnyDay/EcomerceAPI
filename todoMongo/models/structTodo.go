@@ -1,11 +1,12 @@
 package models
 
 type Todo struct {
-	ID       string `json:"ID,omitempty"`
-	Title    string `json:"Title,omitempty"`
-	Category string `json:"Category,omitempty"`
-	Content  string `json:"Content,omitempty"`
-	Created  string `json:"Creation_time,omitempty"`
-	Modified string `json:"Modification_time,omitempty"`
-	State    string `json:"State,omitempty"`
+	ObjectId string `json:"ObjectId" bson:"ObjectId"`
+	ID       string `json:"id,omitempty" bson:"id"`
+	Title    string `json:"title,omitempty" bson:"title"`
+	Category string `json:"category,omitempty" bson:"category"`
+	Content  string `json:"content,omitempty" bson:"content"`
+	Created  string `json:"created,omitempty" bson:"created"`
+	Modified string `json:"modified,omitempty" bson:"modified"`
+	State    string `json:"state,omitempty" bson:"state"`
 }
