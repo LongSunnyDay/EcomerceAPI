@@ -33,6 +33,10 @@ type Cart struct {
 	Items []Item `json:"items" bson:"items"`
 }
 
+type CartItem struct {
+	Item Item `json:"cartItem,omitempty" bson:"cartItem"`
+} 
+
 type Item struct {
 	SKU           string `json:"sku,omitempty" bson:"sku"`
 	QTY           int    `json:"qty,omitempty" bson:"qty"`
@@ -51,6 +55,13 @@ type Item struct {
 type Options struct {
 	OptionsID   string `json:"option_id,omitempty" bson:"option_id"`
 	OptionValue int    `json:"option_value,omitempty" bson:"option_value"`
+}
+
+type PaymentMethod struct {
+	Type           string `bson:"type"`
+	Code           string `json:"code,omitempty" bson:"code"`
+	Title          string `json:"title,omitempty" bson:"title"`
+	IsServerMethod bool   `json:"is_server_method,omitempty" bson:"is_server_method"`
 }
 
 // CONNECTIONSTRING DB connection string
@@ -77,15 +88,10 @@ func init() {
 }
 
 func getCartIDFromMongo(userId string, userType string) (string) {
-	cur, err := db.Collection(COLLNAME).Find(context.Background(), bson.NewDocument(
-		bson.EC.Interface("_id", userId)))
-	helpers.PanicErr(err)
 	bsonData := bson.NewDocument()
-	for cur.Next(context.Background()) {
-		err := cur.Decode(&bsonData)
-		helpers.PanicErr(err)
-	}
-	cur.Close(context.Background())
+	err := db.Collection(COLLNAME).FindOne(nil, bson.NewDocument(
+		bson.EC.Interface("_id", userId))).Decode(&bsonData)
+	helpers.PanicErr(err)
 	if userType == "" {
 		cartID := bsonData.LookupElement("_id").Value().ObjectID().Hex()
 		return cartID
@@ -106,23 +112,53 @@ func createGuestCartInMongo(id string) (string) {
 		bson.EC.String("id", id)))
 	helpers.PanicErr(err)
 
-	cur, err := db.Collection(COLLNAME).Find(context.Background(), bson.NewDocument(
-		bson.EC.String("id", id)))
-	helpers.PanicErr(err)
 	bsonData := bson.NewDocument()
-	for cur.Next(context.Background()) {
-		err := cur.Decode(&bsonData)
-		helpers.PanicErr(err)
-	}
-	cur.Close(context.Background())
+	err = db.Collection(COLLNAME).FindOne(nil, bson.NewDocument(
+		bson.EC.String("id", id))).Decode(&bsonData)
+	helpers.PanicErr(err)
 	idFromMongo := bsonData.LookupElement("_id").Value().ObjectID().Hex()
 	return idFromMongo
 }
 
-func getCartFromMongoByID(userId string) {
-	var cart Cart
+func getCartFromMongoByID(userId string) (Cart) {
+	cart := Cart{Items:[]Item{}}
 	err := db.Collection(COLLNAME).FindOne(context.Background(), bson.NewDocument(
-		bson.EC.String("_id", userId))).Decode(&cart)
+		bson.EC.Interface("_id", userId))).Decode(&cart)
+	if err != nil {
+		createGuestCartInMongo(userId)
+	}
+	return cart
+}
+
+func insertPaymentMethodsToMongo(methods []interface{}) {
+	_, err := db.Collection(COLLNAME).InsertMany(nil, methods)
 	helpers.PanicErr(err)
-	fmt.Println(cart)
+}
+
+func getPaymentMethodsFromMongo() ([]PaymentMethod) {
+	var paymentMethod PaymentMethod
+	var paymentMethods []PaymentMethod
+
+	cur, err := db.Collection(COLLNAME).Find(nil, bson.NewDocument(
+		bson.EC.String("type", "Payment method")))
+	helpers.PanicErr(err)
+	for cur.Next(context.Background()) {
+		err := cur.Decode(&paymentMethod)
+		helpers.PanicErr(err)
+		paymentMethods = append(paymentMethods, paymentMethod)
+	}
+	cur.Close(context.Background())
+	return paymentMethods
+}
+
+func updateUserCartInMongo(cartId string, item CartItem)  {
+	data := bson.NewDocument()
+	result := db.Collection(COLLNAME).FindOneAndUpdate(nil,
+		bson.NewDocument(
+		bson.EC.String("_id", cartId)),
+		bson.NewDocument(
+			bson.EC.SubDocumentFromElements("$addToSet", bson.EC.ArrayFromElements("items", item)))).Decode(&data)
+	fmt.Println(result)
+	fmt.Println("updateUserCartInMongo - ", item)
+	fmt.Println("bsonData - ", data)
 }

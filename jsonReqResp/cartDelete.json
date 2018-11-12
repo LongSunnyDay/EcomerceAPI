@@ -1,0 +1,22 @@
+{
+  "url": "https://demo.vuestorefront.io/api/cart/delete?token={{token}}&cartId={{cartId}}",
+  "payload": {
+    "method": "POST",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "mode": "cors",
+    "body": "{\"cartItem\":{\"sku\":\"WS06-XS-Gray\",\"item_id\":52686,\"quoteId\":\"512132\"}}"
+  },
+  "silent": true,
+  "callback_event": "store:cart/servercartAfterItemDeleted",
+  "task_id": "1541941245476-0ac55cae-30c4-48de-478e-7b035e32b159",
+  "transmited": true,
+  "created_at": "2018-11-11T13:00:45.476Z",
+  "updated_at": "2018-11-11T13:00:45.476Z",
+  "transmited_at": "2018-11-11T13:00:45.806Z",
+  "result": true,
+  "resultCode": 200,
+  "code": 200,
+  "acknowledged": false
+}

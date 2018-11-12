@@ -15,15 +15,18 @@
   "transmited_at": "2018-11-09T15:31:54.236Z",
   "result": [
     {
+      "type": "Payment method",
       "code": "cashondelivery",
       "title": "Cash On Delivery"
     },
     {
+      "type": "Payment method",
       "code": "checkmo",
       "title": "Check / Money order",
       "is_server_method": true
     },
     {
+      "type": "Payment method",
       "code": "free",
       "title": "No Payment Information Required",
       "is_server_method": true

@@ -1,0 +1,46 @@
+{
+  "url": "https://demo.vuestorefront.io/api/cart/shipping-methods?token={{token}}&cartId={{cartId}}",
+  "payload": {
+    "method": "POST",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "mode": "cors",
+    "body": "{\"address\":{\"country_id\":\"US\"}}"
+  },
+  "silent": true,
+  "task_id": "1541941476390-6cfd2a0f-af84-7729-69ce-2135fcec8742",
+  "transmited": true,
+  "created_at": "2018-11-11T13:04:36.390Z",
+  "updated_at": "2018-11-11T13:04:36.390Z",
+  "transmited_at": "2018-11-11T13:04:36.965Z",
+  "result": [
+    {
+      "carrier_code": "flatrate",
+      "method_code": "flatrate",
+      "carrier_title": "Flat Rate",
+      "method_title": "Fixed",
+      "amount": 5,
+      "base_amount": 5,
+      "available": true,
+      "error_message": "",
+      "price_excl_tax": 5,
+      "price_incl_tax": 5
+    },
+    {
+      "carrier_code": "tablerate",
+      "method_code": "bestway",
+      "carrier_title": "Best Way",
+      "method_title": "Table Rate",
+      "amount": 10,
+      "base_amount": 10,
+      "available": true,
+      "error_message": "",
+      "price_excl_tax": 10,
+      "price_incl_tax": 10
+    }
+  ],
+  "resultCode": 200,
+  "code": 200,
+  "acknowledged": false
+}
