@@ -28,27 +28,13 @@ func GetTodo(w http.ResponseWriter, r *http.Request)  {
 }
 
 func RemoveTodo(w http.ResponseWriter, r *http.Request) {
-	urlTodoId := r.URL.Query()["todoId"][0]
-	DeleteTodo(urlTodoId)
+	urlTodoId := chi.URLParam(r, "id")
+	json.NewEncoder(w).Encode(DeleteTodo(urlTodoId))
 }
 
 func UpdateTodo(w http.ResponseWriter, r *http.Request) {
-
 	var todo models.Todo
 	_ = json.NewDecoder(r.Body).Decode(&todo)
-	//fmt.Println(todo)
-
 	urlTodoId := chi.URLParam(r, "id")
-
 	UpdateTodoByID(todo, urlTodoId)
-
-
-
-	//urlTodoId := chi.URLParam(r, "id")
-	//json.NewEncoder(w).Encode(UpdateTodoByID(urlTodoId))
-
-	//urlTodoId := r.URL.Query()["todoId"][0]
-	//var todo models.Todo
-	//_ = json.NewDecoder(r.Body).Decode(&todo)
-	//UpdateTodoByID(todo, urlTodoId)
 }
