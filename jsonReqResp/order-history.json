@@ -1,0 +1,43 @@
+{
+  "url": "https://demo.vuestorefront.io/api/user/order-history?token={{token}}",
+  "payload": {
+    "method": "GET",
+    "mode": "cors",
+    "headers": {
+      "Accept": "application/json, text/plain, */*",
+      "Content-Type": "application/json"
+    }
+  },
+  "task_id": "1541778024218-380775cd-15cf-5825-3279-a95498a5a215",
+  "transmited": true,
+  "created_at": "2018-11-09T15:40:24.218Z",
+  "updated_at": "2018-11-09T15:40:24.218Z",
+  "transmited_at": "2018-11-09T15:40:24.645Z",
+  "result": {
+    "items": [],
+    "search_criteria": {
+      "filter_groups": [
+        {
+          "filters": [
+            {
+              "field": "customer_email",
+              "value": "avad47@gmail.com",
+              "condition_type": "eq"
+            }
+          ]
+        }
+      ],
+      "sort_orders": [
+        {
+          "field": "entity_id",
+          "direction": "DESC"
+        }
+      ],
+      "page_size": 20
+    },
+    "total_count": 0
+  },
+  "resultCode": 200,
+  "code": 200,
+  "acknowledged": false
+}

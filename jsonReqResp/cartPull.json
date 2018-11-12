@@ -1,0 +1,70 @@
+{
+  "url": "https://demo.vuestorefront.io/api/cart/pull?token={{token}}&cartId={{cartId}}",
+  "payload": {
+    "method": "GET",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "mode": "cors"
+  },
+  "silent": true,
+  "force_client_state": false,
+  "dry_run": false,
+  "callback_event": "store:cart/servercartAfterPulled",
+  "task_id": "1541778025048-f187e623-ab92-fe16-1a61-8766494d1f6f",
+  "transmited": true,
+  "created_at": "2018-11-09T15:40:25.048Z",
+  "updated_at": "2018-11-09T15:40:25.048Z",
+  "transmited_at": "2018-11-09T15:40:25.265Z",
+  "result": [
+    {
+      "item_id": 50256,
+      "sku": "MP01-32-Black",
+      "qty": 1,
+      "name": "Caesar Warm-Up Pant",
+      "price": 35,
+      "product_type": "configurable",
+      "quote_id": "512132",
+      "product_option": {
+        "extension_attributes": {
+          "configurable_item_options": [
+            {
+              "option_id": "93",
+              "option_value": 49
+            },
+            {
+              "option_id": "142",
+              "option_value": 176
+            }
+          ]
+        }
+      }
+    },
+    {
+      "item_id": 52174,
+      "sku": "MH03-XS-Black",
+      "qty": 1,
+      "name": "Bruno Compete Hoodie",
+      "price": 63,
+      "product_type": "configurable",
+      "quote_id": "512132",
+      "product_option": {
+        "extension_attributes": {
+          "configurable_item_options": [
+            {
+              "option_id": "93",
+              "option_value": 49
+            },
+            {
+              "option_id": "142",
+              "option_value": 167
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "resultCode": 200,
+  "code": 200,
+  "acknowledged": false
+}
