@@ -76,6 +76,26 @@ func GetAllTodos() []m.Todo {
 	return elements
 }
 
+func UpdateTodoByID(todo m.Todo, todoId string)  interface{}{
+	var todoUpdated m.Todo
+
+
+	objId, err := objectid.FromHex(todoId)
+	helpers.PanicErr(err)
+	filter := bson.NewDocument(bson.EC.ObjectID("_id", objId))
+	fmt.Println(filter)
+
+	err = db.Collection(COLLNAME).FindOneAndReplace(context.Background(), filter, todo).Decode(&todoUpdated)
+
+	fmt.Println(todoUpdated)
+
+	helpers.PanicErr(err)
+
+
+	return  todoUpdated
+
+}
+
 // deletes an existing todo
 func DeleteTodo(todoId string) {
 	objectIDS, err := objectid.FromHex(todoId)
@@ -85,19 +105,26 @@ func DeleteTodo(todoId string) {
 	helpers.PanicErr(err)
 }
 
-func UpdateTodoByID(todo m.Todo, todoID string) {
-	doc := db.Collection(COLLNAME).FindOneAndUpdate(
-		context.Background(),
-		bson.NewDocument(
-			bson.EC.String("id", todoID),
-		),
-		bson.NewDocument(
-			bson.EC.SubDocumentFromElements("$set",
-				bson.EC.String("title", todo.Title),
-				bson.EC.String("category", todo.Category),
-				bson.EC.String("content", todo.Content),
-				bson.EC.String("state", todo.State)),
-			),
-			nil)
-	fmt.Println(doc)
-}
+
+
+
+
+//func UpdateTodoByID(todo m.Todo, todoID string) {
+//	doc := db.Collection(COLLNAME).FindOneAndUpdate(
+//		context.Background(),
+//		bson.NewDocument(
+//			bson.EC.String("id", todoID),
+//		),
+//		bson.NewDocument(
+//			bson.EC.SubDocumentFromElements("$set",
+//				bson.EC.String("id", todo.ID),
+//				bson.EC.String("title", todo.Title),
+//				bson.EC.String("category", todo.Category),
+//				bson.EC.String("content", todo.Content),
+//				bson.EC.String("state", todo.State)),
+//			),
+//			nil)
+//	fmt.Println(doc)
+//}
+
+
