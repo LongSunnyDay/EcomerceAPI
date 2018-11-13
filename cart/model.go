@@ -2,6 +2,7 @@ package cart
 
 import (
 	"context"
+	"fmt"
 	"github.com/mongodb/mongo-go-driver/bson"
 	"github.com/mongodb/mongo-go-driver/mongo"
 	"go-api-ws/helpers"
@@ -37,13 +38,13 @@ type CartItem struct {
 }
 
 type Item struct {
-	SKU           string `json:"sku,omitempty" bson:"sku"`
-	QTY           int    `json:"qty,omitempty" bson:"qty"`
-	Price         int    `json:"price,omitempty" bson:"price"`
-	ProductType   string `json:"product_type,omitempty" bson:"product_type"`
-	Name          string `json:"name,omitempty" bson:"name"`
-	ItemID        int    `json:"item_id,omitempty" bson:"item_id"`
-	QuoteId       string `json:"quote_id,omitempty" bson:"quote_id"`
+	SKU           string  `json:"sku,omitempty" bson:"sku"`
+	QTY           int32   `json:"qty,omitempty" bson:"qty"`
+	Price         float64 `json:"price,omitempty" bson:"price"`
+	ProductType   string  `json:"product_type,omitempty" bson:"product_type"`
+	Name          string  `json:"name,omitempty" bson:"name"`
+	ItemID        int64   `json:"item_id,omitempty" bson:"item_id"`
+	QuoteId       string  `json:"quoteId,omitempty" bson:"quoteId"`
 	ProductOption struct {
 		ExtensionAttributes struct {
 			ConfigurableItemOptions []Options `json:"configurable_item_options,omitempty" bson:"configurable_item_options"`
@@ -53,7 +54,7 @@ type Item struct {
 
 type Options struct {
 	OptionsID   string `json:"option_id,omitempty" bson:"option_id"`
-	OptionValue int    `json:"option_value,omitempty" bson:"option_value"`
+	OptionValue string `json:"option_value,omitempty" bson:"option_value"`
 }
 
 type PaymentMethod struct {
@@ -150,14 +151,48 @@ func getPaymentMethodsFromMongo() []PaymentMethod {
 	return paymentMethods
 }
 
-//func updateUserCartInMongo(cartId string, item CartItem)  {
-//	data := bson.NewDocument()
-//	result := db.Collection(COLLNAME).FindOneAndUpdate(nil,
-//		bson.NewDocument(
-//		bson.EC.String("_id", cartId)),
-//		bson.NewDocument(
-//			bson.EC.SubDocumentFromElements("$addToSet", bson.EC.ArrayFromElements("items", item)))).Decode(&data)
-//	fmt.Println(result)
-//	fmt.Println("updateUserCartInMongo - ", item)
-//	fmt.Println("bsonData - ", data)
-//}
+func updateUserCartInMongo(cartId string, item CartItem) {
+	data := bson.NewDocument()
+	result := db.Collection(COLLNAME).FindOneAndUpdate(nil,
+		bson.NewDocument(
+			bson.EC.String("_id", cartId)),
+		bson.NewDocument(
+			bson.EC.SubDocumentFromElements("$addToSet",
+				bson.EC.SubDocument("items",
+					bson.NewDocument(
+						bson.EC.Int64("item_id", item.Item.ItemID),
+						bson.EC.String("sku", item.Item.SKU),
+						bson.EC.Int32("qty", item.Item.QTY),
+						bson.EC.String("name", item.Item.Name),
+						bson.EC.Double("price", item.Item.Price),
+						bson.EC.String("product_type", item.Item.ProductType),
+						bson.EC.String("quoteId", item.Item.QuoteId),
+						bson.EC.SubDocument("product_option",
+							bson.NewDocument(bson.EC.SubDocument("extension_attributes",
+								bson.NewDocument(bson.EC.Array("configurable_item_options", bson.NewArray(
+									bson.VC.DocumentFromElements(
+										bson.EC.String("option_id", item.Item.ProductOption.ExtensionAttributes.ConfigurableItemOptions[0].OptionsID),
+										bson.EC.String("option_value", item.Item.ProductOption.ExtensionAttributes.ConfigurableItemOptions[0].OptionValue)),
+									bson.VC.DocumentFromElements(
+										bson.EC.String("option_id", item.Item.ProductOption.ExtensionAttributes.ConfigurableItemOptions[1].OptionsID),
+										bson.EC.String("option_value", item.Item.ProductOption.ExtensionAttributes.ConfigurableItemOptions[1].OptionValue))))))))))))).Decode(&data)
+	fmt.Println(result)
+	fmt.Println("updateUserCartInMongo - ", item)
+	fmt.Println("bsonData - ", data)
+}
+
+func deleteItemFromUserCartInMongo(carId string, item CartItem) {
+	data := bson.NewDocument()
+	result, err := db.Collection(COLLNAME).UpdateOne(nil,
+		bson.NewDocument(
+			bson.EC.String("_id", carId)),
+		bson.NewDocument(
+			bson.EC.SubDocumentFromElements("$pull",
+				bson.EC.SubDocument("items",
+					bson.NewDocument(
+						bson.EC.String("sku", item.Item.SKU),
+						bson.EC.String("quoteId", item.Item.QuoteId))))))
+	helpers.PanicErr(err)
+	fmt.Println("Result", result)
+	fmt.Println("Data", data)
+}
