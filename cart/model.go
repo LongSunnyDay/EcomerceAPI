@@ -2,7 +2,6 @@ package cart
 
 import (
 	"context"
-	"fmt"
 	"github.com/mongodb/mongo-go-driver/bson"
 	"github.com/mongodb/mongo-go-driver/mongo"
 	"go-api-ws/helpers"
@@ -35,7 +34,7 @@ type Cart struct {
 
 type CartItem struct {
 	Item Item `json:"cartItem,omitempty" bson:"cartItem"`
-} 
+}
 
 type Item struct {
 	SKU           string `json:"sku,omitempty" bson:"sku"`
@@ -87,7 +86,7 @@ func init() {
 	db = client.Database(DBNAME)
 }
 
-func getCartIDFromMongo(userId string, userType string) (string) {
+func getCartIDFromMongo(userId string, userType string) string {
 	bsonData := bson.NewDocument()
 	err := db.Collection(COLLNAME).FindOne(nil, bson.NewDocument(
 		bson.EC.Interface("_id", userId))).Decode(&bsonData)
@@ -107,7 +106,7 @@ func CreateUserCartInMongo(id string) {
 	helpers.PanicErr(err)
 }
 
-func createGuestCartInMongo(id string) (string) {
+func createGuestCartInMongo(id string) string {
 	_, err := db.Collection(COLLNAME).InsertOne(context.Background(), bson.NewDocument(
 		bson.EC.String("id", id)))
 	helpers.PanicErr(err)
@@ -120,8 +119,8 @@ func createGuestCartInMongo(id string) (string) {
 	return idFromMongo
 }
 
-func getCartFromMongoByID(userId string) (Cart) {
-	cart := Cart{Items:[]Item{}}
+func getCartFromMongoByID(userId string) Cart {
+	cart := Cart{Items: []Item{}}
 	err := db.Collection(COLLNAME).FindOne(context.Background(), bson.NewDocument(
 		bson.EC.Interface("_id", userId))).Decode(&cart)
 	if err != nil {
@@ -135,7 +134,7 @@ func insertPaymentMethodsToMongo(methods []interface{}) {
 	helpers.PanicErr(err)
 }
 
-func getPaymentMethodsFromMongo() ([]PaymentMethod) {
+func getPaymentMethodsFromMongo() []PaymentMethod {
 	var paymentMethod PaymentMethod
 	var paymentMethods []PaymentMethod
 
@@ -151,14 +150,14 @@ func getPaymentMethodsFromMongo() ([]PaymentMethod) {
 	return paymentMethods
 }
 
-func updateUserCartInMongo(cartId string, item CartItem)  {
-	data := bson.NewDocument()
-	result := db.Collection(COLLNAME).FindOneAndUpdate(nil,
-		bson.NewDocument(
-		bson.EC.String("_id", cartId)),
-		bson.NewDocument(
-			bson.EC.SubDocumentFromElements("$addToSet", bson.EC.ArrayFromElements("items", item)))).Decode(&data)
-	fmt.Println(result)
-	fmt.Println("updateUserCartInMongo - ", item)
-	fmt.Println("bsonData - ", data)
-}
+//func updateUserCartInMongo(cartId string, item CartItem)  {
+//	data := bson.NewDocument()
+//	result := db.Collection(COLLNAME).FindOneAndUpdate(nil,
+//		bson.NewDocument(
+//		bson.EC.String("_id", cartId)),
+//		bson.NewDocument(
+//			bson.EC.SubDocumentFromElements("$addToSet", bson.EC.ArrayFromElements("items", item)))).Decode(&data)
+//	fmt.Println(result)
+//	fmt.Println("updateUserCartInMongo - ", item)
+//	fmt.Println("bsonData - ", data)
+//}

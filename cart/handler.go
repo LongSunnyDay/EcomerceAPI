@@ -60,11 +60,11 @@ func getPaymentMethods(w http.ResponseWriter, r *http.Request) {
 	helpers.WriteResultWithStatusCode(w, response, response.Code)
 }
 
-func updateCart(w http.ResponseWriter, r *http.Request)  {
+func updateCart(w http.ResponseWriter, r *http.Request) {
 	urlCartId := r.URL.Query()["cartId"][0]
 	fmt.Println("updateCart - ", urlCartId)
 	var item CartItem
 	_ = json.NewDecoder(r.Body).Decode(&item)
 	fmt.Println(item)
-	updateUserCartInMongo(urlCartId, item)
+	//updateUserCartInMongo(urlCartId, item)
 }
