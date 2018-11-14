@@ -8,7 +8,8 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-)
+	"github.com/mongodb/mongo-go-driver/bson"
+	)
 
 const HeaderContentType = "Content-Type"
 const MIMEApplicationJSON = "application/json"
@@ -61,4 +62,13 @@ func WriteResultWithStatusCode(w http.ResponseWriter, data interface{}, errorCod
 	w.Header().Set(HeaderContentType, MIMEApplicationJSON)
 	w.WriteHeader(errorCode)
 	json.NewEncoder(w).Encode(data)
+}
+
+func StructToBson (v interface{}) (doc *bson.Document, err error) {
+	data, err := bson.Marshal(v)
+	if err != nil {
+		return
+	}
+	err = bson.Unmarshal(data, &doc)
+	return
 }

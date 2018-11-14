@@ -32,9 +32,16 @@ func RemoveTodo(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(DeleteTodo(urlTodoId))
 }
 
-func UpdateTodo(w http.ResponseWriter, r *http.Request) {
+func UpdateTodo (w http.ResponseWriter, r *http.Request){
 	var todo models.Todo
 	_ = json.NewDecoder(r.Body).Decode(&todo)
 	urlTodoId := chi.URLParam(r, "id")
-	UpdateTodoByID(todo, urlTodoId)
+	UpdateTodoById(todo, urlTodoId)
+}
+
+func ReplaceTodo(w http.ResponseWriter, r *http.Request) {
+	var todo models.Todo
+	_ = json.NewDecoder(r.Body).Decode(&todo)
+	urlTodoId := chi.URLParam(r, "id")
+	ReplaceTodoByID(todo, urlTodoId)
 }

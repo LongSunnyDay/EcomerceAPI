@@ -76,7 +76,7 @@ func GetAllTodos() []m.Todo {
 	return elements
 }
 
-func UpdateTodoByID(todo m.Todo, todoId string) interface{}{
+func ReplaceTodoByID(todo m.Todo, todoId string) interface{}{
 	var todoUpdated m.Todo
 
 	objId, err := objectid.FromHex(todoId)
@@ -91,9 +91,25 @@ func UpdateTodoByID(todo m.Todo, todoId string) interface{}{
 	return  todoUpdated
 }
 
+func UpdateTodoById(todo m.Todo, todoId string) interface{}{
+
+	var todoUpdated m.Todo
+	bsonTodo, err := helpers.StructToBson(todo)
+	helpers.PanicErr(err)
+
+	objId, err := objectid.FromHex(todoId)
+	helpers.PanicErr(err)
+	filter := bson.NewDocument(bson.EC.ObjectID("_id", objId))
+
+	err = db.Collection(COLLNAME).FindOneAndUpdate(context.Background(), filter, bson.NewDocument(bson.EC.SubDocument("$set", bsonTodo))).Decode(&todoUpdated)
+	fmt.Println(todoUpdated)
+	helpers.PanicErr(err)
+
+	return  todoUpdated
+}
+
 // deletes an existing todo
 func DeleteTodo(todoId string) interface{}{
-
 	var todo m.Todo
 	objId, err := objectid.FromHex(todoId)
 	filter := bson.NewDocument(bson.EC.ObjectID("_id", objId))
