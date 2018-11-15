@@ -3,7 +3,6 @@ package attribute
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"go-api-ws/helpers"
 	"io/ioutil"
 	"net/http"
@@ -47,10 +46,26 @@ type attribute struct {
 	Tsk                       int64         `json:"tsk"`
 }
 
-func getAttributeFromSolr(attributeId string)  {
+type solrResponse struct {
+	ResponseHeader struct{
+		Status int `json:"status"`
+		QTime int `json:"QTime"`
+		Params struct{
+			JSON string `json:"json"`
+		}
+	} `json:"responseHeader"`
+	Response struct{
+		NumFound int `json:"numFound"`
+		Start int `json:"start"`
+		Docs []attribute `json:"docs"`
+	} `json:"response"`
+}
+
+
+func GetAttributeNameFromSolr(attributeId string) (string) {
 	request := map[string]interface{}{
 		"query":  "_type:attribute",
-		"filter": attributeId}
+		"filter": "id:" + attributeId}
 	requestBytes := new(bytes.Buffer)
 	json.NewEncoder(requestBytes).Encode(request)
 	resp, err := http.Post(
@@ -59,7 +74,12 @@ func getAttributeFromSolr(attributeId string)  {
 		requestBytes)
 	helpers.PanicErr(err)
 	b, _ := ioutil.ReadAll(resp.Body)
-	var attribute attribute
-	json.Unmarshal(b, &attribute)
-	fmt.Println(attribute)
+	//fmt.Printf("%s", b)
+	var solrResp solrResponse
+	json.Unmarshal(b, &solrResp)
+
+	if solrResp.Response.NumFound == 1 {
+		return solrResp.Response.Docs[0].AttributeCode
+	}
+	return ""
 }

@@ -177,8 +177,6 @@ func updateUserCartInMongo(cartId string, item CartItem) {
 										bson.EC.String("option_id", item.Item.ProductOption.ExtensionAttributes.ConfigurableItemOptions[1].OptionsID),
 										bson.EC.String("option_value", item.Item.ProductOption.ExtensionAttributes.ConfigurableItemOptions[1].OptionValue))))))))))))).Decode(&data)
 	fmt.Println(result)
-	fmt.Println("updateUserCartInMongo - ", item)
-	fmt.Println("bsonData - ", data)
 }
 
 func deleteItemFromUserCartInMongo(carId string, item CartItem) {

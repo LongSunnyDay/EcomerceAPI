@@ -2,9 +2,9 @@ package cart
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/kjk/betterguid"
+	"go-api-ws/attribute"
 	"go-api-ws/auth"
 	"go-api-ws/helpers"
 	"net/http"
@@ -62,10 +62,9 @@ func getPaymentMethods(w http.ResponseWriter, r *http.Request) {
 
 func addToUserCart(w http.ResponseWriter, r *http.Request) {
 	urlCartId := r.URL.Query()["cartId"][0]
-	fmt.Println("addToUserCart - ", urlCartId)
 	var item CartItem
 	_ = json.NewDecoder(r.Body).Decode(&item)
-	fmt.Println(item)
+	attribute.GetAttributeNameFromSolr(item.Item.ProductOption.ExtensionAttributes.ConfigurableItemOptions[0].OptionsID)
 	updateUserCartInMongo(urlCartId, item)
 }
 
