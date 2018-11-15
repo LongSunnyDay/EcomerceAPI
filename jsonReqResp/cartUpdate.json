@@ -6,7 +6,29 @@
       "Content-Type": "application/json"
     },
     "mode": "cors",
-    "body": "{\"cartItem\":{\"sku\":\"WS06\",\"qty\":1,\"product_option\":{\"extension_attributes\":{\"custom_options\":[],\"configurable_item_options\":[{\"option_id\":\"93\",\"option_value\":\"52\"},{\"option_id\":\"142\",\"option_value\":\"167\"}],\"bundle_options\":[]}},\"quoteId\":\"512132\"}}"
+    "body": {
+      "cartItem": {
+        "sku": "WS06",
+        "qty": 1,
+        "product_option": {
+          "extension_attributes": {
+            "custom_options": [],
+            "configurable_item_options": [
+              {
+                "option_id": "93",
+                "option_value": "52"
+              },
+              {
+                "option_id": "142",
+                "option_value": "167"
+              }
+            ],
+            "bundle_options": []
+          }
+        },
+        "quoteId": "512132"
+      }
+    }
   },
   "callback_event": "store:cart/servercartAfterItemUpdated",
   "task_id": "1541941170090-3001a2fe-102d-8efe-707a-2da508526fa3",
