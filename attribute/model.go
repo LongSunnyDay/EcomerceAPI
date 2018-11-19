@@ -3,6 +3,7 @@ package attribute
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"go-api-ws/helpers"
 	"io/ioutil"
 	"net/http"
@@ -44,6 +45,14 @@ type attribute struct {
 	IsUnique                  string        `json:"is_unique"`
 	ID                        int           `json:"id"`
 	Tsk                       int64         `json:"tsk"`
+	ChildDocuments            []options `json:"_childDocuments_"`
+}
+
+type options struct {
+	TypeOf string `json:"type_of"`
+	ParentId int `json:"parent_id"`
+	Label string `json:"label"`
+	Value string `json:"value"`
 }
 
 type solrResponse struct {
@@ -61,11 +70,17 @@ type solrResponse struct {
 	} `json:"response"`
 }
 
+type ItemAttribute struct {
+	Name string
+	Value string
+}
 
-func GetAttributeNameFromSolr(attributeId string) (string) {
+func GetAttributeNameFromSolr(attributeId string, attributeValue string) (ItemAttribute) {
+	fmt.Println("GetAttributeNameFromSolr CALLED")
 	request := map[string]interface{}{
 		"query":  "_type:attribute",
-		"filter": "id:" + attributeId}
+		"filter": "id:" + attributeId,
+		"fields": "*, [child parentFilter=_type:attribute childFilter=value:" + attributeValue + " limit=30]"}
 	requestBytes := new(bytes.Buffer)
 	json.NewEncoder(requestBytes).Encode(request)
 	resp, err := http.Post(
@@ -79,7 +94,10 @@ func GetAttributeNameFromSolr(attributeId string) (string) {
 	json.Unmarshal(b, &solrResp)
 
 	if solrResp.Response.NumFound == 1 {
-		return solrResp.Response.Docs[0].AttributeCode
+		itemAttribute := ItemAttribute{
+			Name: solrResp.Response.Docs[0].AttributeCode,
+			Value: solrResp.Response.Docs[0].ChildDocuments[0].Label}
+		return itemAttribute
 	}
-	return ""
+	return ItemAttribute{}
 }

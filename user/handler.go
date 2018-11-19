@@ -99,7 +99,7 @@ func registerUser(w http.ResponseWriter, r *http.Request) {
 			Email:                  user.Customer.Email,
 		}
 		insertUserIntoMongo(userInfo)
-		cart.CreateUserCartInMongo(user.ID)
+		cart.CreateCartInMongoDB(user.ID)
 		response := Response{
 			Code:   http.StatusOK,
 			Result: "ok"}
