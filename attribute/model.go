@@ -3,7 +3,6 @@ package attribute
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"go-api-ws/helpers"
 	"io/ioutil"
 	"net/http"
@@ -76,7 +75,6 @@ type ItemAttribute struct {
 }
 
 func GetAttributeNameFromSolr(attributeId string, attributeValue string) (ItemAttribute) {
-	fmt.Println("GetAttributeNameFromSolr CALLED")
 	request := map[string]interface{}{
 		"query":  "_type:attribute",
 		"filter": "id:" + attributeId,

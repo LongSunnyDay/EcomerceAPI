@@ -11,7 +11,7 @@ func RouterCart() http.Handler {
 	r.Get("/pull", pullCart)
 	r.Post("/payment-methods", addPaymentMethod)
 	r.Get("/payment-methods", getPaymentMethods)
-	r.Post("/update", addToUserCart)
+	r.Post("/update", updateCart)
 	r.Post("/delete", deleteFromUserCart)
 
 	return r

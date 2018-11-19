@@ -105,7 +105,6 @@ func registerUser(w http.ResponseWriter, r *http.Request) {
 			Result: "ok"}
 		helpers.WriteResultWithStatusCode(w, response, response.Code)
 	} else {
-
 		response := Response{
 			Code:   http.StatusBadRequest,
 			Result: validationResult.Errors()}

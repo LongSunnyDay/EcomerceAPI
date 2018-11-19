@@ -3,7 +3,6 @@ package product
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"go-api-ws/helpers"
 	"io/ioutil"
 	"net/http"
@@ -93,7 +92,6 @@ type solrResponse struct {
 }
 
 func GetProductFromSolrBySKU(sku string) (SimpleProductStruct) {
-	fmt.Println("GetProductFromSolrBySKU CALLED")
 	request := map[string]interface{}{
 		"query": "sku:" + sku,
 		"limit": 1}

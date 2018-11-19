@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"encoding/json"
+	"fmt"
 	fr "github.com/DATA-DOG/fastroute"
 	"github.com/pkg/errors"
 	"github.com/xeipuuv/gojsonschema"
@@ -17,6 +18,12 @@ const MIMEApplicationJSON = "application/json"
 func PanicErr(err error) {
 	if err != nil {
 		panic(err)
+	}
+}
+
+func CheckErr(err error)  {
+	if err != nil {
+		fmt.Println("Error: ", err)
 	}
 }
 
