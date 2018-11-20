@@ -86,6 +86,7 @@ type UpdateUser struct {
 	StoreID                int32       `json:"store_id,omitempty" bson:"store_id,omitempty"`
 	UpdatedAt              string       `json:"updated_at,omitempty" bson:"updated_at,omitempty"`
 	WebsiteID              int32       `json:"website_id,omitempty" bson:"website_id,omitempty"`
+	DefaultShipping string `json:"default_shipping" bson:"default_shipping,omitempty"`
 }
 
 type UserAdresses struct {
@@ -100,7 +101,10 @@ type UserAdresses struct {
 	City            string   `json:"city,omitempty" bson:"city,omitempty"`
 	Firstname       string   `json:"firstname,omitempty" bson:"firstname,omitempty"`
 	Lastname        string   `json:"lastname,omitempty" bson:"lastname,omitempty"`
-	DefaultShipping bool     `json:"default_shipping,omitempty" default_shipping:"address,omitempty"`
+	DefaultShipping bool     `json:"default_shipping,omitempty" bson:"default_shipping,omitempty"`
+	Company         string   `json:"company,omitempty" bson:"company,omitempty"`
+	VatID           string   `json:"vat_id,omitempty" bson:"vat_id,omitempty"`
+	DefaultBilling  bool     `json:"default_billing,omitempty" bson:"default_billing,omitempty"`
 }
 
 type Region     struct{

@@ -117,7 +117,8 @@ func updateUser (w http.ResponseWriter, r *http.Request) {
 	var user UpdateUser
 	err := json.NewDecoder(r.Body).Decode(&user)
 	helpers.PanicErr(err)
-	UpdateUserById(user)
+	UpdateUserByIdMongo(user)
+	UpdateUserByIdMySQL(user)
 }
 
 // Path: /api/user/refresh
