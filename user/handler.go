@@ -113,6 +113,13 @@ func registerUser(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func updateUser (w http.ResponseWriter, r *http.Request) {
+	var user UpdateUser
+	err := json.NewDecoder(r.Body).Decode(&user)
+	helpers.PanicErr(err)
+	UpdateUserById(user)
+}
+
 // Path: /api/user/refresh
 func refreshToken(w http.ResponseWriter, req *http.Request) {
 	var jsonBody map[string]string

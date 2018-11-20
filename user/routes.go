@@ -12,5 +12,6 @@ func RouterUser() http.Handler {
 	r.Get("/me", meEndpoint)
 	r.Get("/order-history", getOrderHistory)
 	r.Post("/refresh", refreshToken)
+	r.Put("/update", updateUser)
 	return r
 }

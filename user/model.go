@@ -68,6 +68,47 @@ type Result struct {
 	WebsiteID              int32       `json:"website_id,omitempty" bson:"website_id"`
 }
 
+type Adresses struct {
+	WebsiteID              int32       `json:"website_id,omitempty" bson:"website_id"`
+
+}
+
+type UpdateUser struct {
+	UserAdresses          []UserAdresses `json:"addresses,omitempty" bson:"address,omitempty"`
+	CreatedAt              string       `json:"created_at,omitempty" bson:"created_at,omitempty"`
+	CreatedIn              string      `json:"created_in,omitempty" bson:"created_in,omitempty"`
+	DisableAutoGroupChange int32       `json:"disable_auto_group_change,omitempty" bson:"disable_auto_group_change,omitempty"`
+	Email                  string      `json:"email,omitempty" bson:"email,omitempty"`
+	FirstName              string      `json:"firstname,omitempty" bson:"firstname,omitempty"`
+	GroupID                int32       `json:"group_id,omitempty" bson:"group_id,omitempty"`
+	ID                     string       `json:"id,omitempty" bson:"id,omitempty"`
+	LastName               string      `json:"lastname,omitempty" bson:"lastname,omitempty"`
+	StoreID                int32       `json:"store_id,omitempty" bson:"store_id,omitempty"`
+	UpdatedAt              string       `json:"updated_at,omitempty" bson:"updated_at,omitempty"`
+	WebsiteID              int32       `json:"website_id,omitempty" bson:"website_id,omitempty"`
+}
+
+type UserAdresses struct {
+	ID         int 		`json:"id,omitempty" bson:"id,omitempty"`
+	CustomerID int	    `json:"customer_id,omitempty" bson:"customer_id,omitempty"`
+	Region     Region   `json:"region,omitempty" bson:"region,omitempty"`
+	RegionID        int      `json:"region_id,omitempty" bson:"region_id,omitempty"`
+	CountryID       string   `json:"country_id,omitempty" bson:"country_id,omitempty"`
+	Street          []string `json:"street,omitempty" bson:"street,omitempty"`
+	Telephone       string   `json:"telephone,omitempty" bson:"telephone,omitempty"`
+	Postcode        string   `json:"postcode,omitempty" bson:"postcode,omitempty"`
+	City            string   `json:"city,omitempty" bson:"city,omitempty"`
+	Firstname       string   `json:"firstname,omitempty" bson:"firstname,omitempty"`
+	Lastname        string   `json:"lastname,omitempty" bson:"lastname,omitempty"`
+	DefaultShipping bool     `json:"default_shipping,omitempty" default_shipping:"address,omitempty"`
+}
+
+type Region     struct{
+	RegionCode interface{} `json:"region_code" bson:"region_code,omitempty"`
+	Region     interface{} `json:"region" bson:"region,omitempty"`
+	RegionID   int         `json:"region_id" bson:"region_id,omitempty"`
+}
+
 type OrderHistory struct {
 	Items          []Item `json:"items" bson:"items"`
 	SearchCriteria string `json:"search_criteria" bson:"search_criteria"`
@@ -79,7 +120,7 @@ type Item struct {
 }
 
 // CONNECTIONSTRING DB connection string
-const CONNECTIONSTRING = "mongodb://localhost:32768"
+const CONNECTIONSTRING = "mongodb://localhost:27017"
 
 // DBNAME Database name
 const DBNAME = "go-api-ws"

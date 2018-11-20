@@ -68,7 +68,7 @@ type PaymentMethod struct {
 }
 
 // CONNECTIONSTRING DB connection string
-const CONNECTIONSTRING = "mongodb://localhost:32768"
+const CONNECTIONSTRING = "mongodb://localhost:27017"
 
 // DBNAME Database name
 const DBNAME = "go-api-ws"
