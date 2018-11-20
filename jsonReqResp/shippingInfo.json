@@ -6,7 +6,15 @@
       "Content-Type": "application/json"
     },
     "mode": "cors",
-    "body": "{\"addressInformation\":{\"shippingAddress\":{\"countryId\":\"PL\"},\"shippingCarrierCode\":\"flatrate\",\"shippingMethodCode\":\"flatrate\"}}"
+    "body": {
+      "addressInformation": {
+        "shippingAddress": {
+          "countryId": "PL"
+        },
+        "shippingCarrierCode": "flatrate",
+        "shippingMethodCode": "flatrate"
+      }
+    }
   },
   "silent": true,
   "callback_event": "store:cart/servercartAfterTotals",

@@ -60,7 +60,7 @@ type Result struct {
 	DisableAutoGroupChange int32       `json:"disable_auto_group_change,omitempty" bson:"disable_auto_group_change"`
 	Email                  string      `json:"email,omitempty" bson:"email"`
 	FirstName              string      `json:"firstname,omitempty" bson:"firstname"`
-	GroupID                int32       `json:"group_id,omitempty" bson:"group_id"`
+	GroupID                int32       `json:"group_id" bson:"group_id"`
 	ID                     string       `json:"id,omitempty" bson:"id"`
 	LastName               string      `json:"lastname,omitempty" bson:"lastname"`
 	StoreID                int32       `json:"store_id,omitempty" bson:"store_id"`

@@ -1,11 +1,11 @@
 package user
 
 import (
+	"context"
+	"fmt"
+	"github.com/mongodb/mongo-go-driver/bson"
 	"github.com/mongodb/mongo-go-driver/mongo"
 	"go-api-ws/helpers"
-	"context"
-	"github.com/mongodb/mongo-go-driver/bson"
-	"fmt"
 )
 
 

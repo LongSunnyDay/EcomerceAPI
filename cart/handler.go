@@ -12,8 +12,8 @@ import (
 	"time"
 )
 
-func createCart(w http.ResponseWriter, req *http.Request) {
-	urlToken := req.URL.Query()["token"][0]
+func createCart(w http.ResponseWriter, r *http.Request) {
+	urlToken := r.URL.Query()["token"][0]
 	if len(urlToken) > 0 {
 		token, _ := auth.ParseToken(urlToken)
 
@@ -44,9 +44,9 @@ func createCart(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func pullCart(w http.ResponseWriter, req *http.Request) {
-	urlUserToken := req.URL.Query()["token"][0]
-	urlCartId := req.URL.Query()["cartId"][0]
+func pullCart(w http.ResponseWriter, r *http.Request) {
+	urlUserToken := r.URL.Query()["token"][0]
+	urlCartId := r.URL.Query()["cartId"][0]
 	if len(urlUserToken) > 0 {
 		token, _ := auth.ParseToken(urlUserToken)
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
@@ -67,11 +67,11 @@ func pullCart(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func addPaymentMethod(w http.ResponseWriter, req *http.Request) {
+func addPaymentMethod(w http.ResponseWriter, r *http.Request) {
 	var methods []interface{}
-	_ = json.NewDecoder(req.Body).Decode(&methods)
+	_ = json.NewDecoder(r.Body).Decode(&methods)
 	insertPaymentMethodsToMongo(methods)
-	helpers.WriteResultWithStatusCode(w, "GG", 200)
+	helpers.WriteResultWithStatusCode(w, "ok", 200)
 }
 
 func getPaymentMethods(w http.ResponseWriter, r *http.Request) {
@@ -126,14 +126,14 @@ func deleteFromUserCart(w http.ResponseWriter, r *http.Request) {
 	if len(urlUserToken) > 0 {
 		deleteItemFromCartInMongo(urlCartId, item)
 		response := Response{
-			Code:http.StatusOK,
-			Result:true}
+			Code:   http.StatusOK,
+			Result: true}
 		helpers.WriteResultWithStatusCode(w, response, response.Code)
 	} else {
 		deleteItemFromGuestCartInMongo(urlCartId, item)
 		response := Response{
-			Code:http.StatusOK,
-			Result:true}
+			Code:   http.StatusOK,
+			Result: true}
 		helpers.WriteResultWithStatusCode(w, response, response.Code)
 	}
 }

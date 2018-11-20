@@ -4,13 +4,13 @@ import (
 	"encoding/json"
 	"fmt"
 	fr "github.com/DATA-DOG/fastroute"
+	"github.com/mongodb/mongo-go-driver/bson"
 	"github.com/pkg/errors"
 	"github.com/xeipuuv/gojsonschema"
 	"log"
 	"net/http"
 	"strconv"
-	"github.com/mongodb/mongo-go-driver/bson"
-	)
+)
 
 const HeaderContentType = "Content-Type"
 const MIMEApplicationJSON = "application/json"

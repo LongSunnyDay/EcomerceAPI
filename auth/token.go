@@ -12,7 +12,7 @@ const MySecret = "SenelisMegstaMociutesApvalumus"
 func ParseToken(tokenString string) (*jwt.Token, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("There is an error")
+			return nil, fmt.Errorf("there is an error")
 		}
 		return []byte(MySecret), nil
 	})

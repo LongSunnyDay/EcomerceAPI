@@ -9,7 +9,7 @@ import (
 	"log"
 )
 
-var ErrUserNotFound = errors.New("User not found!")
+var ErrUserNotFound = errors.New("user not found")
 
 func CreateUsersTableIfNotExists() {
 	db, err := config.Conf.GetDb()

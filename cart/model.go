@@ -2,6 +2,7 @@ package cart
 
 import (
 	"context"
+	"fmt"
 	"github.com/mongodb/mongo-go-driver/bson"
 	"github.com/mongodb/mongo-go-driver/bson/objectid"
 	"github.com/mongodb/mongo-go-driver/mongo"
@@ -23,11 +24,6 @@ type Response struct {
 	UpdatedAt    string        `json:"updated_at,omitempty"`
 	Url          string        `json:"url,omitempty"`
 	Meta         interface{}   `json:"meta,omitempty"`
-}
-
-type cartData struct {
-	ObjectId string `json:"_id,omitempty" bson:"_id"`
-	ID       string `json:"id,omitempty" bson:"id"`
 }
 
 type Cart struct {
@@ -138,6 +134,7 @@ func CreateCartInMongoDB(userID string) (cartID string) {
 
 func getGuestCartFromMongoByID(guestCartID string) []Item {
 	cart := Cart{Items: []Item{}}
+	fmt.Println("guestCartID", guestCartID)
 	objectIDFromUserID, err := objectid.FromHex(guestCartID)
 	helpers.PanicErr(err)
 	err = db.Collection(COLLNAME).FindOne(context.Background(), bson.NewDocument(

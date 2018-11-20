@@ -36,7 +36,7 @@ func initRoutes() map[string]fr.Router {
 	} else {
 		core.Routes["GET"] = fr.Chain(getRoutes, productRoutes)
 	}
-
+	return core.Routes
 }
 
 func initProducts() {

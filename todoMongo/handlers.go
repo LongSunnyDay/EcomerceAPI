@@ -2,10 +2,10 @@ package todoMongo
 
 import (
 	"encoding/json"
+	"github.com/go-chi/chi"
 	"go-api-ws/todoMongo/models"
 	"net/http"
-	"github.com/go-chi/chi"
-	)
+)
 
 var todos []models.Todo
 
