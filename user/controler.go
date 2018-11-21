@@ -5,8 +5,10 @@ import (
 		"github.com/mongodb/mongo-go-driver/bson"
 	"github.com/mongodb/mongo-go-driver/mongo"
 	"go-api-ws/helpers"
-	c "../config"
-	)
+	c "go-api-ws/config"
+	_ "github.com/go-sql-driver/mysql"
+	"fmt"
+)
 
 
 // Connect establish a connection to database
@@ -47,12 +49,10 @@ func UpdateUserByIdMySQL(user UpdateUser){
 	dataBase, err := c.Conf.GetDb()
 	helpers.PanicErr(err)
 
-	err = dataBase.QueryRow("SELECT * FROM users u Where id=?", user.ID).Scan(&user.Email)
+	query, err := dataBase.Prepare("Update users set email=? where id=?")
 	helpers.PanicErr(err)
 
-	//usr := user
-	//for rows.Next() {
-	//	rows.Scan(&usr.Email)
-	//}
-
+	_, er := query.Exec(user.Email, user.ID)
+	helpers.PanicErr(er)
+	fmt.Print(user.Email + " updated int mysql")
 }
