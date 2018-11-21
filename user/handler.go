@@ -85,7 +85,7 @@ func registerUser(w http.ResponseWriter, r *http.Request) {
 		insertUserIntoDb(user)
 		user.ID = getUserIdFromDbByEmail(user.Customer.Email)
 		userInfo := Result{
-			Addresses:              []string{},
+			Addresses:              []UserAdresses{},
 			CreatedAt:              time.Now().Unix(),
 			CreatedIn:              "Default Store View",
 			DisableAutoGroupChange: 0,
@@ -114,11 +114,11 @@ func registerUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateUser (w http.ResponseWriter, r *http.Request) {
-	var user UpdateUser
+	var user UpdatedCustomer
 	err := json.NewDecoder(r.Body).Decode(&user)
 	helpers.PanicErr(err)
-	UpdateUserByIdMongo(user)
-	UpdateUserByIdMySQL(user)
+	UpdateUserByIdMongo(user.UpdateUser)
+	UpdateUserByIdMySQL(user.UpdateUser)
 }
 
 // Path: /api/user/refresh

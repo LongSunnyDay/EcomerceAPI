@@ -54,7 +54,7 @@ type MeUser struct {
 }
 
 type Result struct {
-	Addresses              interface{} `json:"addresses" bson:"address"`
+	Addresses              []UserAdresses `json:"addresses" bson:"address"`
 	CreatedAt              int64       `json:"created_at,omitempty" bson:"created_at"`
 	CreatedIn              string      `json:"created_in,omitempty" bson:"created_in"`
 	DisableAutoGroupChange int32       `json:"disable_auto_group_change,omitempty" bson:"disable_auto_group_change"`
@@ -73,9 +73,13 @@ type Adresses struct {
 
 }
 
+type UpdatedCustomer struct{
+	UpdateUser UpdateUser `json:"customer,omitempty" bson:"customer,omitempty"`
+}
+
 type UpdateUser struct {
-	UserAdresses          []UserAdresses `json:"addresses,omitempty" bson:"address,omitempty"`
-	CreatedAt              string       `json:"created_at,omitempty" bson:"created_at,omitempty"`
+	UserAdresses          interface{} `json:"addresses,omitempty" bson:"address,omitempty"`
+	CreatedAt              int64       `json:"created_at,omitempty" bson:"created_at,omitempty"`
 	CreatedIn              string      `json:"created_in,omitempty" bson:"created_in,omitempty"`
 	DisableAutoGroupChange int32       `json:"disable_auto_group_change,omitempty" bson:"disable_auto_group_change,omitempty"`
 	Email                  string      `json:"email,omitempty" bson:"email,omitempty"`
@@ -84,7 +88,7 @@ type UpdateUser struct {
 	ID                     string       `json:"id,omitempty" bson:"id,omitempty"`
 	LastName               string      `json:"lastname,omitempty" bson:"lastname,omitempty"`
 	StoreID                int32       `json:"store_id,omitempty" bson:"store_id,omitempty"`
-	UpdatedAt              string       `json:"updated_at,omitempty" bson:"updated_at,omitempty"`
+	UpdatedAt              int64       `json:"updated_at,omitempty" bson:"updated_at,omitempty"`
 	WebsiteID              int32       `json:"website_id,omitempty" bson:"website_id,omitempty"`
 	DefaultShipping string `json:"default_shipping" bson:"default_shipping,omitempty"`
 }
@@ -235,6 +239,9 @@ func getUserFromMongo(id string) (Result) {
 		helpers.PanicErr(err)
 	}
 	cur.Close(context.Background())
+	if len(userInfo.Addresses) == 0{
+		userInfo.Addresses = []UserAdresses{}
+	}
 	return userInfo
 }
 

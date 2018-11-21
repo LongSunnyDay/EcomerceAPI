@@ -39,8 +39,9 @@ func UpdateUserByIdMongo(user UpdateUser)interface{}{
 	filter := bson.NewDocument(bson.EC.Interface("id", user.ID))
 	doc := bson.NewDocument(bson.EC.SubDocument("$set", bsonUser))
 
-	err = db.Collection(COLLNAME).FindOneAndUpdate(context.Background(), filter, doc).Decode(&updatedUser)
-	helpers.PanicErr(err)
+	lopas := db.Collection(COLLNAME).FindOneAndUpdate(context.Background(), filter, doc)
+	//helpers.PanicErr(err)
+	fmt.Println(lopas)
 
 	return  updatedUser
 }
