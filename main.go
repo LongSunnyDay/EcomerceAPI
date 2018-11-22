@@ -5,6 +5,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"go-api-ws/cart"
 	"go-api-ws/config"
+	"go-api-ws/stock"
 	"go-api-ws/todoMongo"
 	"go-api-ws/user"
 	"net/http"
@@ -12,6 +13,7 @@ import (
 
 func init()  {
 	config.GetConfig("config.yml")
+
 }
 
 func main()  {
@@ -20,5 +22,6 @@ func main()  {
 	r.Mount("/api/user", user.RouterUser())
 	r.Mount("/api/cart", cart.RouterCart())
 	r.Mount("/api/todo", todoMongo.TodoRouter())
+	r.Mount("/api/stock", stock.RouterStock())
 	http.ListenAndServe(":8080", r)
 }

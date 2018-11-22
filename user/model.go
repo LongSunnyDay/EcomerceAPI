@@ -3,7 +3,6 @@ package user
 import (
 	"context"
 	"github.com/mongodb/mongo-go-driver/bson"
-	"github.com/mongodb/mongo-go-driver/mongo"
 	"go-api-ws/config"
 	"go-api-ws/helpers"
 	"net/http"
@@ -128,27 +127,27 @@ type Item struct {
 }
 
 // CONNECTIONSTRING DB connection string
-const CONNECTIONSTRING = "mongodb://localhost:27017"
+//const CONNECTIONSTRING = "mongodb://localhost:27017"
 
 // DBNAME Database name
-const DBNAME = "go-api-ws"
+//const DBNAME = "go-api-ws"
 
 // COLLNAME Collection name
 const COLLNAME = "users"
 
-var db *mongo.Database
+//var db *mongo.Database
 
 // Connect establish a connection to database
-func init() {
-	client, err := mongo.NewClient(CONNECTIONSTRING)
-	helpers.PanicErr(err)
-
-	err = client.Connect(context.Background())
-	helpers.PanicErr(err)
-
-	// Collection types can be used to access the database
-	db = client.Database(DBNAME)
-}
+//func init() {
+//	client, err := mongo.NewClient(CONNECTIONSTRING)
+//	helpers.PanicErr(err)
+//
+//	err = client.Connect(context.Background())
+//	helpers.PanicErr(err)
+//
+//	// Collection types can be used to access the database
+//	db = client.Database(DBNAME)
+//}
 
 // Database operations
 
@@ -210,6 +209,7 @@ func getGroupIdFromDbById(id int) (int) {
 
 // MongoDB
 func insertUserIntoMongo(userInfo Result) {
+	db := config.Conf.GetMongoDb()
 	_, err := db.Collection(COLLNAME).InsertOne(context.Background(),
 		bson.NewDocument(
 			bson.EC.String("type", "User info"),
@@ -229,6 +229,8 @@ func insertUserIntoMongo(userInfo Result) {
 }
 
 func getUserFromMongo(id string) (Result) {
+	db := config.Conf.GetMongoDb()
+
 	cur, err := db.Collection(COLLNAME).Find(context.Background(), bson.NewDocument(
 		bson.EC.Interface("id", id),
 		bson.EC.String("type", "User info")))
@@ -246,6 +248,8 @@ func getUserFromMongo(id string) (Result) {
 }
 
 func getUserOrderHistoryFromMongo(id string) (OrderHistory) {
+	db := config.Conf.GetMongoDb()
+
 	cur, err := db.Collection(COLLNAME).Find(context.Background(), bson.NewDocument(
 		bson.EC.Interface("id", id),
 		bson.EC.String("type", "Order history")))

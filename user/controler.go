@@ -2,26 +2,25 @@ package user
 
 import (
 	"context"
-		"github.com/mongodb/mongo-go-driver/bson"
-	"github.com/mongodb/mongo-go-driver/mongo"
-	"go-api-ws/helpers"
-	c "go-api-ws/config"
-	_ "github.com/go-sql-driver/mysql"
 	"fmt"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/mongodb/mongo-go-driver/bson"
+	"go-api-ws/config"
+	"go-api-ws/helpers"
 )
 
 
 // Connect establish a connection to database
-func init() {
-	client, err := mongo.NewClient(CONNECTIONSTRING)
-	helpers.PanicErr(err)
-
-	err = client.Connect(context.Background())
-	helpers.PanicErr(err)
-
-	// Collection types can be used to access the database
-	db = client.Database(DBNAME)
-}
+//func init() {
+//	client, err := mongo.NewClient(CONNECTIONSTRING)
+//	helpers.PanicErr(err)
+//
+//	err = client.Connect(context.Background())
+//	helpers.PanicErr(err)
+//
+//	// Collection types can be used to access the database
+//	db = client.Database(DBNAME)
+//}
 
 func roleByGroupId(groupId int) (string) {
 	if groupId < 1 {
@@ -39,6 +38,8 @@ func UpdateUserByIdMongo(user UpdateUser)interface{}{
 	filter := bson.NewDocument(bson.EC.Interface("id", user.ID))
 	doc := bson.NewDocument(bson.EC.SubDocument("$set", bsonUser))
 
+	db := config.Conf.GetMongoDb()
+
 	lopas := db.Collection(COLLNAME).FindOneAndUpdate(context.Background(), filter, doc)
 	//helpers.PanicErr(err)
 	fmt.Println(lopas)
@@ -47,7 +48,7 @@ func UpdateUserByIdMongo(user UpdateUser)interface{}{
 }
 
 func UpdateUserByIdMySQL(user UpdateUser){
-	dataBase, err := c.Conf.GetDb()
+	dataBase, err := config.Conf.GetDb()
 	helpers.PanicErr(err)
 
 	query, err := dataBase.Prepare("Update users set email=? where id=?")

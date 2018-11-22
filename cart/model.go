@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/mongodb/mongo-go-driver/bson"
 	"github.com/mongodb/mongo-go-driver/bson/objectid"
-	"github.com/mongodb/mongo-go-driver/mongo"
+	"go-api-ws/config"
 	"go-api-ws/helpers"
 	"net/http"
 	"time"
@@ -62,30 +62,32 @@ type PaymentMethod struct {
 	IsServerMethod bool   `json:"is_server_method,omitempty" bson:"is_server_method"`
 }
 
-// CONNECTIONSTRING DB connection string
-const CONNECTIONSTRING = "mongodb://localhost:27017"
-
-// DBNAME Database name
-const DBNAME = "go-api-ws"
+//// CONNECTIONSTRING DB connection string
+//const CONNECTIONSTRING = "mongodb://localhost:27017"
+//
+//// DBNAME Database name
+//const DBNAME = "go-api-ws"
 
 // COLLNAME Collection name
 const COLLNAME = "cart"
 
-var db *mongo.Database
+//var db *mongo.Database
 
 // Connect establish a connection to database
-func init() {
-	client, err := mongo.NewClient(CONNECTIONSTRING)
-	helpers.PanicErr(err)
-
-	err = client.Connect(context.Background())
-	helpers.PanicErr(err)
-
-	// Collection types can be used to access the database
-	db = client.Database(DBNAME)
-}
+//func init() {
+//	client, err := mongo.NewClient(CONNECTIONSTRING)
+//	helpers.PanicErr(err)
+//
+//	err = client.Connect(context.Background())
+//	helpers.PanicErr(err)
+//
+//	// Collection types can be used to access the database
+//	db = client.Database(DBNAME)
+//}
 
 func getGuestCartIDFromMongo(guestCartID string) (cartID string, err error) {
+	db := config.Conf.GetMongoDb()
+
 	bsonData := bson.NewDocument()
 	err = db.Collection(COLLNAME).FindOne(nil, bson.NewDocument(
 		bson.EC.Interface("_id", guestCartID))).Decode(&bsonData)
@@ -97,6 +99,8 @@ func getGuestCartIDFromMongo(guestCartID string) (cartID string, err error) {
 }
 
 func getUserCartIDFromMongo(userID string) (cartID string, err error) {
+	db := config.Conf.GetMongoDb()
+
 	bsonData := bson.NewDocument()
 	err = db.Collection(COLLNAME).FindOne(nil, bson.NewDocument(
 		bson.EC.String("id", userID))).Decode(&bsonData)
@@ -108,6 +112,8 @@ func getUserCartIDFromMongo(userID string) (cartID string, err error) {
 }
 
 func CreateCartInMongoDB(userID string) (cartID string) {
+	db := config.Conf.GetMongoDb()
+
 	if userID == "" {
 		cart := Cart{
 			Items:     []Item{},
@@ -132,6 +138,8 @@ func CreateCartInMongoDB(userID string) (cartID string) {
 }
 
 func getGuestCartFromMongoByID(guestCartID string) []Item {
+	db := config.Conf.GetMongoDb()
+
 	cart := Cart{Items: []Item{}}
 	objectIDFromUserID, err := objectid.FromHex(guestCartID)
 	helpers.PanicErr(err)
@@ -145,6 +153,8 @@ func getGuestCartFromMongoByID(guestCartID string) []Item {
 }
 
 func getUserCartFromMongoByID(userID string) []Item {
+	db := config.Conf.GetMongoDb()
+
 	cart := Cart{Items: []Item{}}
 	err := db.Collection(COLLNAME).FindOne(context.Background(), bson.NewDocument(
 		bson.EC.String("id", userID))).Decode(&cart)
@@ -156,6 +166,8 @@ func getUserCartFromMongoByID(userID string) []Item {
 }
 
 func insertPaymentMethodsToMongo(methods []interface{}) {
+	db := config.Conf.GetMongoDb()
+
 	_, err := db.Collection(COLLNAME).InsertMany(nil, methods)
 	helpers.PanicErr(err)
 }
@@ -163,6 +175,8 @@ func insertPaymentMethodsToMongo(methods []interface{}) {
 func getPaymentMethodsFromMongo() []PaymentMethod {
 	var paymentMethod PaymentMethod
 	var paymentMethods []PaymentMethod
+
+	db := config.Conf.GetMongoDb()
 
 	cur, err := db.Collection(COLLNAME).Find(nil, bson.NewDocument(
 		bson.EC.String("type", "Payment method")))
@@ -179,6 +193,8 @@ func getPaymentMethodsFromMongo() []PaymentMethod {
 func updateUserCartInMongo(cartID string, item Item) {
 	bsonItem, err := helpers.StructToBson(item)
 	helpers.PanicErr(err)
+
+	db := config.Conf.GetMongoDb()
 
 	db.Collection(COLLNAME).UpdateOne(nil,
 		bson.NewDocument(
@@ -205,6 +221,8 @@ func updateGuestCartInMongo(cartID string, item Item) {
 	bsonCartID, err := objectid.FromHex(cartID)
 	helpers.PanicErr(err)
 
+	db := config.Conf.GetMongoDb()
+
 	db.Collection(COLLNAME).UpdateOne(nil,
 		bson.NewDocument(
 			bson.EC.ObjectID("_id", bsonCartID)),
@@ -224,6 +242,8 @@ func updateGuestCartInMongo(cartID string, item Item) {
 }
 
 func deleteItemFromCartInMongo(carId string, item CartItem) {
+	db := config.Conf.GetMongoDb()
+
 	_, err := db.Collection(COLLNAME).UpdateOne(nil,
 		bson.NewDocument(
 			bson.EC.String("id", carId)),
@@ -238,6 +258,8 @@ func deleteItemFromCartInMongo(carId string, item CartItem) {
 func deleteItemFromGuestCartInMongo(cartID string, item CartItem) {
 	bsonCartID, err := objectid.FromHex(cartID)
 	helpers.PanicErr(err)
+
+	db := config.Conf.GetMongoDb()
 
 	_, err = db.Collection(COLLNAME).UpdateOne(nil,
 		bson.NewDocument(

@@ -6,3 +6,6 @@ db:
   dbname:   go-api-ws
   charset:  utf8
   server:   "tcp(localhost:3306)"
+mongoDB:
+  connection: "mongodb://localhost:27017"
+  db_name: "go-api-ws"

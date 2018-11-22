@@ -5,37 +5,39 @@ import (
 	"fmt"
 	"github.com/mongodb/mongo-go-driver/bson"
 	"github.com/mongodb/mongo-go-driver/bson/objectid"
-	"github.com/mongodb/mongo-go-driver/mongo"
+	"go-api-ws/config"
 	"go-api-ws/helpers"
 	m "go-api-ws/todoMongo/models"
-	)
+)
 
 
 // CONNECTIONSTRING DB connection string
-const CONNECTIONSTRING = "mongodb://localhost:27017"
+//const CONNECTIONSTRING = "mongodb://localhost:27017"
 
 // DBNAME Database name
-const DBNAME = "go-api-ws"
+//const DBNAME = "go-api-ws"
 
 // COLLNAME Collection name
 const COLLNAME = "todos"
 
-var db *mongo.Database
+//var db *mongo.Database
 
 // Connect establish a connection to database
-func init() {
-	client, err := mongo.NewClient(CONNECTIONSTRING)
-	helpers.PanicErr(err)
-
-	err = client.Connect(context.Background())
-	helpers.PanicErr(err)
-
-	// Collection types can be used to access the database
-	db = client.Database(DBNAME)
-}
+//func init() {
+//	client, err := mongo.NewClient(CONNECTIONSTRING)
+//	helpers.PanicErr(err)
+//
+//	err = client.Connect(context.Background())
+//	helpers.PanicErr(err)
+//
+//	// Collection types can be used to access the database
+//	db = client.Database(DBNAME)
+//}
 
 func InsertTodo(todo m.Todo) {
 	fmt.Println(todo)
+	db := config.Conf.GetMongoDb()
+
 	_, err := db.Collection(COLLNAME).InsertOne(context.Background(), todo)
 
 	helpers.PanicErr(err)
@@ -48,6 +50,8 @@ func GetOneTodo(todoId string) interface{}{
 	filter := bson.NewDocument(bson.EC.ObjectID("_id", objId))
 	fmt.Println(filter)
 
+	db := config.Conf.GetMongoDb()
+
 	err = db.Collection(COLLNAME).FindOne(context.Background(), filter).Decode(&todo)
 	helpers.PanicErr(err)
 	fmt.Println(todo)
@@ -58,6 +62,8 @@ func GetOneTodo(todoId string) interface{}{
 }
 
 func GetAllTodos() []m.Todo {
+	db := config.Conf.GetMongoDb()
+
 	cur, err := db.Collection(COLLNAME).Find(context.Background(), nil, nil)
 	helpers.PanicErr(err)
 
@@ -84,6 +90,8 @@ func ReplaceTodoByID(todo m.Todo, todoId string) interface{}{
 	filter := bson.NewDocument(bson.EC.ObjectID("_id", objId))
 	fmt.Println(filter)
 
+	db := config.Conf.GetMongoDb()
+
 	err = db.Collection(COLLNAME).FindOneAndReplace(context.Background(), filter, todo).Decode(&todoUpdated)
 	fmt.Println(todoUpdated)
 	helpers.PanicErr(err)
@@ -101,6 +109,8 @@ func UpdateTodoById(todo m.Todo, todoId string) interface{}{
 	helpers.PanicErr(err)
 	filter := bson.NewDocument(bson.EC.ObjectID("_id", objId))
 
+	db := config.Conf.GetMongoDb()
+
 	err = db.Collection(COLLNAME).FindOneAndUpdate(context.Background(), filter, bson.NewDocument(bson.EC.SubDocument("$set", bsonTodo))).Decode(&todoUpdated)
 	fmt.Println(todoUpdated)
 	helpers.PanicErr(err)
@@ -114,6 +124,8 @@ func DeleteTodo(todoId string) interface{}{
 	objId, err := objectid.FromHex(todoId)
 	filter := bson.NewDocument(bson.EC.ObjectID("_id", objId))
 	fmt.Println(filter)
+
+	db := config.Conf.GetMongoDb()
 
 	err = db.Collection(COLLNAME).FindOneAndDelete(context.Background(), filter).Decode(&todo)
 	if err != nil {

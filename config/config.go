@@ -1,8 +1,11 @@
 package config
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
+	"github.com/mongodb/mongo-go-driver/mongo"
+	"go-api-ws/helpers"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
@@ -18,22 +21,27 @@ type DbConfig struct {
 	Password   string `yaml:"password,omitempty"`
 	Charset    string `yaml:"charset,omitempty"`
 }
+type MongoDBConfig struct {
+	Connection string `yaml:"connection"`
+	DbName     string `yaml:"db_name"`
+}
 
 type Config struct {
-	Port string `yaml:"port"`
-	AssetsPath string `yaml:"assets"`
-	LogFile string `yaml:"logFile"`
-	Host string `yaml:"host"`
-	Db   DbConfig `yaml:"db"`
+	Port       string        `yaml:"port"`
+	AssetsPath string        `yaml:"assets"`
+	LogFile    string        `yaml:"logFile"`
+	Host       string        `yaml:"host"`
+	Db         DbConfig      `yaml:"db"`
+	MongoDB    MongoDBConfig `yaml:"mongoDB"`
 }
 
 type FlagSettings struct {
-	Config string
+	Config     string
 	AssetsPath string
-	Assets http.Dir
-	Host string
-	Port string
-	LogFile string
+	Assets     http.Dir
+	Host       string
+	Port       string
+	LogFile    string
 }
 
 var Flags FlagSettings
@@ -42,6 +50,21 @@ var Conf *Config
 var db *sql.DB
 var dbUri string
 var driverName string
+
+var mongoDB *mongo.Database
+
+func (c *Config) GetMongoDb() (*mongo.Database) {
+	client, err := mongo.NewClient(c.MongoDB.Connection)
+	helpers.PanicErr(err)
+
+	err = client.Connect(context.Background())
+	helpers.PanicErr(err)
+
+	// Collection types can be used to access the database
+	mongoDB = client.Database(c.MongoDB.DbName)
+
+	return mongoDB
+}
 
 func NewFlags() *FlagSettings {
 	Flags := FlagSettings{}
