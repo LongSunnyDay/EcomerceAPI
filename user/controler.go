@@ -2,14 +2,13 @@ package user
 
 import (
 	"context"
-		"github.com/mongodb/mongo-go-driver/bson"
-	"github.com/mongodb/mongo-go-driver/mongo"
-	"go-api-ws/helpers"
-	c "go-api-ws/config"
-	_ "github.com/go-sql-driver/mysql"
 	"fmt"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/mongodb/mongo-go-driver/bson"
+	"github.com/mongodb/mongo-go-driver/mongo"
+	c "go-api-ws/config"
+	"go-api-ws/helpers"
 )
-
 
 // Connect establish a connection to database
 func init() {
@@ -23,14 +22,14 @@ func init() {
 	db = client.Database(DBNAME)
 }
 
-func roleByGroupId(groupId int) (string) {
+func roleByGroupId(groupId int) string {
 	if groupId < 1 {
 		return adminRole
 	}
 	return userRole
 }
 
-func UpdateUserByIdMongo(user UpdateUser)interface{}{
+func UpdateUserByIdMongo(user UpdateUser) interface{} {
 	var updatedUser UpdateUser
 
 	bsonUser, err := helpers.StructToBson(user)
@@ -43,10 +42,10 @@ func UpdateUserByIdMongo(user UpdateUser)interface{}{
 	//helpers.PanicErr(err)
 	fmt.Println(lopas)
 
-	return  updatedUser
+	return updatedUser
 }
 
-func UpdateUserByIdMySQL(user UpdateUser){
+func UpdateUserByIdMySQL(user UpdateUser) {
 	dataBase, err := c.Conf.GetDb()
 	helpers.PanicErr(err)
 

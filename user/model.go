@@ -11,7 +11,7 @@ import (
 
 // Data models
 type User struct {
-	ID       string    `json:"id,omitempty"`
+	ID       string   `json:"id,omitempty"`
 	Customer Customer `json:"customer,omitempty"`
 	Password string   `json:"password,omitempty"`
 	GroupId  int      `json:"group_id,omitempty"`
@@ -55,48 +55,47 @@ type MeUser struct {
 
 type Result struct {
 	Addresses              []UserAdresses `json:"addresses" bson:"address"`
-	CreatedAt              int64       `json:"created_at,omitempty" bson:"created_at"`
-	CreatedIn              string      `json:"created_in,omitempty" bson:"created_in"`
-	DisableAutoGroupChange int32       `json:"disable_auto_group_change,omitempty" bson:"disable_auto_group_change"`
-	Email                  string      `json:"email,omitempty" bson:"email"`
-	FirstName              string      `json:"firstname,omitempty" bson:"firstname"`
-	GroupID                int32       `json:"group_id" bson:"group_id"`
-	ID                     string       `json:"id,omitempty" bson:"id"`
-	LastName               string      `json:"lastname,omitempty" bson:"lastname"`
-	StoreID                int32       `json:"store_id,omitempty" bson:"store_id"`
-	UpdatedAt              int64       `json:"updated_at,omitempty" bson:"updated_at"`
-	WebsiteID              int32       `json:"website_id,omitempty" bson:"website_id"`
+	CreatedAt              int64          `json:"created_at,omitempty" bson:"created_at"`
+	CreatedIn              string         `json:"created_in,omitempty" bson:"created_in"`
+	DisableAutoGroupChange int32          `json:"disable_auto_group_change,omitempty" bson:"disable_auto_group_change"`
+	Email                  string         `json:"email,omitempty" bson:"email"`
+	FirstName              string         `json:"firstname,omitempty" bson:"firstname"`
+	GroupID                int32          `json:"group_id" bson:"group_id"`
+	ID                     string         `json:"id,omitempty" bson:"id"`
+	LastName               string         `json:"lastname,omitempty" bson:"lastname"`
+	StoreID                int32          `json:"store_id,omitempty" bson:"store_id"`
+	UpdatedAt              int64          `json:"updated_at,omitempty" bson:"updated_at"`
+	WebsiteID              int32          `json:"website_id,omitempty" bson:"website_id"`
 }
 
 type Adresses struct {
-	WebsiteID              int32       `json:"website_id,omitempty" bson:"website_id"`
-
+	WebsiteID int32 `json:"website_id,omitempty" bson:"website_id"`
 }
 
-type UpdatedCustomer struct{
+type UpdatedCustomer struct {
 	UpdateUser UpdateUser `json:"customer,omitempty" bson:"customer,omitempty"`
 }
 
 type UpdateUser struct {
-	UserAdresses          interface{} `json:"addresses,omitempty" bson:"address,omitempty"`
+	UserAdresses           interface{} `json:"addresses,omitempty" bson:"address,omitempty"`
 	CreatedAt              int64       `json:"created_at,omitempty" bson:"created_at,omitempty"`
 	CreatedIn              string      `json:"created_in,omitempty" bson:"created_in,omitempty"`
 	DisableAutoGroupChange int32       `json:"disable_auto_group_change,omitempty" bson:"disable_auto_group_change,omitempty"`
 	Email                  string      `json:"email,omitempty" bson:"email,omitempty"`
 	FirstName              string      `json:"firstname,omitempty" bson:"firstname,omitempty"`
 	GroupID                int32       `json:"group_id,omitempty" bson:"group_id,omitempty"`
-	ID                     string       `json:"id,omitempty" bson:"id,omitempty"`
+	ID                     string      `json:"id,omitempty" bson:"id,omitempty"`
 	LastName               string      `json:"lastname,omitempty" bson:"lastname,omitempty"`
 	StoreID                int32       `json:"store_id,omitempty" bson:"store_id,omitempty"`
 	UpdatedAt              int64       `json:"updated_at,omitempty" bson:"updated_at,omitempty"`
 	WebsiteID              int32       `json:"website_id,omitempty" bson:"website_id,omitempty"`
-	DefaultShipping string `json:"default_shipping" bson:"default_shipping,omitempty"`
+	DefaultShipping        string      `json:"default_shipping" bson:"default_shipping,omitempty"`
 }
 
 type UserAdresses struct {
-	ID         int 		`json:"id,omitempty" bson:"id,omitempty"`
-	CustomerID int	    `json:"customer_id,omitempty" bson:"customer_id,omitempty"`
-	Region     Region   `json:"region,omitempty" bson:"region,omitempty"`
+	ID              int      `json:"id,omitempty" bson:"id,omitempty"`
+	CustomerID      int      `json:"customer_id,omitempty" bson:"customer_id,omitempty"`
+	Region          Region   `json:"region,omitempty" bson:"region,omitempty"`
 	RegionID        int      `json:"region_id,omitempty" bson:"region_id,omitempty"`
 	CountryID       string   `json:"country_id,omitempty" bson:"country_id,omitempty"`
 	Street          []string `json:"street,omitempty" bson:"street,omitempty"`
@@ -111,7 +110,7 @@ type UserAdresses struct {
 	DefaultBilling  bool     `json:"default_billing,omitempty" bson:"default_billing,omitempty"`
 }
 
-type Region     struct{
+type Region struct {
 	RegionCode interface{} `json:"region_code" bson:"region_code,omitempty"`
 	Region     interface{} `json:"region" bson:"region,omitempty"`
 	RegionID   int         `json:"region_id" bson:"region_id,omitempty"`
@@ -168,7 +167,7 @@ func insertUserIntoDb(user User) {
 	helpers.PanicErr(err)
 }
 
-func getUserFromDbByEmail(email string) (User) {
+func getUserFromDbByEmail(email string) User {
 	db, err := config.Conf.GetDb()
 	helpers.PanicErr(err)
 	var userFromDb User
@@ -178,7 +177,7 @@ func getUserFromDbByEmail(email string) (User) {
 	return userFromDb
 }
 
-func getUserIdFromDbByEmail(email string) (string) {
+func getUserIdFromDbByEmail(email string) string {
 	db, err := config.Conf.GetDb()
 	helpers.PanicErr(err)
 	var id string
@@ -188,7 +187,7 @@ func getUserIdFromDbByEmail(email string) (string) {
 	return id
 }
 
-func getUserFromDbById(id float64) (Customer) {
+func getUserFromDbById(id float64) Customer {
 	db, err := config.Conf.GetDb()
 	helpers.PanicErr(err)
 	var userFromDb Customer
@@ -198,7 +197,7 @@ func getUserFromDbById(id float64) (Customer) {
 	return userFromDb
 }
 
-func getGroupIdFromDbById(id int) (int) {
+func getGroupIdFromDbById(id int) int {
 	db, err := config.Conf.GetDb()
 	helpers.PanicErr(err)
 	var groupId int
@@ -228,7 +227,7 @@ func insertUserIntoMongo(userInfo Result) {
 	helpers.PanicErr(err)
 }
 
-func getUserFromMongo(id string) (Result) {
+func getUserFromMongo(id string) Result {
 	cur, err := db.Collection(COLLNAME).Find(context.Background(), bson.NewDocument(
 		bson.EC.Interface("id", id),
 		bson.EC.String("type", "User info")))
@@ -239,13 +238,13 @@ func getUserFromMongo(id string) (Result) {
 		helpers.PanicErr(err)
 	}
 	cur.Close(context.Background())
-	if len(userInfo.Addresses) == 0{
+	if len(userInfo.Addresses) == 0 {
 		userInfo.Addresses = []UserAdresses{}
 	}
 	return userInfo
 }
 
-func getUserOrderHistoryFromMongo(id string) (OrderHistory) {
+func getUserOrderHistoryFromMongo(id string) OrderHistory {
 	cur, err := db.Collection(COLLNAME).Find(context.Background(), bson.NewDocument(
 		bson.EC.Interface("id", id),
 		bson.EC.String("type", "Order history")))
