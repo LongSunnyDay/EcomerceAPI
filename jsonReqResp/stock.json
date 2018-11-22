@@ -1,0 +1,48 @@
+{
+  "url": "https://demo.vuestorefront.io/api/stock/check?sku=WS08-XS-Black",
+  "payload": {
+    "method": "GET",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "mode": "cors"
+  },
+  "product_sku": "WS08-XS-Black",
+  "callback_event": "store:stock/stockAfterCheck",
+  "task_id": "1542868419931-040ef04c-daa1-b2c8-0ead-6d8e73418540",
+  "transmited": true,
+  "created_at": "2018-11-22T06:33:39.931Z",
+  "updated_at": "2018-11-22T06:33:39.931Z",
+  "transmited_at": "2018-11-22T06:33:42.998Z",
+  "result": {
+    "item_id": 1482,
+    "product_id": 1482,
+    "stock_id": 1,
+    "qty": 0,
+    "is_in_stock": false,
+    "is_qty_decimal": false,
+    "show_default_notification_message": false,
+    "use_config_min_qty": true,
+    "min_qty": 0,
+    "use_config_min_sale_qty": 1,
+    "min_sale_qty": 1,
+    "use_config_max_sale_qty": true,
+    "max_sale_qty": 10000,
+    "use_config_backorders": true,
+    "backorders": 0,
+    "use_config_notify_stock_qty": true,
+    "notify_stock_qty": 1,
+    "use_config_qty_increments": true,
+    "qty_increments": 0,
+    "use_config_enable_qty_inc": true,
+    "enable_qty_increments": false,
+    "use_config_manage_stock": true,
+    "manage_stock": true,
+    "low_stock_date": "2018-11-07 14:15:18",
+    "is_decimal_divided": false,
+    "stock_status_changed_auto": 1
+  },
+  "resultCode": 200,
+  "code": 200,
+  "acknowledged": false
+}

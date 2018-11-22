@@ -87,7 +87,6 @@ func GetAttributeNameFromSolr(attributeId string, attributeValue string) (ItemAt
 		requestBytes)
 	helpers.PanicErr(err)
 	b, _ := ioutil.ReadAll(resp.Body)
-	//fmt.Printf("%s", b)
 	var solrResp solrResponse
 	json.Unmarshal(b, &solrResp)
 

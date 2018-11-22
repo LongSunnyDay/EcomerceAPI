@@ -2,7 +2,6 @@ package cart
 
 import (
 	"context"
-	"fmt"
 	"github.com/mongodb/mongo-go-driver/bson"
 	"github.com/mongodb/mongo-go-driver/bson/objectid"
 	"github.com/mongodb/mongo-go-driver/mongo"
@@ -134,7 +133,6 @@ func CreateCartInMongoDB(userID string) (cartID string) {
 
 func getGuestCartFromMongoByID(guestCartID string) []Item {
 	cart := Cart{Items: []Item{}}
-	fmt.Println("guestCartID", guestCartID)
 	objectIDFromUserID, err := objectid.FromHex(guestCartID)
 	helpers.PanicErr(err)
 	err = db.Collection(COLLNAME).FindOne(context.Background(), bson.NewDocument(
