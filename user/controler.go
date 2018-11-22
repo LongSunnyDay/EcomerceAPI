@@ -9,7 +9,6 @@ import (
 	"go-api-ws/helpers"
 )
 
-
 // Connect establish a connection to database
 //func init() {
 //	client, err := mongo.NewClient(CONNECTIONSTRING)
@@ -22,14 +21,14 @@ import (
 //	db = client.Database(DBNAME)
 //}
 
-func roleByGroupId(groupId int) (string) {
+func roleByGroupId(groupId int) string {
 	if groupId < 1 {
 		return adminRole
 	}
 	return userRole
 }
 
-func UpdateUserByIdMongo(user UpdateUser)interface{}{
+func UpdateUserByIdMongo(user UpdateUser) interface{} {
 	var updatedUser UpdateUser
 
 	bsonUser, err := helpers.StructToBson(user)
@@ -40,11 +39,11 @@ func UpdateUserByIdMongo(user UpdateUser)interface{}{
 
 	db := config.Conf.GetMongoDb()
 
-	lopas := db.Collection(COLLNAME).FindOneAndUpdate(context.Background(), filter, doc)
+	update := db.Collection(COLLNAME).FindOneAndUpdate(context.Background(), filter, doc)
 	//helpers.PanicErr(err)
-	fmt.Println(lopas)
+	fmt.Println(update)
 
-	return  updatedUser
+	return updatedUser
 }
 
 func UpdateUserByIdMySQL(user UpdateUser){

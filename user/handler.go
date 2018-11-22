@@ -113,7 +113,9 @@ func registerUser(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func updateUser (w http.ResponseWriter, r *http.Request) {
+// Path: /api/user/update
+//Method: post
+func updateUser(w http.ResponseWriter, r *http.Request) {
 	var user UpdatedCustomer
 	err := json.NewDecoder(r.Body).Decode(&user)
 	helpers.PanicErr(err)
