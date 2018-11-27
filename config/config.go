@@ -44,6 +44,8 @@ type FlagSettings struct {
 	LogFile    string
 }
 
+const MySecret = "SenelisMegstaMociutesApvalumus"
+
 var Flags FlagSettings
 var Conf *Config
 

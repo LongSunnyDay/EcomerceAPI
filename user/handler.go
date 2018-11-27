@@ -2,10 +2,10 @@ package user
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"go-api-ws/auth"
 	"go-api-ws/cart"
+	"go-api-ws/config"
 	"go-api-ws/core"
 	"go-api-ws/helpers"
 	"net/http"
@@ -36,14 +36,13 @@ func getOrderHistory(w http.ResponseWriter, r *http.Request) {
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		if claims.VerifyExpiresAt(time.Now().Unix(), true) {
 			orderHistory := getUserOrderHistoryFromMongo(claims["sub"].(string))
-			response := Response{
-				Code:   http.StatusOK,
-				Result: orderHistory}
-			helpers.WriteResultWithStatusCode(w, response, response.Code)
+			response := helpers.Response{
+				Code:http.StatusOK,
+				Result:orderHistory}
+			response.SendResponse(w)
 		}
 	} else {
 		helpers.WriteResultWithStatusCode(w, "Invalid token", http.StatusForbidden)
-		fmt.Println("Invalid token")
 	}
 }
 
@@ -56,21 +55,15 @@ func meEndpoint(w http.ResponseWriter, r *http.Request) {
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		if claims.VerifyExpiresAt(time.Now().Unix(), true) {
 			userInfo := getUserFromMongo(claims["sub"].(string))
-			me := MeUser{
-				Code:   http.StatusOK,
-				Result: userInfo}
-			helpers.WriteResultWithStatusCode(w, me, me.Code)
+			response := helpers.Response{
+				Code:http.StatusOK,
+				Result:userInfo}
+			response.SendResponse(w)
 		} else {
-			response := Response{
-				Code:   http.StatusForbidden,
-				Result: "Token expired"}
-			helpers.WriteResultWithStatusCode(w, response, response.Code)
+			helpers.WriteResultWithStatusCode(w, "Token expired", http.StatusForbidden)
 		}
 	} else {
-		response := Response{
-			Code:   http.StatusBadRequest,
-			Result: "Invalid token"}
-		helpers.WriteResultWithStatusCode(w, response, response.Code)
+		helpers.WriteResultWithStatusCode(w, "Invalid token", http.StatusBadRequest)
 	}
 }
 
@@ -100,16 +93,9 @@ func registerUser(w http.ResponseWriter, r *http.Request) {
 		}
 		insertUserIntoMongo(userInfo)
 		cart.CreateCartInMongoDB(user.ID)
-		response := Response{
-			Code:   http.StatusOK,
-			Result: "ok"}
-		helpers.WriteResultWithStatusCode(w, response, response.Code)
+		helpers.WriteResultWithStatusCode(w, "ok", http.StatusOK)
 	} else {
-		response := Response{
-			Code:   http.StatusBadRequest,
-			Result: validationResult.Errors()}
-
-		helpers.WriteResultWithStatusCode(w, response, response.Code)
+		helpers.WriteResultWithStatusCode(w, validationResult.Errors(), http.StatusBadRequest)
 	}
 }
 
@@ -136,30 +122,25 @@ func refreshToken(w http.ResponseWriter, req *http.Request) {
 			role := roleByGroupId(groupId)
 
 			authToken := auth.GetNewAuthToken(claims["sub"].(string), role)
-			authTokenString, err := authToken.SignedString([]byte(auth.MySecret))
+			authTokenString, err := authToken.SignedString([]byte(config.MySecret))
 			helpers.PanicErr(err)
 
 			refreshToken := auth.GetNewRefreshToken(claims["sub"].(string))
-			refreshTokenString, err := refreshToken.SignedString([]byte(auth.MySecret))
+			refreshTokenString, err := refreshToken.SignedString([]byte(config.MySecret))
 			helpers.PanicErr(err)
 
-			response := Response{
-				Code:   http.StatusOK,
-				Result: authTokenString,
+			response := helpers.Response{
+				Code: http.StatusOK,
+				Result:authTokenString,
 				Meta: map[string]string{
-					"refreshToken": refreshTokenString}}
-			helpers.WriteResultWithStatusCode(w, response, response.Code)
+					"refreshToken" : refreshTokenString}}
+			response.SendResponse(w)
+
 		} else {
-			response := Response{
-				Code:   http.StatusForbidden,
-				Result: "Token expired"}
-			helpers.WriteResultWithStatusCode(w, response, response.Code)
+			helpers.WriteResultWithStatusCode(w, "Token expired", http.StatusForbidden)
 		}
 	} else {
-		response := Response{
-			Code:   http.StatusBadRequest,
-			Result: "Invalid token"}
-		helpers.WriteResultWithStatusCode(w, response, response.Code)
+		helpers.WriteResultWithStatusCode(w, "Invalid token", http.StatusBadRequest)
 	}
 }
 
@@ -181,56 +162,25 @@ func loginEndpoint(w http.ResponseWriter, req *http.Request) {
 			role := roleByGroupId(userFromDb.GroupId)
 
 			authToken := auth.GetNewAuthToken(userFromDb.ID, role)
-			authTokenString, err := authToken.SignedString([]byte(auth.MySecret))
+			authTokenString, err := authToken.SignedString([]byte(config.MySecret))
 			helpers.PanicErr(err)
 
 			refreshToken := auth.GetNewRefreshToken(userFromDb.ID)
-			refreshTokenString, err := refreshToken.SignedString([]byte(auth.MySecret))
+			refreshTokenString, err := refreshToken.SignedString([]byte(config.MySecret))
 			helpers.PanicErr(err)
 
-			response := Response{
+			response := helpers.Response{
 				Code:   http.StatusOK,
 				Result: authTokenString,
 				Meta: map[string]string{
 					"refreshToken": refreshTokenString,
 				}}
-
-			helpers.WriteResultWithStatusCode(w, response, response.Code)
+			response.SendResponse(w)
 		} else {
-			response := Response{
-				Code:   http.StatusUnauthorized,
-				Result: "Password is invalid"}
-			helpers.WriteResultWithStatusCode(w, response, response.Code)
+			helpers.WriteResultWithStatusCode(w, "Password is invalid", http.StatusUnauthorized)
 		}
 	} else {
-		response := Response{
-			Code:   http.StatusBadRequest,
-			Result: validationResult.Errors()}
-		helpers.WriteResultWithStatusCode(w, response, response.Code)
+		helpers.WriteResultWithStatusCode(w, validationResult.Errors(), http.StatusBadRequest)
 
 	}
-}
-
-func protectedEndpointMiddleware(handlerFunc http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, req *http.Request) {
-		urlToken := req.URL.Query()["token"][0]
-		token, _ := auth.ParseToken(urlToken)
-
-		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-			if claims["role"] == "adminRole" && claims.VerifyExpiresAt(time.Now().Unix(), true) {
-				handlerFunc.ServeHTTP(w, req)
-			} else {
-				response := Response{
-					Code:   http.StatusForbidden,
-					Result: "Token expired"}
-				helpers.WriteResultWithStatusCode(w, response, response.Code)
-			}
-		} else {
-			response := Response{
-				Code:   http.StatusBadRequest,
-				Result: "Invalid token"}
-			helpers.WriteResultWithStatusCode(w, response, response.Code)
-		}
-	}
-
 }

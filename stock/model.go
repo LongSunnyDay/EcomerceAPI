@@ -35,43 +35,41 @@ type stockData struct {
 	StockStatusChangedAuto         int    `json:"stock_status_changed_auto"`
 }
 
-func getDataFromDbBySku(itemSku string) stockData {
+func (data *stockData) getDataFromDbBySku(itemSku string) {
 	db, err := config.Conf.GetDb()
 	helpers.PanicErr(err)
-	var itemData stockData
 	err = db.QueryRow("SELECT * FROM stock WHERE sku = ?", itemSku).Scan(
-		&itemData.Sku,
-		&itemData.Backorders,
-		&itemData.EnableQtyIncrements,
-		&itemData.IsInStock,
-		&itemData.IsQtyDecimal,
-		&itemData.ItemId,
-		&itemData.LowStockDate,
-		&itemData.ManageStock,
-		&itemData.MaxSaleQty,
-		&itemData.MinQty,
-		&itemData.MinSaleQty,
-		&itemData.NotifyStockQty,
-		&itemData.ProductId,
-		&itemData.QTY,
-		&itemData.QtyIncrements,
-		&itemData.ShowDefaultNotificationMessage,
-		&itemData.StockId,
-		&itemData.StockStatusChangedAuto,
-		&itemData.UseConfigBackorders,
-		&itemData.UseConfigEnableQtyInc,
-		&itemData.UseConfigManageStock,
-		&itemData.UseConfigMaxSaleQty,
-		&itemData.UseConfigMinQty,
-		&itemData.UseConfigMinSaleQty,
-		&itemData.UseConfigNotifyStockQty,
-		&itemData.UseConfigQtyIncrements,
-		&itemData.IsDecimalDivided)
+		&data.Sku,
+		&data.Backorders,
+		&data.EnableQtyIncrements,
+		&data.IsInStock,
+		&data.IsQtyDecimal,
+		&data.ItemId,
+		&data.LowStockDate,
+		&data.ManageStock,
+		&data.MaxSaleQty,
+		&data.MinQty,
+		&data.MinSaleQty,
+		&data.NotifyStockQty,
+		&data.ProductId,
+		&data.QTY,
+		&data.QtyIncrements,
+		&data.ShowDefaultNotificationMessage,
+		&data.StockId,
+		&data.StockStatusChangedAuto,
+		&data.UseConfigBackorders,
+		&data.UseConfigEnableQtyInc,
+		&data.UseConfigManageStock,
+		&data.UseConfigMaxSaleQty,
+		&data.UseConfigMinQty,
+		&data.UseConfigMinSaleQty,
+		&data.UseConfigNotifyStockQty,
+		&data.UseConfigQtyIncrements,
+		&data.IsDecimalDivided)
 	helpers.PanicErr(err)
-	return itemData
 }
 
-func insertDataToStock(data stockData) {
+func (data stockData) insertDataToStock() {
 	db, err := config.Conf.GetDb()
 	helpers.PanicErr(err)
 	_, err = db.Exec("INSERT INTO stock("+
@@ -130,5 +128,73 @@ func insertDataToStock(data stockData) {
 		data.LowStockDate,
 		data.IsDecimalDivided,
 		data.StockStatusChangedAuto)
+	helpers.PanicErr(err)
+}
+
+func (data stockData) updateDataInDb() {
+	db, err := config.Conf.GetDb()
+	helpers.PanicErr(err)
+	_, err = db.Exec("UPDATE stock s SET " +
+		"s.item_id = ?, " +
+		"s.product_id = ?, " +
+		"s.stock_id = ?, " +
+		"s.qty = ?, " +
+		"s.is_in_stock = ?, " +
+		"s.is_qty_decimal = ?, " +
+		"s.show_default_notification_message = ?, " +
+		"s.use_config_min_qty = ?, " +
+		"s.min_qty = ?, " +
+		"s.use_config_min_sale_qty = ?, " +
+		"s.min_sale_qty = ?, " +
+		"s.use_config_max_sale_qty = ?, " +
+		"s.max_sale_qty = ?, " +
+		"s.use_config_backorders = ?, " +
+		"s.backorders = ?, " +
+		"s.use_config_notify_stock_qty = ?, " +
+		"s.notify_stock_qty = ?, " +
+		"s.use_config_qty_increments = ?, " +
+		"s.qty_increments = ?, " +
+		"s.use_config_enable_qty_inc = ?, " +
+		"s.enable_qty_increments = ?, " +
+		"s.use_config_manage_stock = ?, " +
+		"s.manage_stock = ?, " +
+		"s.low_stock_date = ?, " +
+		"s.is_decimal_divided = ?, " +
+		"s.stock_status_changed_auto = ? " +
+		"WHERE s.sku = ?",
+		data.ItemId,
+		data.ProductId,
+		data.StockId,
+		data.QTY,
+		data.IsInStock,
+		data.IsQtyDecimal,
+		data.ShowDefaultNotificationMessage,
+		data.UseConfigMinQty,
+		data.MinQty,
+		data.UseConfigMinSaleQty,
+		data.MinSaleQty,
+		data.UseConfigMaxSaleQty,
+		data.MaxSaleQty,
+		data.UseConfigBackorders,
+		data.Backorders,
+		data.UseConfigNotifyStockQty,
+		data.NotifyStockQty,
+		data.UseConfigQtyIncrements,
+		data.QtyIncrements,
+		data.UseConfigEnableQtyInc,
+		data.EnableQtyIncrements,
+		data.UseConfigManageStock,
+		data.ManageStock,
+		data.LowStockDate,
+		data.IsDecimalDivided,
+		data.StockStatusChangedAuto,
+		data.Sku)
+	helpers.PanicErr(err)
+}
+
+func removeItemfromDb(itemSku string) {
+	db, err := config.Conf.GetDb()
+	helpers.PanicErr(err)
+	_, err = db.Exec("DELETE FROM stock WHERE sku = ?", itemSku)
 	helpers.PanicErr(err)
 }

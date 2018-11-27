@@ -8,6 +8,8 @@ import (
 func RouterStock() http.Handler {
 	r := chi.NewRouter()
 	r.Get("/check", checkStock)
-	r.Post("/insert", insertToStock)
+	r.Post("/", insertToStock)
+	r.Put("/", updateStockItem)
+	r.Delete("/", removeItemFromStock)
 	return r
 }

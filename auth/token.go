@@ -3,18 +3,18 @@ package auth
 import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
+	"go-api-ws/config"
 	"go-api-ws/helpers"
 	"time"
 )
 
-const MySecret = "SenelisMegstaMociutesApvalumus"
 
 func ParseToken(tokenString string) (*jwt.Token, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("there is an error")
 		}
-		return []byte(MySecret), nil
+		return []byte(config.MySecret), nil
 	})
 	helpers.PanicErr(err)
 	return token, nil

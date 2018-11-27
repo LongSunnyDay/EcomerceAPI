@@ -70,10 +70,14 @@ type solrResponse struct {
 }
 
 type ItemAttribute struct {
-	Name string
-	Value string
+	Name  string
+	Label string
 }
 
+const SolrQueryUrl = "http://localhost:8983/solr/storefrontCore/query"
+const ContentType = "application/json; charset=utf-8"
+
+// Solr client function
 func GetAttributeNameFromSolr(attributeId string, attributeValue string) (ItemAttribute) {
 	request := map[string]interface{}{
 		"query":  "_type:attribute",
@@ -82,8 +86,8 @@ func GetAttributeNameFromSolr(attributeId string, attributeValue string) (ItemAt
 	requestBytes := new(bytes.Buffer)
 	json.NewEncoder(requestBytes).Encode(request)
 	resp, err := http.Post(
-		"http://localhost:8983/solr/storefrontCore/query",
-		"application/json; charset=utf-8",
+		SolrQueryUrl,
+		ContentType,
 		requestBytes)
 	helpers.PanicErr(err)
 	b, _ := ioutil.ReadAll(resp.Body)
@@ -92,8 +96,8 @@ func GetAttributeNameFromSolr(attributeId string, attributeValue string) (ItemAt
 
 	if solrResp.Response.NumFound == 1 {
 		itemAttribute := ItemAttribute{
-			Name: solrResp.Response.Docs[0].AttributeCode,
-			Value: solrResp.Response.Docs[0].ChildDocuments[0].Label}
+			Name:  solrResp.Response.Docs[0].AttributeCode,
+			Label: solrResp.Response.Docs[0].ChildDocuments[0].Label}
 		return itemAttribute
 	}
 	return ItemAttribute{}

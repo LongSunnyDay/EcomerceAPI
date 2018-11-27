@@ -6,24 +6,8 @@ import (
 	"github.com/mongodb/mongo-go-driver/bson/objectid"
 	"go-api-ws/config"
 	"go-api-ws/helpers"
-	"net/http"
 	"time"
 )
-
-type Response struct {
-	Acknowledged bool          `json:"acknowledged,omitempty"`
-	Code         int           `json:"code,omitempty"`
-	CreatedAt    string        `json:"created_at,omitempty"`
-	Payload      *http.Request `json:"payload,omitempty"`
-	Result       interface{}   `json:"result,omitempty"`
-	ResultCode   int           `json:"result_code,omitempty"`
-	TaskID       string        `json:"task_id,omitempty"`
-	Transmited   bool          `json:"transmited,omitempty"`
-	TransmitedAt string        `json:"transmited_at,omitempty"`
-	UpdatedAt    string        `json:"updated_at,omitempty"`
-	Url          string        `json:"url,omitempty"`
-	Meta         interface{}   `json:"meta,omitempty"`
-}
 
 type Cart struct {
 	ID        string    `json:"id,omitempty" bson:"id,omitempty"`
@@ -55,41 +39,14 @@ type Options struct {
 	OptionValue string `json:"option_value,omitempty" bson:"option_value"`
 }
 
-type PaymentMethod struct {
-	Type           string `bson:"type"`
-	Code           string `json:"code,omitempty" bson:"code"`
-	Title          string `json:"title,omitempty" bson:"title"`
-	IsServerMethod bool   `json:"is_server_method,omitempty" bson:"is_server_method"`
-}
-
-//// CONNECTIONSTRING DB connection string
-//const CONNECTIONSTRING = "mongodb://localhost:27017"
-//
-//// DBNAME Database name
-//const DBNAME = "go-api-ws"
-
-// COLLNAME Collection name
-const COLLNAME = "cart"
-
-//var db *mongo.Database
-
-// Connect establish a connection to database
-//func init() {
-//	client, err := mongo.NewClient(CONNECTIONSTRING)
-//	helpers.PanicErr(err)
-//
-//	err = client.Connect(context.Background())
-//	helpers.PanicErr(err)
-//
-//	// Collection types can be used to access the database
-//	db = client.Database(DBNAME)
-//}
+// collectionName Collection name
+const collectionName = "cart"
 
 func getGuestCartIDFromMongo(guestCartID string) (cartID string, err error) {
 	db := config.Conf.GetMongoDb()
 
 	bsonData := bson.NewDocument()
-	err = db.Collection(COLLNAME).FindOne(nil, bson.NewDocument(
+	err = db.Collection(collectionName).FindOne(nil, bson.NewDocument(
 		bson.EC.Interface("_id", guestCartID))).Decode(&bsonData)
 	if err != nil {
 		return "", err
@@ -102,7 +59,7 @@ func getUserCartIDFromMongo(userID string) (cartID string, err error) {
 	db := config.Conf.GetMongoDb()
 
 	bsonData := bson.NewDocument()
-	err = db.Collection(COLLNAME).FindOne(nil, bson.NewDocument(
+	err = db.Collection(collectionName).FindOne(nil, bson.NewDocument(
 		bson.EC.String("id", userID))).Decode(&bsonData)
 	if err != nil {
 		return "", err
@@ -120,7 +77,7 @@ func CreateCartInMongoDB(userID string) (cartID string) {
 			CreatedAt: time.Now()}
 		bsonCart, err := helpers.StructToBson(cart)
 		helpers.PanicErr(err)
-		result, err := db.Collection(COLLNAME).InsertOne(context.Background(), bsonCart)
+		result, err := db.Collection(collectionName).InsertOne(context.Background(), bsonCart)
 		cartID := result.InsertedID.(objectid.ObjectID).Hex()
 		return cartID
 	} else {
@@ -129,7 +86,7 @@ func CreateCartInMongoDB(userID string) (cartID string) {
 			ID:    userID}
 		bsonCart, err := helpers.StructToBson(cart)
 		helpers.PanicErr(err)
-		_, err = db.Collection(COLLNAME).InsertOne(context.Background(), bsonCart)
+		_, err = db.Collection(collectionName).InsertOne(context.Background(), bsonCart)
 		helpers.PanicErr(err)
 		cartID, err = getUserCartIDFromMongo(userID)
 		helpers.PanicErr(err)
@@ -143,7 +100,7 @@ func getGuestCartFromMongoByID(guestCartID string) []Item {
 	cart := Cart{Items: []Item{}}
 	objectIDFromUserID, err := objectid.FromHex(guestCartID)
 	helpers.PanicErr(err)
-	err = db.Collection(COLLNAME).FindOne(context.Background(), bson.NewDocument(
+	err = db.Collection(collectionName).FindOne(context.Background(), bson.NewDocument(
 		bson.EC.ObjectID("_id", objectIDFromUserID))).Decode(&cart)
 	if err != nil {
 		carID := CreateCartInMongoDB(guestCartID)
@@ -156,7 +113,7 @@ func getUserCartFromMongoByID(userID string) []Item {
 	db := config.Conf.GetMongoDb()
 
 	cart := Cart{Items: []Item{}}
-	err := db.Collection(COLLNAME).FindOne(context.Background(), bson.NewDocument(
+	err := db.Collection(collectionName).FindOne(context.Background(), bson.NewDocument(
 		bson.EC.String("id", userID))).Decode(&cart)
 	if err != nil {
 		carID := CreateCartInMongoDB(userID)
@@ -165,38 +122,13 @@ func getUserCartFromMongoByID(userID string) []Item {
 	return cart.Items
 }
 
-func insertPaymentMethodsToMongo(methods []interface{}) {
-	db := config.Conf.GetMongoDb()
-
-	_, err := db.Collection(COLLNAME).InsertMany(nil, methods)
-	helpers.PanicErr(err)
-}
-
-func getPaymentMethodsFromMongo() []PaymentMethod {
-	var paymentMethod PaymentMethod
-	var paymentMethods []PaymentMethod
-
-	db := config.Conf.GetMongoDb()
-
-	cur, err := db.Collection(COLLNAME).Find(nil, bson.NewDocument(
-		bson.EC.String("type", "Payment method")))
-	helpers.PanicErr(err)
-	for cur.Next(context.Background()) {
-		err := cur.Decode(&paymentMethod)
-		helpers.PanicErr(err)
-		paymentMethods = append(paymentMethods, paymentMethod)
-	}
-	cur.Close(context.Background())
-	return paymentMethods
-}
-
 func updateUserCartInMongo(cartID string, item Item) {
 	bsonItem, err := helpers.StructToBson(item)
 	helpers.PanicErr(err)
 
 	db := config.Conf.GetMongoDb()
 
-	db.Collection(COLLNAME).UpdateOne(nil,
+	db.Collection(collectionName).UpdateOne(nil,
 		bson.NewDocument(
 			bson.EC.String("id", cartID)),
 		bson.NewDocument(
@@ -205,7 +137,7 @@ func updateUserCartInMongo(cartID string, item Item) {
 					bson.NewDocument(
 						bson.EC.String("sku", item.SKU))))))
 
-	_, err = db.Collection(COLLNAME).UpdateOne(nil,
+	_, err = db.Collection(collectionName).UpdateOne(nil,
 		bson.NewDocument(
 			bson.EC.String("id", cartID)),
 		bson.NewDocument(
@@ -223,7 +155,7 @@ func updateGuestCartInMongo(cartID string, item Item) {
 
 	db := config.Conf.GetMongoDb()
 
-	db.Collection(COLLNAME).UpdateOne(nil,
+	db.Collection(collectionName).UpdateOne(nil,
 		bson.NewDocument(
 			bson.EC.ObjectID("_id", bsonCartID)),
 		bson.NewDocument(
@@ -232,7 +164,7 @@ func updateGuestCartInMongo(cartID string, item Item) {
 					bson.NewDocument(
 						bson.EC.String("sku", item.SKU))))))
 
-	_, err = db.Collection(COLLNAME).UpdateOne(nil,
+	_, err = db.Collection(collectionName).UpdateOne(nil,
 		bson.NewDocument(
 			bson.EC.ObjectID("_id", bsonCartID)),
 		bson.NewDocument(
@@ -244,7 +176,7 @@ func updateGuestCartInMongo(cartID string, item Item) {
 func deleteItemFromCartInMongo(carId string, item CartItem) {
 	db := config.Conf.GetMongoDb()
 
-	_, err := db.Collection(COLLNAME).UpdateOne(nil,
+	_, err := db.Collection(collectionName).UpdateOne(nil,
 		bson.NewDocument(
 			bson.EC.String("id", carId)),
 		bson.NewDocument(
@@ -261,7 +193,7 @@ func deleteItemFromGuestCartInMongo(cartID string, item CartItem) {
 
 	db := config.Conf.GetMongoDb()
 
-	_, err = db.Collection(COLLNAME).UpdateOne(nil,
+	_, err = db.Collection(collectionName).UpdateOne(nil,
 		bson.NewDocument(
 			bson.EC.ObjectID("_id", bsonCartID)),
 		bson.NewDocument(

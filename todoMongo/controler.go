@@ -10,29 +10,8 @@ import (
 	m "go-api-ws/todoMongo/models"
 )
 
-
-// CONNECTIONSTRING DB connection string
-//const CONNECTIONSTRING = "mongodb://localhost:27017"
-
-// DBNAME Database name
-//const DBNAME = "go-api-ws"
-
 // COLLNAME Collection name
 const COLLNAME = "todos"
-
-//var db *mongo.Database
-
-// Connect establish a connection to database
-//func init() {
-//	client, err := mongo.NewClient(CONNECTIONSTRING)
-//	helpers.PanicErr(err)
-//
-//	err = client.Connect(context.Background())
-//	helpers.PanicErr(err)
-//
-//	// Collection types can be used to access the database
-//	db = client.Database(DBNAME)
-//}
 
 func InsertTodo(todo m.Todo) {
 	fmt.Println(todo)

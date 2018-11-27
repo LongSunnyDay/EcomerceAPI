@@ -1,0 +1,120 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://example.com/root.json",
+  "type": "array",
+  "title": "The Root Schema",
+  "items": {
+    "$id": "#/items",
+    "type": "object",
+    "title": "The Items Schema",
+    "required": [
+      "carrier_code",
+      "method_code",
+      "carrier_title",
+      "method_title",
+      "amount",
+      "base_amount",
+      "error_message",
+      "price_excl_tax",
+      "price_incl_tax"
+    ],
+    "properties": {
+      "carrier_code": {
+        "$id": "#/items/properties/carrier_code",
+        "type": "string",
+        "title": "The Carrier_code Schema",
+        "default": "",
+        "examples": [
+          "flatrate"
+        ],
+        "pattern": "^(.*)$"
+      },
+      "method_code": {
+        "$id": "#/items/properties/method_code",
+        "type": "string",
+        "title": "The Method_code Schema",
+        "default": "",
+        "examples": [
+          "flatrate"
+        ],
+        "pattern": "^(.*)$"
+      },
+      "carrier_title": {
+        "$id": "#/items/properties/carrier_title",
+        "type": "string",
+        "title": "The Carrier_title Schema",
+        "default": "",
+        "examples": [
+          "Flat Rate"
+        ],
+        "pattern": "^(.*)$"
+      },
+      "method_title": {
+        "$id": "#/items/properties/method_title",
+        "type": "string",
+        "title": "The Method_title Schema",
+        "default": "",
+        "examples": [
+          "Fixed"
+        ],
+        "pattern": "^(.*)$"
+      },
+      "amount": {
+        "$id": "#/items/properties/amount",
+        "type": "integer",
+        "title": "The Amount Schema",
+        "default": 0,
+        "examples": [
+          5
+        ]
+      },
+      "base_amount": {
+        "$id": "#/items/properties/base_amount",
+        "type": "integer",
+        "title": "The Base_amount Schema",
+        "default": 0,
+        "examples": [
+          5
+        ]
+      },
+      "available": {
+        "$id": "#/items/properties/available",
+        "type": "boolean",
+        "title": "The Available Schema",
+        "default": false,
+        "examples": [
+          true
+        ]
+      },
+      "error_message": {
+        "$id": "#/items/properties/error_message",
+        "type": "string",
+        "title": "The Error_message Schema",
+        "default": "",
+        "examples": [
+          ""
+        ],
+        "pattern": "^(.*)$"
+      },
+      "price_excl_tax": {
+        "$id": "#/items/properties/price_excl_tax",
+        "type": "integer",
+        "title": "The Price_excl_tax Schema",
+        "default": 0,
+        "examples": [
+          5
+        ]
+      },
+      "price_incl_tax": {
+        "$id": "#/items/properties/price_incl_tax",
+        "type": "integer",
+        "title": "The Price_incl_tax Schema",
+        "default": 0,
+        "examples": [
+          5
+        ]
+      }
+    }
+  }
+}

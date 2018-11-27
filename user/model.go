@@ -5,7 +5,6 @@ import (
 	"github.com/mongodb/mongo-go-driver/bson"
 	"go-api-ws/config"
 	"go-api-ws/helpers"
-	"net/http"
 )
 
 // Data models
@@ -32,26 +31,6 @@ type LoginForm struct {
 	Password string `json:"password,omitempty"`
 }
 
-type Response struct {
-	Acknowledged bool          `json:"acknowledged,omitempty"`
-	Code         int           `json:"code,omitempty"`
-	CreatedAt    string        `json:"created_at,omitempty"`
-	Payload      *http.Request `json:"payload,omitempty"`
-	Result       interface{}   `json:"result,omitempty"`
-	ResultCode   int           `json:"result_code,omitempty"`
-	TaskID       string        `json:"task_id,omitempty"`
-	Transmited   bool          `json:"transmited,omitempty"`
-	TransmitedAt string        `json:"transmited_at,omitempty"`
-	UpdatedAt    string        `json:"updated_at,omitempty"`
-	Url          string        `json:"url,omitempty"`
-	Meta         interface{}   `json:"meta,omitempty"`
-}
-
-type MeUser struct {
-	Code   int    `json:"code"`
-	Result Result `json:"result,omitempty"`
-}
-
 type Result struct {
 	Addresses              []UserAdresses `json:"addresses" bson:"address"`
 	CreatedAt              int64          `json:"created_at,omitempty" bson:"created_at"`
@@ -67,9 +46,6 @@ type Result struct {
 	WebsiteID              int32          `json:"website_id,omitempty" bson:"website_id"`
 }
 
-type Adresses struct {
-	WebsiteID int32 `json:"website_id,omitempty" bson:"website_id"`
-}
 
 type UpdatedCustomer struct {
 	UpdateUser UpdateUser `json:"customer,omitempty" bson:"customer,omitempty"`
@@ -125,31 +101,10 @@ type Item struct {
 	SKU string `json:"sku,omitempty" bson:"sku"`
 }
 
-// CONNECTIONSTRING DB connection string
-//const CONNECTIONSTRING = "mongodb://localhost:27017"
-
-// DBNAME Database name
-//const DBNAME = "go-api-ws"
-
-// COLLNAME Collection name
-const COLLNAME = "users"
-
-//var db *mongo.Database
-
-// Connect establish a connection to database
-//func init() {
-//	client, err := mongo.NewClient(CONNECTIONSTRING)
-//	helpers.PanicErr(err)
-//
-//	err = client.Connect(context.Background())
-//	helpers.PanicErr(err)
-//
-//	// Collection types can be used to access the database
-//	db = client.Database(DBNAME)
-//}
+// collectionName Collection name
+const collectionName = "users"
 
 // Database operations
-
 // MYSQL
 func insertUserIntoDb(user User) {
 	passwordHash, err := hashPassword(user.Password)
@@ -209,7 +164,7 @@ func getGroupIdFromDbById(id int) int {
 // MongoDB
 func insertUserIntoMongo(userInfo Result) {
 	db := config.Conf.GetMongoDb()
-	_, err := db.Collection(COLLNAME).InsertOne(context.Background(),
+	_, err := db.Collection(collectionName).InsertOne(context.Background(),
 		bson.NewDocument(
 			bson.EC.String("type", "User info"),
 			bson.EC.Int64("created_at", userInfo.CreatedAt),
@@ -230,7 +185,7 @@ func insertUserIntoMongo(userInfo Result) {
 func getUserFromMongo(id string) (Result) {
 	db := config.Conf.GetMongoDb()
 
-	cur, err := db.Collection(COLLNAME).Find(context.Background(), bson.NewDocument(
+	cur, err := db.Collection(collectionName).Find(context.Background(), bson.NewDocument(
 		bson.EC.Interface("id", id),
 		bson.EC.String("type", "User info")))
 	helpers.PanicErr(err)
@@ -249,7 +204,7 @@ func getUserFromMongo(id string) (Result) {
 func getUserOrderHistoryFromMongo(id string) (OrderHistory) {
 	db := config.Conf.GetMongoDb()
 
-	cur, err := db.Collection(COLLNAME).Find(context.Background(), bson.NewDocument(
+	cur, err := db.Collection(collectionName).Find(context.Background(), bson.NewDocument(
 		bson.EC.Interface("id", id),
 		bson.EC.String("type", "Order history")))
 	helpers.PanicErr(err)

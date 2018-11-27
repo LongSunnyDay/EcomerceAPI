@@ -12,6 +12,12 @@ import (
 	"strconv"
 )
 
+type Response struct {
+	Code   int         `json:"code,omitempty"`
+	Result interface{} `json:"result,omitempty"`
+	Meta   interface{} `json:"meta,omitempty"`
+}
+
 const HeaderContentType = "Content-Type"
 const MIMEApplicationJSON = "application/json"
 
@@ -21,7 +27,7 @@ func PanicErr(err error) {
 	}
 }
 
-func CheckErr(err error)  {
+func CheckErr(err error) {
 	if err != nil {
 		fmt.Println("Error: ", err)
 	}
@@ -65,17 +71,21 @@ func GetTokenFromUrl(r *http.Request) (string, error) {
 	return "", errors.New("Token not found")
 }
 
-func WriteResultWithStatusCode(w http.ResponseWriter, data interface{}, errorCode int)  {
+func WriteResultWithStatusCode(w http.ResponseWriter, data interface{}, statusCode int) {
 	w.Header().Set(HeaderContentType, MIMEApplicationJSON)
-	w.WriteHeader(errorCode)
+	w.WriteHeader(statusCode)
 	json.NewEncoder(w).Encode(data)
 }
 
-func StructToBson (v interface{}) (doc *bson.Document, err error) {
+func StructToBson(v interface{}) (doc *bson.Document, err error) {
 	data, err := bson.Marshal(v)
 	if err != nil {
 		return
 	}
 	err = bson.Unmarshal(data, &doc)
 	return
+}
+
+func (r Response) SendResponse(w http.ResponseWriter)  {
+	WriteResultWithStatusCode(w, r, r.Code)
 }

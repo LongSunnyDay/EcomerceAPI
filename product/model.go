@@ -3,6 +3,7 @@ package product
 import (
 	"bytes"
 	"encoding/json"
+	"go-api-ws/attribute"
 	"go-api-ws/helpers"
 	"io/ioutil"
 	"net/http"
@@ -98,8 +99,8 @@ func GetProductFromSolrBySKU(sku string) (SimpleProductStruct) {
 	requestBytes := new(bytes.Buffer)
 	json.NewEncoder(requestBytes).Encode(request)
 	resp, err := http.Post(
-		"http://localhost:8983/solr/storefrontCore/query",
-		"application/json; charset=utf-8",
+		attribute.SolrQueryUrl,
+		attribute.ContentType,
 		requestBytes)
 	helpers.PanicErr(err)
 	b, _ := ioutil.ReadAll(resp.Body)

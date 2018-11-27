@@ -6,13 +6,13 @@ func BuildSKUFromItemAttributes(itemAttributes []attribute.ItemAttribute, sku st
 
 	for _, itemAttribute := range itemAttributes {
 		if itemAttribute.Name == "size" {
-			sku = sku + "-" + itemAttribute.Value
+			sku = sku + "-" + itemAttribute.Label
 		}
 	}
 
 	for _, itemAttribute := range itemAttributes {
 		if itemAttribute.Name == "color" {
-			sku = sku + "-" + itemAttribute.Value
+			sku = sku + "-" + itemAttribute.Label
 		}
 	}
 	return sku

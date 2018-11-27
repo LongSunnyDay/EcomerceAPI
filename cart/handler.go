@@ -23,24 +23,24 @@ func createCart(w http.ResponseWriter, r *http.Request) {
 				helpers.CheckErr(err)
 				if err != nil {
 					cartID := CreateCartInMongoDB(claims["sub"].(string))
-					response := Response{
-						Code:   http.StatusOK,
-						Result: cartID}
-					helpers.WriteResultWithStatusCode(w, response, response.Code)
+					response := helpers.Response{
+						Code:http.StatusOK,
+						Result:cartID}
+					response.SendResponse(w)
 				} else {
-					response := Response{
-						Code:   http.StatusOK,
-						Result: cartID}
-					helpers.WriteResultWithStatusCode(w, response, response.Code)
+					response := helpers.Response{
+						Code:http.StatusOK,
+						Result:cartID}
+					response.SendResponse(w)
 				}
 			}
 		}
 	} else {
 		cartID := CreateCartInMongoDB("")
-		response := Response{
-			Code:   http.StatusOK,
-			Result: cartID}
-		helpers.WriteResultWithStatusCode(w, response, response.Code)
+		response := helpers.Response{
+			Code:http.StatusOK,
+			Result:cartID}
+		response.SendResponse(w)
 	}
 }
 
@@ -52,34 +52,19 @@ func pullCart(w http.ResponseWriter, r *http.Request) {
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 			if claims.VerifyExpiresAt(time.Now().Unix(), true) {
 				cart := getUserCartFromMongoByID(urlCartId)
-				response := Response{
+				response := helpers.Response{
 					Code:   http.StatusOK,
 					Result: cart}
-				helpers.WriteResultWithStatusCode(w, response, response.Code)
+				response.SendResponse(w)
 			}
 		}
 	} else {
 		cart := getGuestCartFromMongoByID(urlCartId)
-		response := Response{
+		response := helpers.Response{
 			Code:   http.StatusOK,
 			Result: cart}
-		helpers.WriteResultWithStatusCode(w, response, response.Code)
+		response.SendResponse(w)
 	}
-}
-
-func addPaymentMethod(w http.ResponseWriter, r *http.Request) {
-	var methods []interface{}
-	_ = json.NewDecoder(r.Body).Decode(&methods)
-	insertPaymentMethodsToMongo(methods)
-	helpers.WriteResultWithStatusCode(w, "ok", 200)
-}
-
-func getPaymentMethods(w http.ResponseWriter, r *http.Request) {
-	paymentMethods := getPaymentMethodsFromMongo()
-	response := Response{
-		Code:   http.StatusOK,
-		Result: paymentMethods}
-	helpers.WriteResultWithStatusCode(w, response, response.Code)
 }
 
 func updateCart(w http.ResponseWriter, r *http.Request) {
@@ -104,16 +89,16 @@ func updateCart(w http.ResponseWriter, r *http.Request) {
 
 	if len(urlUserToken) > 0 {
 		updateUserCartInMongo(urlCartId, item.Item)
-		response := Response{
+		response := helpers.Response{
 			Code:   http.StatusOK,
 			Result: item.Item}
-		helpers.WriteResultWithStatusCode(w, response, response.Code)
+		response.SendResponse(w)
 	} else {
 		updateGuestCartInMongo(urlCartId, item.Item)
-		response := Response{
+		response := helpers.Response{
 			Code:   http.StatusOK,
 			Result: item.Item}
-		helpers.WriteResultWithStatusCode(w, response, response.Code)
+		response.SendResponse(w)
 	}
 }
 
@@ -125,15 +110,15 @@ func deleteFromUserCart(w http.ResponseWriter, r *http.Request) {
 
 	if len(urlUserToken) > 0 {
 		deleteItemFromCartInMongo(urlCartId, item)
-		response := Response{
+		response := helpers.Response{
 			Code:   http.StatusOK,
 			Result: true}
-		helpers.WriteResultWithStatusCode(w, response, response.Code)
+		response.SendResponse(w)
 	} else {
 		deleteItemFromGuestCartInMongo(urlCartId, item)
-		response := Response{
+		response := helpers.Response{
 			Code:   http.StatusOK,
 			Result: true}
-		helpers.WriteResultWithStatusCode(w, response, response.Code)
+		response.SendResponse(w)
 	}
 }

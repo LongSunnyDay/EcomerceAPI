@@ -6,23 +6,15 @@
       "Content-Type": "application/json"
     },
     "mode": "cors",
-    "body": {
-      "addressInformation": {
-        "shippingAddress": {
-          "countryId": "PL"
-        },
-        "shippingCarrierCode": "flatrate",
-        "shippingMethodCode": "flatrate"
-      }
-    }
+    "body": "{\"addressInformation\":{\"shippingAddress\":{\"countryId\":\"PL\"},\"shippingCarrierCode\":\"flatrate\",\"shippingMethodCode\":\"flatrate\"}}"
   },
   "silent": true,
   "callback_event": "store:cart/servercartAfterTotals",
-  "task_id": "1541778025309-e9852886-9143-4af6-2110-410451e96ae3",
+  "task_id": "1543229898383-53746e4b-234d-4185-43ec-6379d716fd6f",
   "transmited": true,
-  "created_at": "2018-11-09T15:40:25.309Z",
-  "updated_at": "2018-11-09T15:40:25.309Z",
-  "transmited_at": "2018-11-09T15:40:25.670Z",
+  "created_at": "2018-11-26T10:58:18.383Z",
+  "updated_at": "2018-11-26T10:58:18.383Z",
+  "transmited_at": "2018-11-26T10:58:18.921Z",
   "result": {
     "payment_methods": [
       {
@@ -35,83 +27,51 @@
       }
     ],
     "totals": {
-      "grand_total": 88.3,
-      "base_grand_total": 107.46,
-      "subtotal": 98,
-      "base_subtotal": 98,
-      "discount_amount": -14.7,
-      "base_discount_amount": -14.7,
-      "subtotal_with_discount": 83.3,
-      "base_subtotal_with_discount": 83.3,
+      "grand_total": 29.65,
+      "base_grand_total": 35.32,
+      "subtotal": 29,
+      "base_subtotal": 29,
+      "discount_amount": -4.35,
+      "base_discount_amount": -4.35,
+      "subtotal_with_discount": 24.65,
+      "base_subtotal_with_discount": 24.65,
       "shipping_amount": 5,
       "base_shipping_amount": 5,
       "shipping_discount_amount": 0,
       "base_shipping_discount_amount": 0,
-      "tax_amount": 19.16,
-      "base_tax_amount": 19.16,
+      "tax_amount": 5.67,
+      "base_tax_amount": 5.67,
       "weee_tax_applied_amount": null,
       "shipping_tax_amount": 0,
       "base_shipping_tax_amount": 0,
-      "subtotal_incl_tax": 120.54,
+      "subtotal_incl_tax": 35.67,
       "shipping_incl_tax": 5,
       "base_shipping_incl_tax": 5,
       "base_currency_code": "USD",
       "quote_currency_code": "USD",
-      "items_qty": 2,
+      "items_qty": 1,
       "items": [
         {
-          "item_id": 50256,
-          "price": 35,
-          "base_price": 35,
+          "item_id": 62530,
+          "price": 29,
+          "base_price": 29,
           "qty": 1,
-          "row_total": 35,
-          "base_row_total": 35,
+          "row_total": 29,
+          "base_row_total": 29,
           "row_total_with_discount": 0,
-          "tax_amount": 6.84,
-          "base_tax_amount": 6.84,
+          "tax_amount": 5.67,
+          "base_tax_amount": 5.67,
           "tax_percent": 23,
-          "discount_amount": 5.25,
-          "base_discount_amount": 5.25,
+          "discount_amount": 4.35,
+          "base_discount_amount": 4.35,
           "discount_percent": 15,
-          "price_incl_tax": 43.05,
-          "base_price_incl_tax": 43.05,
-          "row_total_incl_tax": 43.05,
-          "base_row_total_incl_tax": 43.05,
+          "price_incl_tax": 35.67,
+          "base_price_incl_tax": 35.67,
+          "row_total_incl_tax": 35.67,
+          "base_row_total_incl_tax": 35.67,
           "options": [
             {
-              "value": "Black",
-              "label": "Color"
-            },
-            {
-              "value": "32",
-              "label": "Size"
-            }
-          ],
-          "weee_tax_applied_amount": null,
-          "weee_tax_applied": null,
-          "name": "Caesar Warm-Up Pant"
-        },
-        {
-          "item_id": 52174,
-          "price": 63,
-          "base_price": 63,
-          "qty": 1,
-          "row_total": 63,
-          "base_row_total": 63,
-          "row_total_with_discount": 0,
-          "tax_amount": 12.32,
-          "base_tax_amount": 12.32,
-          "tax_percent": 23,
-          "discount_amount": 9.45,
-          "base_discount_amount": 9.45,
-          "discount_percent": 15,
-          "price_incl_tax": 77.49,
-          "base_price_incl_tax": 77.49,
-          "row_total_incl_tax": 77.49,
-          "base_row_total_incl_tax": 77.49,
-          "options": [
-            {
-              "value": "Black",
+              "value": "Gray",
               "label": "Color"
             },
             {
@@ -121,14 +81,14 @@
           ],
           "weee_tax_applied_amount": null,
           "weee_tax_applied": null,
-          "name": "Bruno Compete Hoodie"
+          "name": "Elisa EverCool&trade; Tee"
         }
       ],
       "total_segments": [
         {
           "code": "subtotal",
           "title": "Subtotal",
-          "value": 120.54
+          "value": 35.67
         },
         {
           "code": "shipping",
@@ -138,17 +98,17 @@
         {
           "code": "discount",
           "title": "Discount",
-          "value": -14.7
+          "value": -4.35
         },
         {
           "code": "tax",
           "title": "Tax",
-          "value": 19.16,
+          "value": 5.67,
           "area": "taxes",
           "extension_attributes": {
             "tax_grandtotal_details": [
               {
-                "amount": 19.16,
+                "amount": 5.67,
                 "rates": [
                   {
                     "percent": "23",
@@ -163,7 +123,7 @@
         {
           "code": "grand_total",
           "title": "Grand Total",
-          "value": 107.46,
+          "value": 35.32,
           "area": "footer"
         }
       ]

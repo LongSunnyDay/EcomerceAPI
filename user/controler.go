@@ -9,18 +9,6 @@ import (
 	"go-api-ws/helpers"
 )
 
-// Connect establish a connection to database
-//func init() {
-//	client, err := mongo.NewClient(CONNECTIONSTRING)
-//	helpers.PanicErr(err)
-//
-//	err = client.Connect(context.Background())
-//	helpers.PanicErr(err)
-//
-//	// Collection types can be used to access the database
-//	db = client.Database(DBNAME)
-//}
-
 func roleByGroupId(groupId int) string {
 	if groupId < 1 {
 		return adminRole
@@ -39,7 +27,7 @@ func UpdateUserByIdMongo(user UpdateUser) interface{} {
 
 	db := config.Conf.GetMongoDb()
 
-	update := db.Collection(COLLNAME).FindOneAndUpdate(context.Background(), filter, doc)
+	update := db.Collection(collectionName).FindOneAndUpdate(context.Background(), filter, doc)
 	//helpers.PanicErr(err)
 	fmt.Println(update)
 
