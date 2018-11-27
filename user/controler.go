@@ -43,5 +43,5 @@ func UpdateUserByIdMySQL(user UpdateUser){
 
 	_, er := query.Exec(user.Email, user.ID)
 	helpers.PanicErr(er)
-	fmt.Print(user.Email + " updated int mysql")
+	fmt.Println(user.Email + " updated int mysql")
 }
