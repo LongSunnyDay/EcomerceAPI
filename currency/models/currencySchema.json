@@ -1,0 +1,23 @@
+{
+  "additionalProperties": true,
+  "required": [
+    "name",
+    "code",
+    "sign",
+    "defaultCurrency"
+  ],
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "code": {
+      "type": "string"
+    },
+    "sign": {
+      "type": "string"
+    },
+    "defaultCurrency": {
+      "type": "boolean"
+    }
+  }
+}

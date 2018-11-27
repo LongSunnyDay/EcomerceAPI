@@ -2,7 +2,7 @@ port: :3306
 db:
   driverName: mysql
   user: root
-  password:
+  password: root
   dbname:   go-api-ws
   charset:  utf8
   server:   "tcp(localhost:3306)"

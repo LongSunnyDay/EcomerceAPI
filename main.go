@@ -11,6 +11,7 @@ import (
 	"go-api-ws/todoMongo"
 	"go-api-ws/user"
 	"net/http"
+	"go-api-ws/currency"
 )
 
 func init()  {
@@ -23,6 +24,7 @@ func main()  {
 	r := chi.NewRouter()
 	r.Mount("/api/user", user.RouterUser())
 	r.Mount("/api/cart", cart.RouterCart())
+	r.Mount("/api/currency", currency.CurrencyRouter())
 	r.Mount("/api/todo", todoMongo.TodoRouter())
 	r.Mount("/api/stock", stock.RouterStock())
 	r.Mount("/api/payment-methods", payment.RouterPayment())
