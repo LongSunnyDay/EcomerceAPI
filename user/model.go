@@ -46,7 +46,6 @@ type Result struct {
 	WebsiteID              int32          `json:"website_id,omitempty" bson:"website_id"`
 }
 
-
 type UpdatedCustomer struct {
 	UpdateUser UpdateUser `json:"customer,omitempty" bson:"customer,omitempty"`
 }

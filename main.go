@@ -9,6 +9,7 @@ import (
 	"go-api-ws/shipping"
 	"go-api-ws/stock"
 	"go-api-ws/todoMongo"
+	"go-api-ws/total"
 	"go-api-ws/user"
 	"net/http"
 	"go-api-ws/currency"
@@ -31,5 +32,6 @@ func main()  {
 	r.Mount("/api/stock", stock.RouterStock())
 	r.Mount("/api/payment-methods", payment.RouterPayment())
 	r.Mount("/api/shipping-methods", shipping.RoutesShippingMethods())
+	r.Mount("/api/shipping-information", total.RoutesTotal())
 	http.ListenAndServe(":8080", r)
 }

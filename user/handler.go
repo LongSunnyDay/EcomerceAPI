@@ -37,8 +37,8 @@ func getOrderHistory(w http.ResponseWriter, r *http.Request) {
 		if claims.VerifyExpiresAt(time.Now().Unix(), true) {
 			orderHistory := getUserOrderHistoryFromMongo(claims["sub"].(string))
 			response := helpers.Response{
-				Code:http.StatusOK,
-				Result:orderHistory}
+				Code:   http.StatusOK,
+				Result: orderHistory}
 			response.SendResponse(w)
 		}
 	} else {
@@ -56,8 +56,8 @@ func meEndpoint(w http.ResponseWriter, r *http.Request) {
 		if claims.VerifyExpiresAt(time.Now().Unix(), true) {
 			userInfo := getUserFromMongo(claims["sub"].(string))
 			response := helpers.Response{
-				Code:http.StatusOK,
-				Result:userInfo}
+				Code:   http.StatusOK,
+				Result: userInfo}
 			response.SendResponse(w)
 		} else {
 			helpers.WriteResultWithStatusCode(w, "Token expired", http.StatusForbidden)
@@ -93,7 +93,11 @@ func registerUser(w http.ResponseWriter, r *http.Request) {
 		}
 		insertUserIntoMongo(userInfo)
 		cart.CreateCartInMongoDB(user.ID)
-		helpers.WriteResultWithStatusCode(w, "ok", http.StatusOK)
+		//helpers.WriteResultWithStatusCode(w, "ok", http.StatusOK)
+		response := helpers.Response{
+			Code:   http.StatusOK,
+			Result: userInfo}
+		response.SendResponse(w)
 	} else {
 		helpers.WriteResultWithStatusCode(w, validationResult.Errors(), http.StatusBadRequest)
 	}
@@ -119,9 +123,11 @@ func refreshToken(w http.ResponseWriter, req *http.Request) {
 
 			groupId := getGroupIdFromDbById(claims["sub"].(int))
 
-			role := roleByGroupId(groupId)
+			//role := roleByGroupId(groupId)
 
-			authToken := auth.GetNewAuthToken(claims["sub"].(string), role)
+			//authToken := auth.GetNewAuthToken(claims["sub"].(string), role)
+			authToken := auth.GetNewAuthToken(claims["sub"].(string), groupId)
+
 			authTokenString, err := authToken.SignedString([]byte(config.MySecret))
 			helpers.PanicErr(err)
 
@@ -130,10 +136,10 @@ func refreshToken(w http.ResponseWriter, req *http.Request) {
 			helpers.PanicErr(err)
 
 			response := helpers.Response{
-				Code: http.StatusOK,
-				Result:authTokenString,
+				Code:   http.StatusOK,
+				Result: authTokenString,
 				Meta: map[string]string{
-					"refreshToken" : refreshTokenString}}
+					"refreshToken": refreshTokenString}}
 			response.SendResponse(w)
 
 		} else {
@@ -159,9 +165,11 @@ func loginEndpoint(w http.ResponseWriter, req *http.Request) {
 
 		if checkPasswordHash(pswd, userFromDb.Password) {
 
-			role := roleByGroupId(userFromDb.GroupId)
+			//role := roleByGroupId(userFromDb.GroupId)
 
-			authToken := auth.GetNewAuthToken(userFromDb.ID, role)
+			//authToken := auth.GetNewAuthToken(userFromDb.ID, role)
+			authToken := auth.GetNewAuthToken(userFromDb.ID, userFromDb.GroupId)
+
 			authTokenString, err := authToken.SignedString([]byte(config.MySecret))
 			helpers.PanicErr(err)
 
