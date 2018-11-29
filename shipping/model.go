@@ -13,8 +13,8 @@ type method struct {
 	MethodCode   string `json:"method_code"`
 	CarrierTitle string `json:"carrier_title"`
 	MethodTitle  string `json:"method_title"`
-	Amount       int    `json:"amount"`
-	BaseAmount   int    `json:"base_amount"`
+	Amount       float64    `json:"amount"`
+	BaseAmount   float64    `json:"base_amount"`
 	Available    bool   `json:"available"`
 	ErrorMessage string `json:"error_message"`
 	PriceExclTax int    `json:"price_excl_tax"`

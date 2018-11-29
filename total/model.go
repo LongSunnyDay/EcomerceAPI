@@ -4,10 +4,16 @@ import (
 	"go-api-ws/attribute"
 	"go-api-ws/cart"
 	"go-api-ws/helpers"
+	"go-api-ws/payment"
 	"go-api-ws/shipping"
 	"go-api-ws/tax"
 	"strconv"
 )
+
+type TotalsResp struct {
+	Totals Totals `json:"totals"`
+	PaymentMethods []payment.Method `json:"payment_methods"`
+}
 
 type Totals struct {
 	GrandTotal                 float64   `json:"grand_total"`
@@ -33,7 +39,7 @@ type Totals struct {
 	BaseCurrencyCode           string    `json:"base_currency_code"`
 	QuoteCurrencyCode          string    `json:"quote_currency_code"`
 	ItemsQty                   float64   `json:"items_qty"`
-	Items                      []Item    `json:"items"`
+	Items                      []*Item    `json:"items"`
 	TotalSegments              []Segment `json:"total_segments"`
 }
 
@@ -58,7 +64,7 @@ type Item struct {
 	WeeTaxAppliedAmount  float64  `json:"wee_tax_applied_amount"`
 	WeeTaxApplied        float64  `json:"wee_tax_applied"`
 	Name                 string   `json:"name"`
-	Options              []Option `json:"options"`
+	Options              []*Option `json:"options"`
 }
 
 type Option struct {
@@ -121,31 +127,22 @@ func (t *Totals) getItems(cartId string) {
 			totalOptions := Option{
 				Value: option.Label,
 				Label: option.Name}
-			totalsItem.Options = append(totalsItem.Options, totalOptions)
+			totalsItem.Options = append(totalsItem.Options, &totalOptions)
 		}
-		t.Items = append(t.Items, totalsItem)
+		t.Items = append(t.Items, &totalsItem)
 	}
-	//for _, item := range t.Items {
-	//	fmt.Println(item.ItemId)
-	//	fmt.Println(item.Qty)
-	//	fmt.Println(item.Name)
-	//	fmt.Println(item.Price)
-	//	fmt.Println(item.Options)
-	//}
 }
 
-func (t *Totals) getSubtotalTotal() {
-	var subValue float64
+func (t *Totals) getSubtotal() {
 	for _, item := range t.Items {
-		price := item.Price
+		item.BasePrice = item.Price
+		item.BaseRowTotal = item.BasePrice * item.Qty
 		item.RowTotal = item.Price * item.Qty
-		subValue = price * item.Qty
+
+		t.ItemsQty = t.ItemsQty + item.Qty
+		t.Subtotal = t.Subtotal + item.RowTotal
+		t.BaseSubtotal = t.Subtotal
 	}
-	segment := Segment{
-		Code:  "subtotal",
-		Title: "Subtotal",
-		Value: subValue}
-	t.TotalSegments = append(t.TotalSegments, segment)
 }
 
 func (t *Totals) getTaxRates(groupId float64) tax.Rules {
@@ -155,59 +152,96 @@ func (t *Totals) getTaxRates(groupId float64) tax.Rules {
 	return rules
 }
 
-func (t *Totals) calculateTax(rules tax.Rules) float64 {
+func (t *Totals) calculateTax(rules tax.Rules) {
+
 	rateInt, err := strconv.Atoi(rules.Rates.Percent)
 	helpers.PanicErr(err)
+
 	rateFloat := float64(rateInt)
 	rateFloat = rateFloat / 100
 	taxAmount := t.Subtotal * rateFloat
+
+
+	t.TaxAmount = taxAmount
+	for _, item := range t.Items {
+		item.TaxPercent = float64(rateInt)
+
+		//item.BasePriceInclTax = item.BasePrice * (1 + rateFloat)
+		item.BasePriceInclTax = item.BasePrice
+
+		item.RowTotalInclTax = item.RowTotal * (1 + rateFloat)
+		//item.RowTotalInclTax = item.RowTotal
+
+		item.BaseTaxAmount = item.RowTotal * item.TaxPercent
+
+		//item.PriceInclTax = item.Price * (1 + rateFloat)
+		item.PriceInclTax = item.Price
+
+		item.TaxAmount = item.RowTotal * item.TaxPercent
+	}
+}
+
+func (t *Totals) getShipping(information AddressData) {
+	method := shipping.GetShippingMethod(information.AddressInformation.ShippingCarrierCode, information.AddressInformation.ShippingMethodCode)
+
+	t.ShippingInclTax = method.PriceInclTax
+	t.ShippingAmount = method.Amount
+	t.BaseShippingAmount = method.BaseAmount
+	t.BaseShippingInclTax = method.PriceInclTax
+}
+
+func (t *Totals) calculateGrandtotal(rules tax.Rules) {
+	for _, item := range t.Items {
+		t.BaseTaxAmount = t.BaseTaxAmount + item.TaxAmount
+
+	}
+	t.BaseGrandTotal = t.Subtotal + t.DiscountAmount + t.TaxAmount + t.ShippingInclTax
+	t.BaseSubtotalWithDiscount = t.Subtotal + t.DiscountAmount
+	t.SubtotalInclTax = t.Subtotal + t.TaxAmount
+	t.SubtotalWithDiscount = t.Subtotal - t.DiscountAmount
+
 	segment := Segment{
+		Code:  "subtotal",
+		Title: "Subtotal",
+		Value: t.SubtotalInclTax}
+	t.TotalSegments = append(t.TotalSegments, segment)
+
+	segment = Segment{
+		Code:  "shipping",
+		Title: "Shipping & Handling (Flat Rate - Fixed)",
+		Value: t.ShippingInclTax}
+	t.TotalSegments = append(t.TotalSegments, segment)
+
+	segment = Segment{
+		Code:  "discount",
+		Title: "Discount",
+		Value: 0}
+	t.TotalSegments = append(t.TotalSegments, segment)
+
+	segment = Segment{
 		Code:  "tax",
 		Title: "Tax",
-		Value: taxAmount,
+		Value: t.TaxAmount,
 		Area:  "taxes",
 		ExtensionAttribute: ExtensionAttribute{
 			TaxGrandtotalDetails: []TaxGrandtotalDetail{
 				TaxGrandtotalDetail{
-					Amount: taxAmount,
+					Amount: t.TaxAmount,
 					Rates: []Rate{
 						Rate{
 							Percent: rules.Rates.Percent,
 							Title:   "VAT23-pl"}},
 					GroupId: rules.GroupId}}}}
 	t.TotalSegments = append(t.TotalSegments, segment)
-	t.TaxAmount = taxAmount
-	for _, item := range t.Items {
-		item.TaxPercent = float64(rateInt)
-		item.TaxAmount = item.RowTotal * item.TaxPercent
-		item.PriceInclTax = item.Price + item.TaxAmount
-		item.BasePriceInclTax = item.Price * (1 + rateFloat)
-		item.RowTotalInclTax = item.BasePriceInclTax * item.Qty
-	}
-	return taxAmount
-}
 
-func (t *Totals) getShipping(information AddressData) {
-	method := shipping.GetShippingMethod(information.AddressInformation.ShippingCarrierCode, information.AddressInformation.ShippingMethodCode)
-	segment := Segment{
-		Code:  "shipping",
-		Title: "Shipping & Handling (" + method.CarrierTitle + " - " + method.MethodTitle + ")",
-		Value: method.PriceInclTax}
-	t.TotalSegments = append(t.TotalSegments, segment)
-	t.ShippingInclTax = method.PriceInclTax
 
-}
-
-func (t *Totals) calculateGrandtotal() {
-	t.GrandTotal = t.Subtotal + t.TaxAmount + t.ShippingInclTax
-	segment := Segment{
+	segment = Segment{
 		Code:  "grand_total",
 		Title: "Grand Total",
-		Value: t.GrandTotal,
+		Value: t.BaseGrandTotal,
 		Area:  "footer"}
 	t.TotalSegments = append(t.TotalSegments, segment)
 
-	//fmt.Println(t.TotalSegments)
 }
 
 func getDiscount() {

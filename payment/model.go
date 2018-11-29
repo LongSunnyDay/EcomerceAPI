@@ -7,9 +7,9 @@ import (
 	"go-api-ws/helpers"
 )
 
-type methods []method
+type Methods []Method
 
-type method struct {
+type Method struct {
 	Id             int    `json:"id,omitempty"`
 	Code           string `json:"code"`
 	Title          string `json:"title"`
@@ -25,14 +25,14 @@ func insertPaymentMethodsToMongo(methods []interface{}) {
 	helpers.PanicErr(err)
 }
 
-func getPaymentMethodsFromMongo() []method {
-	var paymentMethod method
-	var paymentMethods []method
+func getPaymentMethodsFromMongo() []Method {
+	var paymentMethod Method
+	var paymentMethods []Method
 
 	db := config.Conf.GetMongoDb()
 
 	cur, err := db.Collection(collectionName).Find(nil, bson.NewDocument(
-		bson.EC.String("type", "Payment method")))
+		bson.EC.String("type", "Payment Method")))
 	helpers.PanicErr(err)
 	for cur.Next(context.Background()) {
 		err := cur.Decode(&paymentMethod)
@@ -43,7 +43,7 @@ func getPaymentMethodsFromMongo() []method {
 	return paymentMethods
 }
 
-func (m method) insertToDb() {
+func (m Method) insertToDb() {
 	db, err := config.Conf.GetDb()
 	helpers.PanicErr(err)
 	_, err = db.Exec("INSERT INTO paymentMethods("+
@@ -55,15 +55,15 @@ func (m method) insertToDb() {
 	helpers.PanicErr(err)
 }
 
-func getPaymentMethodsFromDb() methods {
+func getPaymentMethodsFromDb() Methods {
 	db, err := config.Conf.GetDb()
 	helpers.PanicErr(err)
 	rows, err := db.Query("SELECT Code, Title, IsServerMethod FROM paymentMethods")
 	helpers.PanicErr(err)
-	var methods []method
+	var methods []Method
 	defer rows.Close()
 	for rows.Next() {
-		var method method
+		var method Method
 		if err := rows.Scan(&method.Code, &method.Title, &method.IsServerMethod); err != nil {
 			helpers.PanicErr(err)
 		}
@@ -72,7 +72,7 @@ func getPaymentMethodsFromDb() methods {
 	return methods
 }
 
-func (m method) updatePaymentMethodInDb()  {
+func (m Method) updatePaymentMethodInDb()  {
 	db, err := config.Conf.GetDb()
 	helpers.PanicErr(err)
 	_, err = db.Exec("UPDATE paymentMethods p SET " +

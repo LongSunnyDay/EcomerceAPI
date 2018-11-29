@@ -78,6 +78,8 @@ func updateCart(w http.ResponseWriter, r *http.Request) {
 		attributes = append(attributes, attribute.GetAttributeNameFromSolr(itemOptions.OptionsID, itemOptions.OptionValue))
 	}
 
+	//sku := product.BuildSKUFromItemAttributes(attributes, item.Item.SKU)
+
 	productFromSolr := product.GetProductFromSolrBySKU(item.Item.SKU)
 
 	item.Item.SKU = productFromSolr.Sku

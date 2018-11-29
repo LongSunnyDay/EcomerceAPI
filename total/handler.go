@@ -2,7 +2,6 @@ package total
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"go-api-ws/auth"
 	"go-api-ws/helpers"
@@ -25,18 +24,21 @@ func GetTotals(w http.ResponseWriter, r *http.Request) {
 
 	var totals Totals
 	totals.getItems(urlCartId)
+	totals.getSubtotal()
 
 	var addressInfo AddressData
 	_ = json.NewDecoder(r.Body).Decode(&addressInfo)
-	totals.getSubtotalTotal()
 	totals.getShipping(addressInfo)
+
 	rates := totals.getTaxRates(groupId)
 	totals.calculateTax(rates)
-	totals.calculateGrandtotal()
-	fmt.Printf("%+v/n", totals)
+	totals.calculateGrandtotal(rates)
+	//fmt.Printf("%+v/n", totals)
+	totalsResp := TotalsResp{
+		Totals:totals}
 	response := helpers.Response{
 		Code:   http.StatusOK,
-		Result: totals}
+		Result: totalsResp}
 	response.SendResponse(w)
 
 }
