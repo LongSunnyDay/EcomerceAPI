@@ -18,7 +18,7 @@ type method struct {
 	Available    bool   `json:"available"`
 	ErrorMessage string `json:"error_message"`
 	PriceExclTax int    `json:"price_excl_tax"`
-	PriceInclTax int    `json:"price_incl_tax"`
+	PriceInclTax float64    `json:"price_incl_tax"`
 }
 
 func (m method) insertToDb() {
@@ -94,4 +94,16 @@ func removePaymentMethodFromDb(id string) {
 	helpers.PanicErr(err)
 	_, err = db.Exec("DELETE FROM shippingMethods  WHERE Id = ?", id)
 	helpers.PanicErr(err)
+}
+
+func GetShippingMethod(shippingCarrier string, shippingMethod string) method {
+	//fmt.Println(shippingCarrier, shippingMethod)
+	db, err := config.Conf.GetDb()
+	helpers.PanicErr(err)
+	var method method
+	err = db.QueryRow("SELECT * FROM shippingMethods WHERE carrier_code = ? AND method_code = ?", shippingCarrier, shippingMethod).
+		Scan(&method.Id, &method.CarrierCode, &method.MethodCode, &method.CarrierTitle, &method.MethodTitle,
+		&method.Amount, &method.BaseAmount, &method.Available, &method.ErrorMessage, &method.PriceExclTax, &method.PriceInclTax)
+	helpers.PanicErr(err)
+	return method
 }

@@ -58,7 +58,8 @@ func (m method) insertToDb() {
 func getPaymentMethodsFromDb() methods {
 	db, err := config.Conf.GetDb()
 	helpers.PanicErr(err)
-	rows, err := db.Query("SELECT Code, Title, Is_server_method FROM paymentMethods")
+	rows, err := db.Query("SELECT Code, Title, IsServerMethod FROM paymentMethods")
+	helpers.PanicErr(err)
 	var methods []method
 	defer rows.Close()
 	for rows.Next() {

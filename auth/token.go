@@ -20,11 +20,11 @@ func ParseToken(tokenString string) (*jwt.Token, error) {
 	return token, nil
 }
 
-func GetNewAuthToken(sub string, role string) (*jwt.Token) {
+func GetNewAuthToken(sub string, groupId int) (*jwt.Token) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"sub":  sub,
 		"exp":  time.Now().Add(time.Hour * 1).Unix(),
-		"role": role,
+		"groupId": groupId,
 	})
 	return token
 }

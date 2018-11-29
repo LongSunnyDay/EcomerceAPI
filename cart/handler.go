@@ -51,7 +51,7 @@ func pullCart(w http.ResponseWriter, r *http.Request) {
 		token, _ := auth.ParseToken(urlUserToken)
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 			if claims.VerifyExpiresAt(time.Now().Unix(), true) {
-				cart := getUserCartFromMongoByID(urlCartId)
+				cart := GetUserCartFromMongoByID(urlCartId)
 				response := helpers.Response{
 					Code:   http.StatusOK,
 					Result: cart}
@@ -78,8 +78,7 @@ func updateCart(w http.ResponseWriter, r *http.Request) {
 		attributes = append(attributes, attribute.GetAttributeNameFromSolr(itemOptions.OptionsID, itemOptions.OptionValue))
 	}
 
-	sku := product.BuildSKUFromItemAttributes(attributes, item.Item.SKU)
-	productFromSolr := product.GetProductFromSolrBySKU(sku)
+	productFromSolr := product.GetProductFromSolrBySKU(item.Item.SKU)
 
 	item.Item.SKU = productFromSolr.Sku
 	item.Item.Price = productFromSolr.Price
