@@ -1,0 +1,23 @@
+{
+  "additionalProperties": true,
+  "required": [
+    "code",
+    "code3",
+    "name",
+    "nameEn"
+  ],
+  "properties": {
+    "code": {
+      "type": "string"
+    },
+    "code3": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "nameEn": {
+      "type": "string"
+    }
+  }
+}
