@@ -90,3 +90,20 @@ func removePaymentMethodFromDb(id string)  {
 	_, err = db.Exec("DELETE FROM paymentMethods  WHERE Id = ?", id)
 	helpers.PanicErr(err)
 }
+
+func GetActualPaymentMethodsFromDb() Methods {
+	db, err := config.Conf.GetDb()
+	helpers.PanicErr(err)
+	rows, err := db.Query("SELECT Code, Title, IsServerMethod FROM paymentMethods WHERE id != 17")
+	helpers.PanicErr(err)
+	var methods []Method
+	defer rows.Close()
+	for rows.Next() {
+		var method Method
+		if err := rows.Scan(&method.Code, &method.Title, &method.IsServerMethod); err != nil {
+			helpers.PanicErr(err)
+		}
+		methods = append(methods, method)
+	}
+	return methods
+}

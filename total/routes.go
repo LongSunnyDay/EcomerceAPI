@@ -7,6 +7,7 @@ import (
 
 func RoutesTotal() http.Handler {
 	r := chi.NewRouter()
-	r.Post("/shipping-information", GetTotals)
+	r.Post("/shipping-information", GetTotalsWithPaymentMethods)
+	r.Post("/totals", GetTotals)
 	return r
 }

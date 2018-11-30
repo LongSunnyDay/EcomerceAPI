@@ -23,7 +23,7 @@ func AddShippingMethods(w http.ResponseWriter, r *http.Request)  {
 	}
 }
 
-func getShippingMethods(w http.ResponseWriter, r *http.Request)  {
+func GetShippingMethods(w http.ResponseWriter, r *http.Request)  {
 	shippingMethods := getShippingMethodsFromDb()
 	response := helpers.Response{
 		Code: http.StatusOK,

@@ -47,7 +47,7 @@ type Item struct {
 	ItemId               int      `json:"item_id"`
 	Price                float64  `json:"price"`
 	BasePrice            float64  `json:"base_price"`
-	Qty                  float64  `json:"qty"`
+	Qty                  int  `json:"qty"`
 	RowTotal             float64  `json:"row_total"`
 	BaseRowTotal         float64  `json:"base_row_total"`
 	RowTotalWithDiscount float64  `json:"row_total_with_discount"`
@@ -105,8 +105,13 @@ type AddressData struct {
 	} `json:"addressInformation"`
 }
 
-func (t *Totals) calculateTotals() {
-
+func (t *Totals) calculateTotals(urlCartId string, addressInformation AddressData, groupId float64 ) {
+	t.getItems(urlCartId)
+	t.getSubtotal()
+	t.getShipping(addressInformation)
+	rates := t.getTaxRates(groupId)
+	t.calculateTax(rates)
+	t.calculateGrandtotal(rates)
 }
 
 func (t *Totals) getItems(cartId string) {
@@ -135,11 +140,12 @@ func (t *Totals) getItems(cartId string) {
 
 func (t *Totals) getSubtotal() {
 	for _, item := range t.Items {
+		qtyFloat := float64(item.Qty)
 		item.BasePrice = item.Price
-		item.BaseRowTotal = item.BasePrice * item.Qty
-		item.RowTotal = item.Price * item.Qty
+		item.BaseRowTotal = item.BasePrice * qtyFloat
+		item.RowTotal = item.Price * qtyFloat
 
-		t.ItemsQty = t.ItemsQty + item.Qty
+		t.ItemsQty = t.ItemsQty + qtyFloat
 		t.Subtotal = t.Subtotal + item.RowTotal
 		t.BaseSubtotal = t.Subtotal
 	}

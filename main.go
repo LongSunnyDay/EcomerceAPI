@@ -32,6 +32,6 @@ func main()  {
 	r.Mount("/api/stock", stock.RouterStock())
 	r.Mount("/api/payment-methods", payment.RouterPayment())
 	r.Mount("/api/shipping-methods", shipping.RoutesShippingMethods())
-	r.Mount("/api/shipping-information", total.RoutesTotal())
+	r.Mount("/api/totals", total.RoutesTotal())
 	http.ListenAndServe(":8080", r)
 }

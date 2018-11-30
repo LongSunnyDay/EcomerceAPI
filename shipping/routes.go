@@ -8,7 +8,7 @@ import (
 func RoutesShippingMethods() http.Handler {
 	r := chi.NewRouter()
 	r.Post("/", AddShippingMethods)
-	r.Get("/", getShippingMethods)
+	r.Get("/", GetShippingMethods)
 	r.Put("/", updateShippingMethod)
 	r.Delete("/", removePaymentMethod)
 	return r
