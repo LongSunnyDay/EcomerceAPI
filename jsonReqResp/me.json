@@ -8,21 +8,21 @@
       "Content-Type": "application/json"
     }
   },
-  "task_id": "1541941656419-10362e33-b3b2-7b77-e300-4fcbd22f428e",
+  "task_id": "1543995617636-a11f1324-46d5-ee32-99cf-fabbc9df853e",
   "transmited": true,
-  "created_at": "2018-11-11T13:07:36.419Z",
-  "updated_at": "2018-11-11T13:07:36.419Z",
-  "transmited_at": "2018-11-11T13:07:37.331Z",
+  "created_at": "2018-12-05T07:40:17.636Z",
+  "updated_at": "2018-12-05T07:40:17.636Z",
+  "transmited_at": "2018-12-05T07:40:20.913Z",
   "result": {
     "id": 1646,
     "group_id": 1,
     "default_shipping": "362",
     "created_at": "2018-10-25 12:55:40",
-    "updated_at": "2018-11-11 12:57:59",
+    "updated_at": "2018-12-04 08:27:38",
     "created_in": "Default Store View",
     "email": "avad47@gmail.com",
-    "firstname": "aaaaaas",
-    "lastname": "aaaaaas",
+    "firstname": "sssssssxx",
+    "lastname": "sssssssss",
     "store_id": 1,
     "website_id": 1,
     "addresses": [
@@ -34,15 +34,16 @@
           "region": null,
           "region_id": 0
         },
+        "region_id": 0,
         "country_id": "LT",
         "street": [
-          "aaaaa",
+          "aaaa",
           "1"
         ],
         "telephone": "",
         "postcode": "12341",
-        "city": "Kaunas",
-        "firstname": "aaaaaas",
+        "city": "ddddd",
+        "firstname": "aaaaaasdddddd",
         "lastname": "aaaaaas",
         "default_shipping": true
       }

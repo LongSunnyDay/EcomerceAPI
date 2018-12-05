@@ -16,9 +16,8 @@ func roleByGroupId(groupId int) string {
 	return userRole
 }
 
-func UpdateUserByIdMongo(user UpdateUser) interface{} {
-	var updatedUser UpdateUser
-
+func UpdateUserByIdMongo(user CustomerData) {
+	fmt.Println(user)
 	bsonUser, err := helpers.StructToBson(user)
 	helpers.PanicErr(err)
 
@@ -27,21 +26,9 @@ func UpdateUserByIdMongo(user UpdateUser) interface{} {
 
 	db := config.Conf.GetMongoDb()
 
-	update := db.Collection(collectionName).FindOneAndUpdate(context.Background(), filter, doc)
+	db.Collection(collectionName).FindOneAndUpdate(context.Background(), filter, doc)
 	//helpers.PanicErr(err)
-	fmt.Println(update)
 
-	return updatedUser
 }
 
-func UpdateUserByIdMySQL(user UpdateUser){
-	dataBase, err := config.Conf.GetDb()
-	helpers.PanicErr(err)
 
-	query, err := dataBase.Prepare("Update users set email=? where id=?")
-	helpers.PanicErr(err)
-
-	_, er := query.Exec(user.Email, user.ID)
-	helpers.PanicErr(er)
-	fmt.Println(user.Email + " updated in mysql")
-}

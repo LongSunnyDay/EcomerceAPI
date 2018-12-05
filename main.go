@@ -5,6 +5,8 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"go-api-ws/cart"
 	"go-api-ws/config"
+	"go-api-ws/currency"
+	"go-api-ws/language"
 	"go-api-ws/payment"
 	"go-api-ws/shipping"
 	"go-api-ws/stock"
@@ -12,8 +14,6 @@ import (
 	"go-api-ws/total"
 	"go-api-ws/user"
 	"net/http"
-	"go-api-ws/currency"
-	"go-api-ws/language"
 )
 
 func init()  {

@@ -11,7 +11,7 @@ import (
 )
 
 type TotalsResp struct {
-	Totals Totals `json:"totals"`
+	Totals         Totals           `json:"totals"`
 	PaymentMethods []payment.Method `json:"payment_methods"`
 }
 
@@ -39,31 +39,31 @@ type Totals struct {
 	BaseCurrencyCode           string    `json:"base_currency_code"`
 	QuoteCurrencyCode          string    `json:"quote_currency_code"`
 	ItemsQty                   float64   `json:"items_qty"`
-	Items                      []*Item    `json:"items"`
+	Items                      []*Item   `json:"items"`
 	TotalSegments              []Segment `json:"total_segments"`
 }
 
 type Item struct {
-	ItemId               int      `json:"item_id"`
-	Price                float64  `json:"price"`
-	BasePrice            float64  `json:"base_price"`
-	Qty                  int  `json:"qty"`
-	RowTotal             float64  `json:"row_total"`
-	BaseRowTotal         float64  `json:"base_row_total"`
-	RowTotalWithDiscount float64  `json:"row_total_with_discount"`
-	TaxAmount            float64  `json:"tax_amount"`
-	BaseTaxAmount        float64  `json:"base_tax_amount"`
-	TaxPercent           float64  `json:"tax_percent"`
-	DiscountAmount       float64  `json:"discount_amount"`
-	BaseDiscountAmount   float64  `json:"base_discount_amount"`
-	DiscountPercent      float64  `json:"discount_percent"`
-	PriceInclTax         float64  `json:"price_incl_tax"`
-	BasePriceInclTax     float64  `json:"base_price_incl_tax"`
-	RowTotalInclTax      float64  `json:"row_total_incl_tax"`
-	BaseRowTotalInclTax  float64  `json:"base_row_total_incl_tax"`
-	WeeTaxAppliedAmount  float64  `json:"wee_tax_applied_amount"`
-	WeeTaxApplied        float64  `json:"wee_tax_applied"`
-	Name                 string   `json:"name"`
+	ItemId               int       `json:"item_id"`
+	Price                float64   `json:"price"`
+	BasePrice            float64   `json:"base_price"`
+	Qty                  int       `json:"qty"`
+	RowTotal             float64   `json:"row_total"`
+	BaseRowTotal         float64   `json:"base_row_total"`
+	RowTotalWithDiscount float64   `json:"row_total_with_discount"`
+	TaxAmount            float64   `json:"tax_amount"`
+	BaseTaxAmount        float64   `json:"base_tax_amount"`
+	TaxPercent           float64   `json:"tax_percent"`
+	DiscountAmount       float64   `json:"discount_amount"`
+	BaseDiscountAmount   float64   `json:"base_discount_amount"`
+	DiscountPercent      float64   `json:"discount_percent"`
+	PriceInclTax         float64   `json:"price_incl_tax"`
+	BasePriceInclTax     float64   `json:"base_price_incl_tax"`
+	RowTotalInclTax      float64   `json:"row_total_incl_tax"`
+	BaseRowTotalInclTax  float64   `json:"base_row_total_incl_tax"`
+	WeeTaxAppliedAmount  float64   `json:"wee_tax_applied_amount"`
+	WeeTaxApplied        float64   `json:"wee_tax_applied"`
+	Name                 string    `json:"name"`
 	Options              []*Option `json:"options"`
 }
 
@@ -105,7 +105,7 @@ type AddressData struct {
 	} `json:"addressInformation"`
 }
 
-func (t *Totals) calculateTotals(urlCartId string, addressInformation AddressData, groupId float64 ) {
+func (t *Totals) calculateTotals(urlCartId string, addressInformation AddressData, groupId float64) {
 	t.getItems(urlCartId)
 	t.getSubtotal()
 	t.getShipping(addressInformation)
@@ -166,7 +166,6 @@ func (t *Totals) calculateTax(rules tax.Rules) {
 	rateFloat := float64(rateInt)
 	rateFloat = rateFloat / 100
 	taxAmount := t.Subtotal * rateFloat
-
 
 	t.TaxAmount = taxAmount
 	for _, item := range t.Items {
@@ -239,7 +238,6 @@ func (t *Totals) calculateGrandtotal(rules tax.Rules) {
 							Title:   "VAT23-pl"}},
 					GroupId: rules.GroupId}}}}
 	t.TotalSegments = append(t.TotalSegments, segment)
-
 
 	segment = Segment{
 		Code:  "grand_total",

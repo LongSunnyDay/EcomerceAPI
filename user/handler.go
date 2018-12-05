@@ -9,6 +9,7 @@ import (
 	"go-api-ws/core"
 	"go-api-ws/helpers"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -54,7 +55,11 @@ func meEndpoint(w http.ResponseWriter, r *http.Request) {
 	token, _ := auth.ParseToken(urlToken)
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		if claims.VerifyExpiresAt(time.Now().Unix(), true) {
-			userInfo := getUserFromMongo(claims["sub"].(string))
+			userId, err := strconv.Atoi(claims["sub"].(string))
+			helpers.PanicErr(err)
+			userId64 := int64(userId)
+			userInfo := getUserFromMySQLById(userId64)
+			userInfo.Addresses = getAddressesFromMySQL(userId64)
 			response := helpers.Response{
 				Code:   http.StatusOK,
 				Result: userInfo}
@@ -73,30 +78,28 @@ func registerUser(w http.ResponseWriter, r *http.Request) {
 	var user User
 	_ = json.NewDecoder(r.Body).Decode(&user)
 	validationResult := helpers.CheckJSONSchemaWithGoStruct("file://user/jsonSchemaModels/userRegister.schema.json", user)
-
 	if validationResult.Valid() {
-		insertUserIntoDb(user)
-		user.ID = getUserIdFromDbByEmail(user.Customer.Email)
-		userInfo := Result{
-			Addresses:              []UserAdresses{},
-			CreatedAt:              time.Now().Unix(),
-			CreatedIn:              "Default Store View",
-			DisableAutoGroupChange: 0,
-			GroupID:                1,
-			ID:                     user.ID,
-			WebsiteID:              1,
-			UpdatedAt:              time.Now().Unix(),
-			StoreID:                1,
-			FirstName:              user.Customer.FirstName,
-			LastName:               user.Customer.LastName,
-			Email:                  user.Customer.Email,
-		}
-		insertUserIntoMongo(userInfo)
+		id := insertUserIntoMySQL(user)
+		customer := getUserFromMySQLById(id)
+		//userInfo := CustomerData{
+		//	Address:              []*Address{},
+		//	CreatedAt:              time.Now().Unix(),
+		//	CreatedIn:              "Default Store View",
+		//	DisableAutoGroupChange: 0,
+		//	GroupID:                1,
+		//	ID:                     user.ID,
+		//	WebsiteID:              1,
+		//	UpdatedAt:              time.Now().Unix(),
+		//	StoreID:                1,
+		//	FirstName:              user.Customer.FirstName,
+		//	LastName:               user.Customer.LastName,
+		//	Email:                  user.Customer.Email,
+		//}
+		//insertUserIntoMongo(userInfo)
 		cart.CreateCartInMongoDB(user.ID)
-		//helpers.WriteResultWithStatusCode(w, "ok", http.StatusOK)
 		response := helpers.Response{
 			Code:   http.StatusOK,
-			Result: userInfo}
+			Result: customer}
 		response.SendResponse(w)
 	} else {
 		helpers.WriteResultWithStatusCode(w, validationResult.Errors(), http.StatusBadRequest)
@@ -109,8 +112,20 @@ func updateUser(w http.ResponseWriter, r *http.Request) {
 	var user UpdatedCustomer
 	err := json.NewDecoder(r.Body).Decode(&user)
 	helpers.PanicErr(err)
-	UpdateUserByIdMongo(user.UpdateUser)
-	UpdateUserByIdMySQL(user.UpdateUser)
+	//fmt.Printf("%+v\n",user)
+	for i := range user.UpdateUser.Addresses {
+		user.UpdateUser.Addresses[i].insertOrUpdateAddressIntoMySQL(user.UpdateUser.ID)
+	}
+	for _, address := range user.UpdateUser.Addresses {
+		if address.DefaultShipping == true {
+			user.UpdateUser.DefaultShipping = strconv.Itoa(int(address.ID))
+		}
+	}
+	user.UpdateUser.UpdateUserByIdMySQL()
+	response := helpers.Response{
+		Result: user.UpdateUser,
+		Code:   http.StatusOK}
+	response.SendResponse(w)
 }
 
 // Path: /api/user/refresh
@@ -121,7 +136,7 @@ func refreshToken(w http.ResponseWriter, req *http.Request) {
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		if claims.VerifyExpiresAt(time.Now().Unix(), true) {
 
-			groupId := getGroupIdFromDbById(claims["sub"].(int))
+			groupId := getGroupIdFromMySQLById(claims["sub"].(int))
 
 			//role := roleByGroupId(groupId)
 
@@ -161,7 +176,7 @@ func loginEndpoint(w http.ResponseWriter, req *http.Request) {
 	userLogin.Password = ""
 
 	if validationResult.Valid() {
-		userFromDb := getUserFromDbByEmail(userLogin.Username)
+		userFromDb := getUserFromMySQLByEmail(userLogin.Username)
 
 		if checkPasswordHash(pswd, userFromDb.Password) {
 
