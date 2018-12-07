@@ -7,6 +7,7 @@ import (
 	"go-api-ws/config"
 	"go-api-ws/currency"
 	"go-api-ws/language"
+	"go-api-ws/order"
 	"go-api-ws/payment"
 	"go-api-ws/shipping"
 	"go-api-ws/stock"
@@ -16,12 +17,12 @@ import (
 	"net/http"
 )
 
-func init()  {
+func init() {
 	config.GetConfig("config.yml")
 
 }
 
-func main()  {
+func main() {
 
 	r := chi.NewRouter()
 	r.Mount("/api/user", user.RouterUser())
@@ -33,5 +34,6 @@ func main()  {
 	r.Mount("/api/payment-methods", payment.RouterPayment())
 	r.Mount("/api/shipping-methods", shipping.RoutesShippingMethods())
 	r.Mount("/api/totals", total.RoutesTotal())
+	r.Mount("/api/order", order.RouterOrder())
 	http.ListenAndServe(":8080", r)
 }

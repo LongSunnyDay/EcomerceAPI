@@ -30,7 +30,7 @@ func GetTotals(w http.ResponseWriter, r *http.Request) {
 	var addressInfo AddressData
 	_ = json.NewDecoder(r.Body).Decode(&addressInfo)
 
-	totals.calculateTotals(urlCartId, addressInfo, groupId)
+	totals.CalculateTotals(urlCartId, addressInfo, groupId)
 
 	totalsResp := TotalsResp{
 		Totals: totals}
@@ -60,7 +60,7 @@ func GetTotalsWithPaymentMethods(w http.ResponseWriter, r *http.Request) {
 	var addressInfo AddressData
 	_ = json.NewDecoder(r.Body).Decode(&addressInfo)
 
-	totals.calculateTotals(urlCartId, addressInfo, groupId)
+	totals.CalculateTotals(urlCartId, addressInfo, groupId)
 	paymentMethods := payment.GetActualPaymentMethodsFromDb()
 
 	totalsResp := TotalsResp{

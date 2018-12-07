@@ -105,16 +105,16 @@ type AddressData struct {
 	} `json:"addressInformation"`
 }
 
-func (t *Totals) calculateTotals(urlCartId string, addressInformation AddressData, groupId float64) {
-	t.getItems(urlCartId)
-	t.getSubtotal()
-	t.getShipping(addressInformation)
-	rates := t.getTaxRates(groupId)
-	t.calculateTax(rates)
-	t.calculateGrandtotal(rates)
+func (t *Totals) CalculateTotals(urlCartId string, addressInformation AddressData, groupId float64) {
+	t.GetItems(urlCartId)
+	t.GetSubtotal()
+	t.GetShipping(addressInformation)
+	rates := t.GetTaxRates(groupId)
+	t.CalculateTax(rates)
+	t.CalculateGrandtotal(rates)
 }
 
-func (t *Totals) getItems(cartId string) {
+func (t *Totals) GetItems(cartId string) {
 	cartItems := cart.GetUserCartFromMongoByID(cartId)
 	for _, item := range cartItems {
 		totalsItem := Item{
@@ -138,7 +138,7 @@ func (t *Totals) getItems(cartId string) {
 	}
 }
 
-func (t *Totals) getSubtotal() {
+func (t *Totals) GetSubtotal() {
 	for _, item := range t.Items {
 		qtyFloat := float64(item.Qty)
 		item.BasePrice = item.Price
@@ -151,14 +151,14 @@ func (t *Totals) getSubtotal() {
 	}
 }
 
-func (t *Totals) getTaxRates(groupId float64) tax.Rules {
+func (t *Totals) GetTaxRates(groupId float64) tax.Rules {
 	var taxRates tax.Rules
 	taxRates.GroupId = int(groupId)
 	rules := taxRates.GetRates()
 	return rules
 }
 
-func (t *Totals) calculateTax(rules tax.Rules) {
+func (t *Totals) CalculateTax(rules tax.Rules) {
 
 	rateInt, err := strconv.Atoi(rules.Rates.Percent)
 	helpers.PanicErr(err)
@@ -186,7 +186,7 @@ func (t *Totals) calculateTax(rules tax.Rules) {
 	}
 }
 
-func (t *Totals) getShipping(information AddressData) {
+func (t *Totals) GetShipping(information AddressData) {
 	method := shipping.GetShippingMethod(information.AddressInformation.ShippingCarrierCode, information.AddressInformation.ShippingMethodCode)
 
 	t.ShippingInclTax = method.PriceInclTax
@@ -195,7 +195,7 @@ func (t *Totals) getShipping(information AddressData) {
 	t.BaseShippingInclTax = method.PriceInclTax
 }
 
-func (t *Totals) calculateGrandtotal(rules tax.Rules) {
+func (t *Totals) CalculateGrandtotal(rules tax.Rules) {
 	for _, item := range t.Items {
 		t.BaseTaxAmount = t.BaseTaxAmount + item.TaxAmount
 
