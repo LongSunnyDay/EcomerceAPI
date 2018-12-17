@@ -21,7 +21,7 @@ type CartItem struct {
 
 type Item struct {
 	SKU           string  `json:"sku,omitempty" bson:"sku"`
-	QTY           int `json:"qty,omitempty" bson:"qty"`
+	QTY           float64 `json:"qty,omitempty" bson:"qty"`
 	Price         float64 `json:"price,omitempty" bson:"price"`
 	ProductType   string  `json:"product_type,omitempty" bson:"product_type"`
 	Name          string  `json:"name,omitempty" bson:"name"`

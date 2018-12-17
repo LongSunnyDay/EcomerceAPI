@@ -47,7 +47,7 @@ type Item struct {
 	ItemId               int       `json:"item_id"`
 	Price                float64   `json:"price"`
 	BasePrice            float64   `json:"base_price"`
-	Qty                  int       `json:"qty"`
+	Qty                  float64       `json:"qty"`
 	RowTotal             float64   `json:"row_total"`
 	BaseRowTotal         float64   `json:"base_row_total"`
 	RowTotalWithDiscount float64   `json:"row_total_with_discount"`
@@ -177,12 +177,12 @@ func (t *Totals) CalculateTax(rules tax.Rules) {
 		item.RowTotalInclTax = item.RowTotal * (1 + rateFloat)
 		//item.RowTotalInclTax = item.RowTotal
 
-		item.BaseTaxAmount = item.RowTotal * item.TaxPercent
+		item.BaseTaxAmount = item.RowTotal * (item.TaxPercent / 100)
 
 		//item.PriceInclTax = item.Price * (1 + rateFloat)
 		item.PriceInclTax = item.Price
 
-		item.TaxAmount = item.RowTotal * item.TaxPercent
+		item.TaxAmount = item.RowTotal * (item.TaxPercent / 100)
 	}
 }
 

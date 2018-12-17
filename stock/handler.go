@@ -8,8 +8,8 @@ import (
 
 func checkStock(w http.ResponseWriter, r *http.Request)  {
 	itemSkuFromUrl := r.URL.Query()["sku"][0]
-	var item stockData
-	item.getDataFromDbBySku(itemSkuFromUrl)
+	var item DataStock
+	item.GetDataFromDbBySku(itemSkuFromUrl)
 	response := helpers.Response{
 		Code:http.StatusOK,
 		Result:item}
@@ -17,14 +17,14 @@ func checkStock(w http.ResponseWriter, r *http.Request)  {
 }
 
 func insertToStock(w http.ResponseWriter, r *http.Request)  {
-	var stockData stockData
+	var stockData DataStock
 	_ = json.NewDecoder(r.Body).Decode(&stockData)
 	stockData.insertDataToStock()
 	helpers.WriteResultWithStatusCode(w, "ok", http.StatusOK)
 }
 
 func updateStockItem(w http.ResponseWriter, r *http.Request) {
-	var stockData stockData
+	var stockData DataStock
 	_ = json.NewDecoder(r.Body).Decode(&stockData)
 	stockData.updateDataInDb()
 	helpers.WriteResultWithStatusCode(w, "ok", http.StatusOK)
@@ -32,6 +32,6 @@ func updateStockItem(w http.ResponseWriter, r *http.Request) {
 
 func removeItemFromStock(w http.ResponseWriter, r *http.Request) {
 	itemSkuFromUrl := r.URL.Query()["sku"][0]
-    removeItemfromDb(itemSkuFromUrl)
+    removeItemFromDb(itemSkuFromUrl)
 	helpers.WriteResultWithStatusCode(w, "ok", http.StatusOK)
 }

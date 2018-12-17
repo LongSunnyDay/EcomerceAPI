@@ -228,7 +228,7 @@ type PlaceOrderData struct {
 
 type AddressInformation struct {
 	ShippingAddress         Address     `json:"shippingAddress"`
-	BillingAddress          Address     `json:"billing_address"`
+	BillingAddress          Address     `json:"billingAddress"`
 	ShippingMethodCode      string      `json:"shipping_method_code"`
 	ShippingCarrierCode     string      `json:"shipping_carrier_code"`
 	ShippingExtraFields     interface{} `json:"shippingExtraFields"`
@@ -296,76 +296,83 @@ type Product struct {
 	Info                struct {
 		Stock string `json:"stock"`
 	} `json:"info"`
-	ParentSku      string   `json:"parentSku"`
-	Options        []Option `json:"options"`
-	ProductOptions struct {
-		ExtensionAttribute struct {
-			ConfigurableItemOptions []ConfigurableItemOption `json:"configurable_item_options"`
-		} `json:"extension_attribute"`
-	} `json:"product_options"`
-	Qty                        float64 `json:"qty"`
-	IsConfigured               bool    `json:"is_configured"`
-	Color                      string  `json:"color"`
-	SmallImage                 string  `json:"small_image"`
-	HasOptions                 []int   `json:"has_options"`
-	MsrpDisplayActualPriceType string  `json:"msrp_display_actual_price_type"`
-	Size                       string  `json:"size"`
-	OnlineStockCheckId         string  `json:"onlineStockCheckid"`
-	IsInStock                  bool    `json:"is_in_stock"`
-	ServerItemId               int64   `json:"server_item_id"`
-	ServerCartId               string  `json:"server_cart_id"`
-	PrevQty                    float64 `json:"prev_qty"`
-	Totals                     struct {
-		ItemId               int64    `json:"item_id"`
-		Price                float64  `json:"price"`
-		BasePrice            float64  `json:"base_price"`
-		Qty                  float64  `json:"qty"`
-		RowTotal             float64  `json:"row_total"`
-		BaseRowTotal         float64  `json:"base_row_total"`
-		RowTotalWithDiscount float64  `json:"row_total_with_discount"`
-		TaxAmount            float64  `json:"tax_amount"`
-		BaseTaxAmount        float64  `json:"base_tax_amount"`
-		TaxPercent           float64  `json:"tax_percent"`
-		DiscountAmount       float64  `json:"discount_amount"`
-		BaseDiscountAmount   float64  `json:"base_discount_amount"`
-		DiscountPercent      float64  `json:"discount_percent"`
-		PriceInclTax         float64  `json:"price_incl_tax"`
-		BasePriceInclTax     float64  `json:"base_price_incl_tax"`
-		RowTotalInclTax      float64  `json:"row_total_incl_tax"`
-		BaseRowTotalInclTax  float64  `json:"base_row_total_incl_tax"`
-		Options              []Option `json:"options"`
-		WeeeTaxAppliedAmount float64  `json:"weee_tax_applied_amount"`
-		WeeeTaxApplied       float64  `json:"weee_tax_applied"`
-		Name                 string   `json:"name"`
-	} `json:"totals"`
-	Stock struct {
-		ItemId                         int64   `json:"item_id"`
-		ProductId                      int64   `json:"product_id"`
-		StockId                        int64   `json:"stock_id"`
-		Qty                            float64 `json:"qty"`
-		IsInStock                      bool    `json:"is_in_stock"`
-		IsQtyDecimal                   bool    `json:"is_qty_decimal"`
-		ShowDefaultNotificationMessage bool    `json:"show_default_notification_message"`
-		UseConfigMinQty                bool    `json:"use_config_min_qty"`
-		MinQty                         float64 `json:"min_qty"`
-		UseConfigMinSaleQty            int64   `json:"use_config_min_sale_qty"`
-		MinSaleQty                     float64 `json:"min_sale_qty"`
-		UseConfigMaxSaleQty            bool    `json:"use_config_max_sale_qty"`
-		MaxSaleQty                     float64 `json:"max_sale_qty"`
-		UseConfigBackorders            bool    `json:"use_config_backorders"`
-		Backorders                     int64   `json:"backorders"`
-		UseConfigNotifyStockQty        bool    `json:"use_config_notify_stock_qty"`
-		NotifyStockQty                 float64 `json:"notify_stock_qty"`
-		UseConfigQtyIncrements         bool    `json:"use_config_qty_increments"`
-		QtyIncrements                  float64 `json:"qty_increments"`
-		UseConfigEnableQtyInc          bool    `json:"use_config_enable_qty_inc"`
-		EnableQtyIncrements            bool    `json:"enable_qty_increments"`
-		UseConfigManageStock           bool    `json:"use_config_manage_stock"`
-		ManageStock                    bool    `json:"manage_stock"`
-		LowStockDate                   string  `json:"low_stock_date"`
-		IsDecimalDivided               bool    `json:"is_decimal_divided"`
-		StockStatusChangeAuto          int64   `json:"stock_status_change_auto"`
-	} `json:"stock"`
+	ParentSku                  string        `json:"parentSku"`
+	ProductOption              ProductOption `json:"product_option"`
+	Qty                        float64       `json:"qty"`
+	IsConfigured               bool          `json:"is_configured"`
+	Color                      string        `json:"color"`
+	SmallImage                 string        `json:"small_image"`
+	HasOptions                 []int         `json:"has_options"`
+	MsrpDisplayActualPriceType string        `json:"msrp_display_actual_price_type"`
+	Size                       string        `json:"size"`
+	OnlineStockCheckId         string        `json:"onlineStockCheckid"`
+	IsInStock                  bool          `json:"is_in_stock"`
+	ServerItemId               int64         `json:"server_item_id"`
+	ServerCartId               string        `json:"server_cart_id"`
+	PrevQty                    float64       `json:"prev_qty"`
+	Totals                     Totals        `json:"totals"`
+	Stock                      Stock         `json:"stock"`
+}
+
+type Stock struct {
+	ItemId                         int64   `json:"item_id"`
+	ProductId                      int64   `json:"product_id"`
+	StockId                        int64   `json:"stock_id"`
+	Qty                            float64 `json:"qty"`
+	IsInStock                      bool    `json:"is_in_stock"`
+	IsQtyDecimal                   bool    `json:"is_qty_decimal"`
+	ShowDefaultNotificationMessage bool    `json:"show_default_notification_message"`
+	UseConfigMinQty                bool    `json:"use_config_min_qty"`
+	MinQty                         float64 `json:"min_qty"`
+	UseConfigMinSaleQty            int64   `json:"use_config_min_sale_qty"`
+	MinSaleQty                     float64 `json:"min_sale_qty"`
+	UseConfigMaxSaleQty            bool    `json:"use_config_max_sale_qty"`
+	MaxSaleQty                     float64 `json:"max_sale_qty"`
+	UseConfigBackorders            bool    `json:"use_config_backorders"`
+	Backorders                     int64   `json:"backorders"`
+	UseConfigNotifyStockQty        bool    `json:"use_config_notify_stock_qty"`
+	NotifyStockQty                 float64 `json:"notify_stock_qty"`
+	UseConfigQtyIncrements         bool    `json:"use_config_qty_increments"`
+	QtyIncrements                  float64 `json:"qty_increments"`
+	UseConfigEnableQtyInc          bool    `json:"use_config_enable_qty_inc"`
+	EnableQtyIncrements            bool    `json:"enable_qty_increments"`
+	UseConfigManageStock           bool    `json:"use_config_manage_stock"`
+	ManageStock                    bool    `json:"manage_stock"`
+	LowStockDate                   string  `json:"low_stock_date"`
+	IsDecimalDivided               bool    `json:"is_decimal_divided"`
+	StockStatusChangeAuto          int64   `json:"stock_status_change_auto"`
+}
+
+type Totals struct {
+	ItemId               int64    `json:"item_id"`
+	Price                float64  `json:"price"`
+	BasePrice            float64  `json:"base_price"`
+	Qty                  float64  `json:"qty"`
+	RowTotal             float64  `json:"row_total"`
+	BaseRowTotal         float64  `json:"base_row_total"`
+	RowTotalWithDiscount float64  `json:"row_total_with_discount"`
+	TaxAmount            float64  `json:"tax_amount"`
+	BaseTaxAmount        float64  `json:"base_tax_amount"`
+	TaxPercent           float64  `json:"tax_percent"`
+	DiscountAmount       float64  `json:"discount_amount"`
+	BaseDiscountAmount   float64  `json:"base_discount_amount"`
+	DiscountPercent      float64  `json:"discount_percent"`
+	PriceInclTax         float64  `json:"price_incl_tax"`
+	BasePriceInclTax     float64  `json:"base_price_incl_tax"`
+	RowTotalInclTax      float64  `json:"row_total_incl_tax"`
+	BaseRowTotalInclTax  float64  `json:"base_row_total_incl_tax"`
+	Options              []Option `json:"options"`
+	WeeeTaxAppliedAmount float64  `json:"weee_tax_applied_amount"`
+	WeeeTaxApplied       float64  `json:"weee_tax_applied"`
+	Name                 string   `json:"name"`
+}
+
+type ProductOption struct {
+	ExtensionAttributes ExtensionAttributes `json:"extension_attributes"`
+}
+
+type ExtensionAttributes struct {
+	ConfigurableItemOptions []ConfigurableItemOption `json:"configurable_item_options"`
 }
 
 type Option struct {
@@ -375,9 +382,9 @@ type Option struct {
 
 type ConfigurableItemOption struct {
 	OptionId    string `json:"option_id"`
-	OptionValue int64  `json:"option_value"`
+	OptionValue string `json:"option_value"`
 }
 
 func (placeOrderData *PlaceOrderData) GetUserGroup() {
-	
+
 }

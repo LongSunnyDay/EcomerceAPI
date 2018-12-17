@@ -1,16 +1,17 @@
 package stock
 
 import (
+	"errors"
 	"go-api-ws/config"
 	"go-api-ws/helpers"
 )
 
-type stockData struct {
+type DataStock struct {
 	Sku                            string `json:"sku"`
 	ItemId                         int    `json:"item_id"`
 	ProductId                      int    `json:"product_id"`
 	StockId                        int    `json:"stock_id"`
-	QTY                            int    `json:"qty"`
+	QTY                            float64    `json:"qty"`
 	IsInStock                      bool   `json:"is_in_stock"`
 	IsQtyDecimal                   bool   `json:"is_qty_decimal"`
 	ShowDefaultNotificationMessage bool   `json:"show_default_notification_message"`
@@ -35,7 +36,7 @@ type stockData struct {
 	StockStatusChangedAuto         int    `json:"stock_status_changed_auto"`
 }
 
-func (data *stockData) getDataFromDbBySku(itemSku string) {
+func (data *DataStock) GetDataFromDbBySku(itemSku string) {
 	db, err := config.Conf.GetDb()
 	helpers.PanicErr(err)
 	err = db.QueryRow("SELECT * FROM stock WHERE sku = ?", itemSku).Scan(
@@ -69,7 +70,7 @@ func (data *stockData) getDataFromDbBySku(itemSku string) {
 	helpers.PanicErr(err)
 }
 
-func (data stockData) insertDataToStock() {
+func (data DataStock) insertDataToStock() {
 	db, err := config.Conf.GetDb()
 	helpers.PanicErr(err)
 	_, err = db.Exec("INSERT INTO stock("+
@@ -99,8 +100,8 @@ func (data stockData) insertDataToStock() {
 		"manage_stock, "+
 		"low_stock_date, "+
 		"is_decimal_divided, "+
-		"stock_status_changed_auto)"+
-		" VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+		"stock_status_changed_auto) "+
+		"VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
 		data.Sku,
 		data.ItemId,
 		data.ProductId,
@@ -131,7 +132,7 @@ func (data stockData) insertDataToStock() {
 	helpers.PanicErr(err)
 }
 
-func (data stockData) updateDataInDb() {
+func (data DataStock) updateDataInDb() {
 	db, err := config.Conf.GetDb()
 	helpers.PanicErr(err)
 	_, err = db.Exec("UPDATE stock s SET " +
@@ -192,9 +193,18 @@ func (data stockData) updateDataInDb() {
 	helpers.PanicErr(err)
 }
 
-func removeItemfromDb(itemSku string) {
+func removeItemFromDb(itemSku string) {
 	db, err := config.Conf.GetDb()
 	helpers.PanicErr(err)
 	_, err = db.Exec("DELETE FROM stock WHERE sku = ?", itemSku)
 	helpers.PanicErr(err)
+}
+
+func (data *DataStock) CheckSOOT(itemSku string, itemQty float64) (err error) {
+	if data.Sku == itemSku && data.QTY >= itemQty {
+		return nil
+	} else {
+		err := errors.New("item out of stock")
+		return err
+	}
 }
