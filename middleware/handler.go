@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-const role  = "user"
+const role = "user"
 
 func protectedEndpoint(handlerFunc http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {

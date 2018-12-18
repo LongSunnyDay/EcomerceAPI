@@ -169,7 +169,7 @@ type solrResponse struct {
 	} `json:"response"`
 }
 
-func GetProductFromSolrBySKU(sku string) (ConfigurableProductStruct) {
+func GetProductFromSolrBySKU(sku string) ConfigurableProductStruct {
 	request := map[string]interface{}{
 		"query": "+_type:product +sku:'" + sku + "'",
 		"limit": 1}

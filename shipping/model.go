@@ -8,17 +8,17 @@ import (
 type methods []method
 
 type method struct {
-	Id           int    `json:"id,omitempty"`
-	CarrierCode  string `json:"carrier_code"`
-	MethodCode   string `json:"method_code"`
-	CarrierTitle string `json:"carrier_title"`
-	MethodTitle  string `json:"method_title"`
-	Amount       float64    `json:"amount"`
-	BaseAmount   float64    `json:"base_amount"`
-	Available    bool   `json:"available"`
-	ErrorMessage string `json:"error_message"`
-	PriceExclTax int    `json:"price_excl_tax"`
-	PriceInclTax float64    `json:"price_incl_tax"`
+	Id           int     `json:"id,omitempty"`
+	CarrierCode  string  `json:"carrier_code"`
+	MethodCode   string  `json:"method_code"`
+	CarrierTitle string  `json:"carrier_title"`
+	MethodTitle  string  `json:"method_title"`
+	Amount       float64 `json:"amount"`
+	BaseAmount   float64 `json:"base_amount"`
+	Available    bool    `json:"available"`
+	ErrorMessage string  `json:"error_message"`
+	PriceExclTax int     `json:"price_excl_tax"`
+	PriceInclTax float64 `json:"price_incl_tax"`
 }
 
 func (m method) insertToDb() {
@@ -103,7 +103,7 @@ func GetShippingMethod(shippingCarrier string, shippingMethod string) method {
 	var method method
 	err = db.QueryRow("SELECT * FROM shippingMethods WHERE carrier_code = ? AND method_code = ?", shippingCarrier, shippingMethod).
 		Scan(&method.Id, &method.CarrierCode, &method.MethodCode, &method.CarrierTitle, &method.MethodTitle,
-		&method.Amount, &method.BaseAmount, &method.Available, &method.ErrorMessage, &method.PriceExclTax, &method.PriceInclTax)
+			&method.Amount, &method.BaseAmount, &method.Available, &method.ErrorMessage, &method.PriceExclTax, &method.PriceInclTax)
 	helpers.PanicErr(err)
 	return method
 }

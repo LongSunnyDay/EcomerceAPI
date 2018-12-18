@@ -22,7 +22,7 @@ func PlaceOrder(w http.ResponseWriter, r *http.Request) {
 
 	if len(cartItemsFromMongo) == len(orderData.Products) {
 		for i, item := range orderData.Products {
-			if cartItemsFromMongo[i].SKU != item.Sku || cartItemsFromMongo[i].QTY != item.Qty{
+			if cartItemsFromMongo[i].SKU != item.Sku || cartItemsFromMongo[i].QTY != item.Qty {
 				fmt.Println("Items in order and in cart doesn't match by SKU or QTY")
 			} else {
 				fmt.Println("All good, order item SKU -> ", item.Sku)
@@ -43,12 +43,11 @@ func PlaceOrder(w http.ResponseWriter, r *http.Request) {
 		for _, stockItem := range orderStock {
 			err := stockItem.CheckSOOT(item.Sku, item.Qty)
 			if err != nil {
-			fmt.Println(err)
+				fmt.Println(err)
 			}
 			fmt.Println(item.Sku)
 		}
 	}
-
 
 	for _, item := range orderData.Products {
 		checkPrice := product.GetProductPriceFromDbBySku(item.Sku, item.FinalPrice)

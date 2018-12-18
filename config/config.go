@@ -55,7 +55,7 @@ var driverName string
 
 var mongoDB *mongo.Database
 
-func (c *Config) GetMongoDb() (*mongo.Database) {
+func (c *Config) GetMongoDb() *mongo.Database {
 	client, err := mongo.NewClient(c.MongoDB.Connection)
 	helpers.PanicErr(err)
 

@@ -1,16 +1,17 @@
 package currency
 
-import( "net/http"
-	m "go-api-ws/currency/models"
+import (
 	"encoding/json"
-	"go-api-ws/helpers"
-	"github.com/xeipuuv/gojsonschema"
-	c "go-api-ws/config"
 	"fmt"
 	"github.com/go-chi/chi"
-	)
+	"github.com/xeipuuv/gojsonschema"
+	c "go-api-ws/config"
+	m "go-api-ws/currency/models"
+	"go-api-ws/helpers"
+	"net/http"
+)
 
-func createCurrency(w http.ResponseWriter, r *http.Request){
+func createCurrency(w http.ResponseWriter, r *http.Request) {
 	var schemaLoader = gojsonschema.NewReferenceLoader("file://currency/models/currencySchema.json")
 	var currency m.Currency
 	var currencies []m.Currency
@@ -19,16 +20,16 @@ func createCurrency(w http.ResponseWriter, r *http.Request){
 	result, err := gojsonschema.Validate(schemaLoader, documentLoader)
 	helpers.PanicErr(err)
 
-	if result.Valid(){
+	if result.Valid() {
 		db, err := c.Conf.GetDb()
 		helpers.PanicErr(err)
 
-		result, err := db.Exec("INSERT INTO currency(" +
-			"id," +
-			"name, " +
-			"code, " +
-			"sign, " +
-			"defaultCurrency) " +
+		result, err := db.Exec("INSERT INTO currency("+
+			"id,"+
+			"name, "+
+			"code, "+
+			"sign, "+
+			"defaultCurrency) "+
 			" VALUES(?, ?, ?, ?, ?)",
 			currency.Id,
 			currency.Name,
@@ -40,7 +41,7 @@ func createCurrency(w http.ResponseWriter, r *http.Request){
 
 		currencies = append(currencies, currency)
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode("Currency: " + currency.Name + " has been registered. " )
+		json.NewEncoder(w).Encode("Currency: " + currency.Name + " has been registered. ")
 
 	} else {
 		json.NewEncoder(w).Encode("There is and error registering currency:")
@@ -51,7 +52,7 @@ func createCurrency(w http.ResponseWriter, r *http.Request){
 	}
 }
 
-func getCurrency(w http.ResponseWriter, r *http.Request){
+func getCurrency(w http.ResponseWriter, r *http.Request) {
 	var currency m.Currency
 	currencyID := chi.URLParam(r, "currencyID")
 	db, err := c.Conf.GetDb()
@@ -63,7 +64,7 @@ func getCurrency(w http.ResponseWriter, r *http.Request){
 	json.NewEncoder(w).Encode(currency)
 }
 
-func getCurrencyList(w http.ResponseWriter, r *http.Request){
+func getCurrencyList(w http.ResponseWriter, r *http.Request) {
 	var currency m.Currency
 	var currencies []m.Currency
 	currencies = []m.Currency{}
@@ -92,7 +93,7 @@ func getCurrencyList(w http.ResponseWriter, r *http.Request){
 
 }
 
-func removeCurrency(w http.ResponseWriter, r *http.Request){
+func removeCurrency(w http.ResponseWriter, r *http.Request) {
 	currencyID := chi.URLParam(r, "currencyID")
 	db, err := c.Conf.GetDb()
 	helpers.CheckErr(err)
@@ -102,7 +103,7 @@ func removeCurrency(w http.ResponseWriter, r *http.Request){
 	helpers.CheckErr(err)
 }
 
-func updateCurrency(w http.ResponseWriter, r *http.Request){
+func updateCurrency(w http.ResponseWriter, r *http.Request) {
 	currencyID := chi.URLParam(r, "currencyID")
 	var currency m.Currency
 	err := json.NewDecoder(r.Body).Decode(&currency)

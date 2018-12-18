@@ -72,19 +72,19 @@ func getPaymentMethodsFromDb() Methods {
 	return methods
 }
 
-func (m Method) updatePaymentMethodInDb()  {
+func (m Method) updatePaymentMethodInDb() {
 	db, err := config.Conf.GetDb()
 	helpers.PanicErr(err)
-	_, err = db.Exec("UPDATE paymentMethods p SET " +
-		"p.Code = ?, " +
-		"p.Title = ?, " +
-		"p.IsServerMethod = ? " +
+	_, err = db.Exec("UPDATE paymentMethods p SET "+
+		"p.Code = ?, "+
+		"p.Title = ?, "+
+		"p.IsServerMethod = ? "+
 		"WHERE p.Id = ?",
 		m.Code, m.Title, m.IsServerMethod, m.Id)
 	helpers.PanicErr(err)
 }
 
-func removePaymentMethodFromDb(id string)  {
+func removePaymentMethodFromDb(id string) {
 	db, err := config.Conf.GetDb()
 	helpers.PanicErr(err)
 	_, err = db.Exec("DELETE FROM paymentMethods  WHERE Id = ?", id)

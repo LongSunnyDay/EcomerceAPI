@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func TodoRouter() http.Handler{
+func TodoRouter() http.Handler {
 	router := chi.NewRouter()
 	router.Post("/create", CreateTodo)
 	router.Get("/getTodo/{id}", GetTodo)

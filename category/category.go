@@ -5,10 +5,10 @@ import (
 )
 
 type Category struct {
-	Id string
-	Code string
-	Slug string
-	Title string
+	Id          string
+	Code        string
+	Slug        string
+	Title       string
 	Description string
 }
 
@@ -18,10 +18,10 @@ var cotegoryModule core.ApiModule
 
 func init() {
 	cotegoryModule = core.ApiModule{
-		Name: "Category module",
+		Name:        "Category module",
 		Description: "Category module. Support unlimited count of categories. Categories are stored as a flat list.",
-		Version: "0.1",
-		Author: "Remigijus Bauzys @ JivaLabs",
+		Version:     "0.1",
+		Author:      "Remigijus Bauzys @ JivaLabs",
 	}
 }
 

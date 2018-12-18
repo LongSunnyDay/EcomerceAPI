@@ -342,7 +342,7 @@ func insertUserIntoMongo(userInfo CustomerData) {
 	helpers.PanicErr(err)
 }
 
-func getUserFromMongo(id string) (CustomerData) {
+func getUserFromMongo(id string) CustomerData {
 	db := config.Conf.GetMongoDb()
 	var userInfo CustomerData
 	err := db.Collection(collectionName).FindOne(context.Background(), bson.NewDocument(
@@ -356,7 +356,7 @@ func getUserFromMongo(id string) (CustomerData) {
 	return userInfo
 }
 
-func getUserOrderHistoryFromMongo(id string) (OrderHistory) {
+func getUserOrderHistoryFromMongo(id string) OrderHistory {
 	db := config.Conf.GetMongoDb()
 
 	cur, err := db.Collection(collectionName).Find(context.Background(), bson.NewDocument(

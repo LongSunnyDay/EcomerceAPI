@@ -47,7 +47,7 @@ type Item struct {
 	ItemId               int       `json:"item_id"`
 	Price                float64   `json:"price"`
 	BasePrice            float64   `json:"base_price"`
-	Qty                  float64       `json:"qty"`
+	Qty                  float64   `json:"qty"`
 	RowTotal             float64   `json:"row_total"`
 	BaseRowTotal         float64   `json:"base_row_total"`
 	RowTotalWithDiscount float64   `json:"row_total_with_discount"`

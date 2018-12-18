@@ -38,7 +38,7 @@ func updatePaymentMethod(w http.ResponseWriter, r *http.Request) {
 	validationResult := helpers.CheckJSONSchemaWithGoStruct(
 		"file://payment/jsonSchemaModels/update-payment-Method.schema.json",
 		method)
-	if validationResult.Valid(){
+	if validationResult.Valid() {
 		method.updatePaymentMethodInDb()
 		helpers.WriteResultWithStatusCode(w, "ok", http.StatusOK)
 	} else {

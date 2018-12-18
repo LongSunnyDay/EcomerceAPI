@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func cmdDeleteAll (){
+func cmdDeleteAll() {
 	deleteUrl := "http://localhost:8983/solr/vue_storefront_core/update?commit=true"
 	deleteCmd := "<delete><query>*:*</query></delete>"
 	resp, err := http.Post(deleteUrl, "text/xml", strings.NewReader(deleteCmd))

@@ -8,7 +8,6 @@ import (
 	"time"
 )
 
-
 func ParseToken(tokenString string) (*jwt.Token, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -20,16 +19,16 @@ func ParseToken(tokenString string) (*jwt.Token, error) {
 	return token, nil
 }
 
-func GetNewAuthToken(sub string, groupId int) (*jwt.Token) {
+func GetNewAuthToken(sub string, groupId int) *jwt.Token {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"sub":  sub,
-		"exp":  time.Now().Add(time.Hour * 1).Unix(),
+		"sub":     sub,
+		"exp":     time.Now().Add(time.Hour * 1).Unix(),
 		"groupId": groupId,
 	})
 	return token
 }
 
-func GetNewRefreshToken(sub string) (*jwt.Token) {
+func GetNewRefreshToken(sub string) *jwt.Token {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"sub": sub,
 		"exp": time.Now().Add(time.Hour * 4).Unix(),

@@ -24,13 +24,13 @@ func createCart(w http.ResponseWriter, r *http.Request) {
 				if err != nil {
 					cartID := CreateCartInMongoDB(claims["sub"].(string))
 					response := helpers.Response{
-						Code:http.StatusOK,
-						Result:cartID}
+						Code:   http.StatusOK,
+						Result: cartID}
 					response.SendResponse(w)
 				} else {
 					response := helpers.Response{
-						Code:http.StatusOK,
-						Result:cartID}
+						Code:   http.StatusOK,
+						Result: cartID}
 					response.SendResponse(w)
 				}
 			}
@@ -38,8 +38,8 @@ func createCart(w http.ResponseWriter, r *http.Request) {
 	} else {
 		cartID := CreateCartInMongoDB("")
 		response := helpers.Response{
-			Code:http.StatusOK,
-			Result:cartID}
+			Code:   http.StatusOK,
+			Result: cartID}
 		response.SendResponse(w)
 	}
 }
@@ -77,7 +77,6 @@ func updateCart(w http.ResponseWriter, r *http.Request) {
 	for _, itemOptions := range item.Item.ProductOption.ExtensionAttributes.ConfigurableItemOptions {
 		attributes = append(attributes, attribute.GetAttributeNameFromSolr(itemOptions.OptionsID, itemOptions.OptionValue))
 	}
-
 
 	productFromSolr := product.GetProductFromSolrBySKU(item.Item.SKU)
 	if len(item.Item.SKU) == 4 {

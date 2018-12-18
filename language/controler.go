@@ -1,18 +1,18 @@
 package language
 
 import (
-	"net/http"
-	"github.com/xeipuuv/gojsonschema"
-	m "go-api-ws/language/models"
 	"encoding/json"
-	"go-api-ws/helpers"
-	c "go-api-ws/config"
 	"fmt"
 	"github.com/go-chi/chi"
+	"github.com/xeipuuv/gojsonschema"
+	c "go-api-ws/config"
+	"go-api-ws/helpers"
+	m "go-api-ws/language/models"
+	"net/http"
 )
 
 func createLanguage(w http.ResponseWriter, r *http.Request) {
-	var schemaLoader= gojsonschema.NewReferenceLoader("file://language/models/languageSchema.json")
+	var schemaLoader = gojsonschema.NewReferenceLoader("file://language/models/languageSchema.json")
 	var language m.Language
 	//var languages []m.Language
 	_ = json.NewDecoder(r.Body).Decode(&language)
@@ -47,13 +47,12 @@ func createLanguage(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-
 	//else {
 	//	fmt.Println("Couldn't add "+ language.Name + "to the database.")
 	//}
 }
 
-func getLanguage(w http.ResponseWriter, r *http.Request){
+func getLanguage(w http.ResponseWriter, r *http.Request) {
 	var language m.Language
 	languageID := chi.URLParam(r, "languageID")
 	db, err := c.Conf.GetDb()
@@ -65,7 +64,7 @@ func getLanguage(w http.ResponseWriter, r *http.Request){
 	json.NewEncoder(w).Encode(language)
 }
 
-func getLanguageList(w http.ResponseWriter, r *http.Request){
+func getLanguageList(w http.ResponseWriter, r *http.Request) {
 	var language m.Language
 	var languages []m.Language
 	languages = []m.Language{}
@@ -93,7 +92,7 @@ func getLanguageList(w http.ResponseWriter, r *http.Request){
 	json.NewEncoder(w).Encode(languages)
 }
 
-func removeLanguage(w http.ResponseWriter, r *http.Request){
+func removeLanguage(w http.ResponseWriter, r *http.Request) {
 	languageID := chi.URLParam(r, "languageID")
 	db, err := c.Conf.GetDb()
 	helpers.CheckErr(err)
@@ -103,7 +102,7 @@ func removeLanguage(w http.ResponseWriter, r *http.Request){
 	helpers.CheckErr(err)
 }
 
-func updateLanguage(w http.ResponseWriter, r *http.Request){
+func updateLanguage(w http.ResponseWriter, r *http.Request) {
 	languageID := chi.URLParam(r, "languageID")
 	var language m.Language
 	err := json.NewDecoder(r.Body).Decode(&language)
@@ -119,5 +118,3 @@ func updateLanguage(w http.ResponseWriter, r *http.Request){
 	helpers.PanicErr(er)
 	fmt.Println(language.Name + " updated in mysql")
 }
-
-

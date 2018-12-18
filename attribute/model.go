@@ -44,28 +44,28 @@ type attribute struct {
 	IsUnique                  string        `json:"is_unique"`
 	ID                        int           `json:"id"`
 	Tsk                       int64         `json:"tsk"`
-	ChildDocuments            []options `json:"_childDocuments_"`
+	ChildDocuments            []options     `json:"_childDocuments_"`
 }
 
 type options struct {
-	TypeOf string `json:"type_of"`
-	ParentId int `json:"parent_id"`
-	Label string `json:"label"`
-	Value string `json:"value"`
+	TypeOf   string `json:"type_of"`
+	ParentId int    `json:"parent_id"`
+	Label    string `json:"label"`
+	Value    string `json:"value"`
 }
 
 type solrResponse struct {
-	ResponseHeader struct{
+	ResponseHeader struct {
 		Status int `json:"status"`
-		QTime int `json:"QTime"`
-		Params struct{
+		QTime  int `json:"QTime"`
+		Params struct {
 			JSON string `json:"json"`
 		}
 	} `json:"responseHeader"`
-	Response struct{
-		NumFound int `json:"numFound"`
-		Start int `json:"start"`
-		Docs []attribute `json:"docs"`
+	Response struct {
+		NumFound int         `json:"numFound"`
+		Start    int         `json:"start"`
+		Docs     []attribute `json:"docs"`
 	} `json:"response"`
 }
 
@@ -78,7 +78,7 @@ const SolrQueryUrl = "http://localhost:8983/solr/storefrontCore/query"
 const ContentType = "application/json; charset=utf-8"
 
 // Solr client function
-func GetAttributeNameFromSolr(attributeId string, attributeValue string) (ItemAttribute) {
+func GetAttributeNameFromSolr(attributeId string, attributeValue string) ItemAttribute {
 	request := map[string]interface{}{
 		"query":  "_type:attribute",
 		"filter": "id:" + attributeId,

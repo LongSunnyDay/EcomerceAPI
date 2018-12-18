@@ -22,7 +22,7 @@ func InsertTodo(todo m.Todo) {
 	helpers.PanicErr(err)
 
 }
-func GetOneTodo(todoId string) interface{}{
+func GetOneTodo(todoId string) interface{} {
 	var todo m.Todo
 
 	objId, err := objectid.FromHex(todoId)
@@ -37,7 +37,7 @@ func GetOneTodo(todoId string) interface{}{
 
 	fmt.Println(todo.ObjectId)
 
-	return  todo
+	return todo
 }
 
 func GetAllTodos() []m.Todo {
@@ -61,7 +61,7 @@ func GetAllTodos() []m.Todo {
 	return elements
 }
 
-func ReplaceTodoByID(todo m.Todo, todoId string) interface{}{
+func ReplaceTodoByID(todo m.Todo, todoId string) interface{} {
 	var todoUpdated m.Todo
 
 	objId, err := objectid.FromHex(todoId)
@@ -75,10 +75,10 @@ func ReplaceTodoByID(todo m.Todo, todoId string) interface{}{
 	fmt.Println(todoUpdated)
 	helpers.PanicErr(err)
 
-	return  todoUpdated
+	return todoUpdated
 }
 
-func UpdateTodoById(todo m.Todo, todoId string) interface{}{
+func UpdateTodoById(todo m.Todo, todoId string) interface{} {
 
 	var todoUpdated m.Todo
 	bsonTodo, err := helpers.StructToBson(todo)
@@ -94,11 +94,11 @@ func UpdateTodoById(todo m.Todo, todoId string) interface{}{
 	fmt.Println(todoUpdated)
 	helpers.PanicErr(err)
 
-	return  todoUpdated
+	return todoUpdated
 }
 
 // deletes an existing todo
-func DeleteTodo(todoId string) interface{}{
+func DeleteTodo(todoId string) interface{} {
 	var todo m.Todo
 	objId, err := objectid.FromHex(todoId)
 	filter := bson.NewDocument(bson.EC.ObjectID("_id", objId))
@@ -110,8 +110,8 @@ func DeleteTodo(todoId string) interface{}{
 	if err != nil {
 		panic(err)
 	}
-	 {
-		fmt.Println("todo ID: "+ todoId  +" has been deleted")
+	{
+		fmt.Println("todo ID: " + todoId + " has been deleted")
 	}
 
 	return nil

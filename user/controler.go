@@ -30,5 +30,3 @@ func UpdateUserByIdMongo(user CustomerData) {
 	//helpers.PanicErr(err)
 
 }
-
-

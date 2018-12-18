@@ -54,7 +54,7 @@ func GetIntParameter(r *http.Request, name string) (int, error) {
 	return strconv.Atoi(parameter)
 }
 
-func CheckJSONSchemaWithGoStruct(jsonSchemaPath string, structForValidation interface{}) (*gojsonschema.Result) {
+func CheckJSONSchemaWithGoStruct(jsonSchemaPath string, structForValidation interface{}) *gojsonschema.Result {
 	schemaForValidation := gojsonschema.NewReferenceLoader(jsonSchemaPath)
 	documentToValidate := gojsonschema.NewGoLoader(structForValidation)
 	validationResult, err := gojsonschema.Validate(schemaForValidation, documentToValidate)
@@ -86,6 +86,6 @@ func StructToBson(v interface{}) (doc *bson.Document, err error) {
 	return
 }
 
-func (r Response) SendResponse(w http.ResponseWriter)  {
+func (r Response) SendResponse(w http.ResponseWriter) {
 	WriteResultWithStatusCode(w, r, r.Code)
 }
