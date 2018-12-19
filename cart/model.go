@@ -26,7 +26,7 @@ type Item struct {
 	ProductType   string  `json:"product_type,omitempty" bson:"product_type"`
 	Name          string  `json:"name,omitempty" bson:"name"`
 	ItemID        int     `json:"item_id,omitempty" bson:"item_id,omitempty"`
-	QuoteId       string  `json:"quoteId,omitempty" bson:"quoteId"`
+	QuoteId       int64  `json:"quoteId,omitempty" bson:"quoteId"`
 	ProductOption struct {
 		ExtensionAttributes struct {
 			ConfigurableItemOptions []Options `json:"configurable_item_options,omitempty" bson:"configurable_item_options"`

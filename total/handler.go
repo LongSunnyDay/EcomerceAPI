@@ -13,13 +13,13 @@ import (
 func GetTotals(w http.ResponseWriter, r *http.Request) {
 	urlToken := r.URL.Query()["token"][0]
 	urlCartId := r.URL.Query()["cartId"][0]
-	var groupId float64
+	var groupId int64
 	if len(urlToken) > 0 {
 		token, err := auth.ParseToken(urlToken)
 		helpers.PanicErr(err)
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 			if claims.VerifyExpiresAt(time.Now().Unix(), true) {
-				groupId = claims["groupId"].(float64)
+				groupId = claims["groupId"].(int64)
 			}
 		}
 	} else {
@@ -43,13 +43,13 @@ func GetTotals(w http.ResponseWriter, r *http.Request) {
 func GetTotalsWithPaymentMethods(w http.ResponseWriter, r *http.Request) {
 	urlToken := r.URL.Query()["token"][0]
 	urlCartId := r.URL.Query()["cartId"][0]
-	var groupId float64
+	var groupId int64
 	if len(urlToken) > 0 {
 		token, err := auth.ParseToken(urlToken)
 		helpers.PanicErr(err)
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 			if claims.VerifyExpiresAt(time.Now().Unix(), true) {
-				groupId = claims["groupId"].(float64)
+				groupId = claims["groupId"].(int64)
 			}
 		}
 	} else {

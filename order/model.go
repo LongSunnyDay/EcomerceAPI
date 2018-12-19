@@ -20,18 +20,18 @@ type History struct {
 	BaseTotalDue                          float64        `json:"base_total_due"`
 	BaseToGlobalRate                      float64        `json:"base_to_global_rate"`
 	BaseToOrderRate                       float64        `json:"base_to_order_rate"`
-	BillingAddressId                      int            `json:"billing_address_id"`
+	BillingAddressId                      int64          `json:"billing_address_id"`
 	CreatedAt                             time.Time      `json:"created_at"`
 	CustomerEmail                         string         `json:"customer_email"`
 	CustomerFirstname                     string         `json:"customer_firstname"`
-	CustomerGroupId                       int            `json:"customer_group_id"`
-	CustomerId                            int            `json:"customer_id"`
+	CustomerGroupId                       int64          `json:"customer_group_id"`
+	CustomerId                            int64          `json:"customer_id"`
 	CustomerIsGuest                       int            `json:"customer_is_guest"`
 	CustomerLastname                      string         `json:"customer_lastname"`
 	CustomerNoteNotify                    int            `json:"customer_note_notify"`
 	DiscountAmount                        float64        `json:"discount_amount"`
 	EmailSent                             int            `json:"email_sent"`
-	EntityId                              int            `json:"entity_id"`
+	EntityId                              int64          `json:"entity_id"`
 	GlobalCurrencyCode                    string         `json:"global_currency_code"`
 	GrandTotal                            float64        `json:"grand_total"`
 	DiscountTaxCompensationAmount         float64        `json:"discount_tax_compensation_amount"`
@@ -39,7 +39,7 @@ type History struct {
 	IsVirtual                             int            `json:"is_virtual"`
 	OrderCurrencyCode                     string         `json:"order_currency_code"`
 	ProtectCode                           string         `json:"protect_code"`
-	QuoteId                               int            `json:"quote_id"`
+	QuoteId                               int64            `json:"quote_id"`
 	ShippingAmount                        float64        `json:"shipping_amount"`
 	ShippingDescription                   string         `json:"shipping_description"`
 	ShippingDiscountAmount                float64        `json:"shipping_discount_amount"`
@@ -197,7 +197,7 @@ type Payment struct {
 
 type ShippingAssignment struct {
 	Shipping struct {
-		Address BillingAddress `json:"address"`
+		Address BillingAddress `json:"addresses"`
 		Method  string         `json:"method"`
 		Total   struct {
 			BaseShippingAmount                    float64 `json:"base_shipping_amount"`

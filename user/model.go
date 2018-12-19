@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/mongodb/mongo-go-driver/bson"
+	"go-api-ws/addresses"
 	"go-api-ws/config"
 	"go-api-ws/helpers"
 	"time"
@@ -38,46 +39,46 @@ type UpdatedCustomer struct {
 }
 
 type CustomerData struct {
-	Addresses              []Address `json:"addresses" bson:"address"`
-	CreatedAt              time.Time `json:"created_at,omitempty" bson:"created_at,omitempty"`
-	CreatedIn              string    `json:"created_in,omitempty" bson:"created_in,omitempty"`
-	DisableAutoGroupChange int32     `json:"disable_auto_group_change,omitempty" bson:"disable_auto_group_change,omitempty"`
-	Email                  string    `json:"email,omitempty" bson:"email,omitempty"`
-	FirstName              string    `json:"firstname,omitempty" bson:"firstname,omitempty"`
-	GroupID                int32     `json:"group_id,omitempty" bson:"group_id,omitempty"`
-	ID                     string    `json:"id,omitempty" bson:"id,omitempty"`
-	LastName               string    `json:"lastname,omitempty" bson:"lastname,omitempty"`
-	StoreID                int32     `json:"store_id,omitempty" bson:"store_id,omitempty"`
-	UpdatedAt              time.Time `json:"updated_at,omitempty" bson:"updated_at,omitempty"`
-	WebsiteID              int32     `json:"website_id,omitempty" bson:"website_id,omitempty"`
-	DefaultShipping        string    `json:"default_shipping,omitempty" bson:"default_shipping,omitempty"`
+	Addresses              []addresses.Address `json:"addresses" bson:"addresses"`
+	CreatedAt              time.Time           `json:"created_at,omitempty" bson:"created_at,omitempty"`
+	CreatedIn              string              `json:"created_in,omitempty" bson:"created_in,omitempty"`
+	DisableAutoGroupChange int32               `json:"disable_auto_group_change,omitempty" bson:"disable_auto_group_change,omitempty"`
+	Email                  string              `json:"email,omitempty" bson:"email,omitempty"`
+	FirstName              string              `json:"firstname,omitempty" bson:"firstname,omitempty"`
+	GroupID                int64               `json:"group_id,omitempty" bson:"group_id,omitempty"`
+	ID                     int64               `json:"id,omitempty" bson:"id,omitempty"`
+	LastName               string              `json:"lastname,omitempty" bson:"lastname,omitempty"`
+	StoreID                int32               `json:"store_id,omitempty" bson:"store_id,omitempty"`
+	UpdatedAt              time.Time           `json:"updated_at,omitempty" bson:"updated_at,omitempty"`
+	WebsiteID              int32               `json:"website_id,omitempty" bson:"website_id,omitempty"`
+	DefaultShipping        string              `json:"default_shipping,omitempty" bson:"default_shipping,omitempty"`
 }
 
-type Address struct {
-	ID              int64    `json:"id,omitempty" bson:"id,omitempty"`
-	CustomerID      int      `json:"customer_id,omitempty" bson:"customer_id,omitempty"`
-	Region          Region   `json:"region" bson:"region,omitempty"`
-	RegionID        int      `json:"region_id,omitempty" bson:"region_id,omitempty"`
-	CountryID       string   `json:"country_id,omitempty" bson:"country_id,omitempty"`
-	Street          []string `json:"street,omitempty" bson:"street,omitempty"`
-	Telephone       string   `json:"telephone,omitempty" bson:"telephone,omitempty"`
-	Postcode        string   `json:"postcode,omitempty" bson:"postcode,omitempty"`
-	City            string   `json:"city,omitempty" bson:"city,omitempty"`
-	Firstname       string   `json:"firstname,omitempty" bson:"firstname,omitempty"`
-	Lastname        string   `json:"lastname,omitempty" bson:"lastname,omitempty"`
-	DefaultShipping bool     `json:"default_shipping,omitempty" bson:"default_shipping,omitempty"`
-	Company         string   `json:"company,omitempty" bson:"company,omitempty"`
-	VatID           string   `json:"vat_id,omitempty" bson:"vat_id,omitempty"`
-	DefaultBilling  bool     `json:"default_billing,omitempty" bson:"default_billing,omitempty"`
-	StreetLine0     string   `json:"street_line_0,omitempty"`
-	StreetLine1     string   `json:"street_line_1,omitempty"`
-}
-
-type Region struct {
-	RegionCode string `json:"region_code" bson:"region_code"`
-	Region     string `json:"region" bson:"region"`
-	RegionID   int    `json:"region_id" bson:"region_id"`
-}
+//type Address struct {
+//	ID              int64    `json:"id,omitempty" bson:"id,omitempty"`
+//	CustomerID      int      `json:"customer_id,omitempty" bson:"customer_id,omitempty"`
+//	Region          Region   `json:"region" bson:"region,omitempty"`
+//	RegionID        int      `json:"region_id,omitempty" bson:"region_id,omitempty"`
+//	CountryID       string   `json:"country_id,omitempty" bson:"country_id,omitempty"`
+//	Street          []string `json:"street,omitempty" bson:"street,omitempty"`
+//	Telephone       string   `json:"telephone,omitempty" bson:"telephone,omitempty"`
+//	Postcode        string   `json:"postcode,omitempty" bson:"postcode,omitempty"`
+//	City            string   `json:"city,omitempty" bson:"city,omitempty"`
+//	Firstname       string   `json:"firstname,omitempty" bson:"firstname,omitempty"`
+//	Lastname        string   `json:"lastname,omitempty" bson:"lastname,omitempty"`
+//	DefaultShipping bool     `json:"default_shipping,omitempty" bson:"default_shipping,omitempty"`
+//	Company         string   `json:"company,omitempty" bson:"company,omitempty"`
+//	VatID           string   `json:"vat_id,omitempty" bson:"vat_id,omitempty"`
+//	DefaultBilling  bool     `json:"default_billing,omitempty" bson:"default_billing,omitempty"`
+//	StreetLine0     string   `json:"street_line_0,omitempty"`
+//	StreetLine1     string   `json:"street_line_1,omitempty"`
+//}
+//
+//type Region struct {
+//	RegionCode string `json:"region_code" bson:"region_code"`
+//	Region     string `json:"region" bson:"region"`
+//	RegionID   int    `json:"region_id" bson:"region_id"`
+//}
 
 type OrderHistory struct {
 	Items          []Item `json:"items" bson:"items"`
@@ -158,7 +159,7 @@ func getUserIdFromMySQLByEmail(email string) string {
 	return id
 }
 
-func getUserFromMySQLById(id int64) CustomerData {
+func GetUserFromMySQLById(id int64) CustomerData {
 	db, err := config.Conf.GetDb()
 	helpers.PanicErr(err)
 	var userFromDb CustomerData
@@ -192,126 +193,126 @@ func getUserFromMySQLById(id int64) CustomerData {
 	return userFromDb
 }
 
-func getAddressesFromMySQL(userId int64) []Address {
-	db, err := config.Conf.GetDb()
-	helpers.PanicErr(err)
-	var addresses []Address
-	rows, err := db.Query("SELECT "+
-		"id, "+
-		"customer_id, "+
-		"region_id, "+
-		"country_id, "+
-		"telephone, "+
-		"postcode, "+
-		"city, "+
-		"firstname, "+
-		"lastname, "+
-		"default_shipping, "+
-		"street_line_0, "+
-		"street_line_1 FROM addresses WHERE customer_id = ?", userId)
-	for rows.Next() {
-		var address Address
-		if err := rows.Scan(&address.ID, &address.CustomerID, &address.RegionID,
-			&address.CountryID, &address.Telephone, &address.Postcode, &address.City,
-			&address.Firstname, &address.Lastname, &address.DefaultShipping,
-			&address.StreetLine0, &address.StreetLine1); err != nil {
-			helpers.PanicErr(err)
-		}
-		address.formatStreetArray()
-		address.getRegion()
-		addresses = append(addresses, address)
-	}
-	if len(addresses) > 0 {
-		return addresses
-	}
-	return []Address{}
-}
+//func getAddressesFromMySQL(userId int64) []Address {
+//	db, err := config.Conf.GetDb()
+//	helpers.PanicErr(err)
+//	var addresses []Address
+//	rows, err := db.Query("SELECT "+
+//		"id, "+
+//		"customer_id, "+
+//		"region_id, "+
+//		"country_id, "+
+//		"telephone, "+
+//		"postcode, "+
+//		"city, "+
+//		"firstname, "+
+//		"lastname, "+
+//		"default_shipping, "+
+//		"street_line_0, "+
+//		"street_line_1 FROM addresses WHERE customer_id = ?", userId)
+//	for rows.Next() {
+//		var addresses Address
+//		if err := rows.Scan(&addresses.ID, &addresses.CustomerID, &addresses.RegionID,
+//			&addresses.CountryID, &addresses.Telephone, &addresses.Postcode, &addresses.City,
+//			&addresses.Firstname, &addresses.Lastname, &addresses.DefaultShipping,
+//			&addresses.StreetLine0, &addresses.StreetLine1); err != nil {
+//			helpers.PanicErr(err)
+//		}
+//		addresses.formatStreetArray()
+//		addresses.getRegion()
+//		addresses = append(addresses, addresses)
+//	}
+//	if len(addresses) > 0 {
+//		return addresses
+//	}
+//	return []Address{}
+//}
+//
+//func (addresses *Address) insertOrUpdateAddressIntoMySQL(customerId string) {
+//	db, err := config.Conf.GetDb()
+//	helpers.PanicErr(err)
+//	res, err := db.Exec("INSERT INTO addresses("+
+//		"id, "+
+//		"customer_id, "+
+//		"region_id, "+
+//		"country_id, "+
+//		"telephone, "+
+//		"postcode, "+
+//		"city, "+
+//		"firstname, "+
+//		"lastname, "+
+//		"default_shipping, "+
+//		"street_line_0, "+
+//		"street_line_1)"+
+//		" VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE "+
+//		"region_id=VALUES(region_id), "+
+//		"country_id=VALUES(country_id), "+
+//		"telephone=VALUES(telephone), "+
+//		"postcode=VALUES(postcode), "+
+//		"city=VALUES(city), "+
+//		"firstname=VALUES(firstname), "+
+//		"lastname=VALUES(lastname), "+
+//		"default_shipping=VALUES(default_shipping),"+
+//		"street_line_0=VALUES(street_line_0),"+
+//		"street_line_1=VALUES(street_line_1)",
+//		addresses.ID,
+//		customerId,
+//		addresses.RegionID,
+//		addresses.CountryID,
+//		addresses.Telephone,
+//		addresses.Postcode,
+//		addresses.City,
+//		addresses.Firstname,
+//		addresses.Lastname,
+//		addresses.DefaultShipping,
+//		addresses.Street[0],
+//		addresses.Street[1])
+//	helpers.PanicErr(err)
+//	addressId, err := res.LastInsertId()
+//	addresses.ID = addressId
+//}
+//
+//func (addresses *Address) getRegion() {
+//	db, err := config.Conf.GetDb()
+//	helpers.PanicErr(err)
+//	var region Region
+//	err = db.QueryRow("SELECT region_id, region_code, region "+
+//		"FROM region WHERE region_id=?", addresses.RegionID).Scan(&region.RegionID, &region.RegionCode, &region.Region)
+//	helpers.PanicErr(err)
+//	addresses.Region = region
+//}
+//
+//func (addresses *Address) formatStreetArray() {
+//	addresses.Street = []string{addresses.StreetLine0, addresses.StreetLine1}
+//	addresses.StreetLine0 = ""
+//	addresses.StreetLine1 = ""
+//}
+//
+//func updateAddressInMySQL(addresses Address) {
+//	db, err := config.Conf.GetDb()
+//	helpers.PanicErr(err)
+//	_, err = db.Exec("UPDATE addresses SET "+
+//		"region_id=?, "+
+//		"country_id=?, "+
+//		"telephone=?, "+
+//		"postcode=?, "+
+//		"city=?, "+
+//		"firstname=?, "+
+//		"lastname=?, "+
+//		"default_shipping=? "+
+//		"WHERE id=?",
+//		addresses.RegionID,
+//		addresses.CountryID,
+//		addresses.Telephone,
+//		addresses.Postcode,
+//		addresses.City,
+//		addresses.Firstname,
+//		addresses.Lastname,
+//		addresses.DefaultShipping)
+//	helpers.PanicErr(err)
+//}
 
-func (address *Address) insertOrUpdateAddressIntoMySQL(customerId string) {
-	db, err := config.Conf.GetDb()
-	helpers.PanicErr(err)
-	res, err := db.Exec("INSERT INTO addresses("+
-		"id, "+
-		"customer_id, "+
-		"region_id, "+
-		"country_id, "+
-		"telephone, "+
-		"postcode, "+
-		"city, "+
-		"firstname, "+
-		"lastname, "+
-		"default_shipping, "+
-		"street_line_0, "+
-		"street_line_1)"+
-		" VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE "+
-		"region_id=VALUES(region_id), "+
-		"country_id=VALUES(country_id), "+
-		"telephone=VALUES(telephone), "+
-		"postcode=VALUES(postcode), "+
-		"city=VALUES(city), "+
-		"firstname=VALUES(firstname), "+
-		"lastname=VALUES(lastname), "+
-		"default_shipping=VALUES(default_shipping),"+
-		"street_line_0=VALUES(street_line_0),"+
-		"street_line_1=VALUES(street_line_1)",
-		address.ID,
-		customerId,
-		address.RegionID,
-		address.CountryID,
-		address.Telephone,
-		address.Postcode,
-		address.City,
-		address.Firstname,
-		address.Lastname,
-		address.DefaultShipping,
-		address.Street[0],
-		address.Street[1])
-	helpers.PanicErr(err)
-	addressId, err := res.LastInsertId()
-	address.ID = addressId
-}
-
-func (address *Address) getRegion() {
-	db, err := config.Conf.GetDb()
-	helpers.PanicErr(err)
-	var region Region
-	err = db.QueryRow("SELECT region_id, region_code, region "+
-		"FROM region WHERE region_id=?", address.RegionID).Scan(&region.RegionID, &region.RegionCode, &region.Region)
-	helpers.PanicErr(err)
-	address.Region = region
-}
-
-func (address *Address) formatStreetArray() {
-	address.Street = []string{address.StreetLine0, address.StreetLine1}
-	address.StreetLine0 = ""
-	address.StreetLine1 = ""
-}
-
-func updateAddressInMySQL(address Address) {
-	db, err := config.Conf.GetDb()
-	helpers.PanicErr(err)
-	_, err = db.Exec("UPDATE addresses SET "+
-		"region_id=?, "+
-		"country_id=?, "+
-		"telephone=?, "+
-		"postcode=?, "+
-		"city=?, "+
-		"firstname=?, "+
-		"lastname=?, "+
-		"default_shipping=? "+
-		"WHERE id=?",
-		address.RegionID,
-		address.CountryID,
-		address.Telephone,
-		address.Postcode,
-		address.City,
-		address.Firstname,
-		address.Lastname,
-		address.DefaultShipping)
-	helpers.PanicErr(err)
-}
-
-func getGroupIdFromMySQLById(id int) int {
+func GetGroupIdFromMySQLById(id int) int {
 	db, err := config.Conf.GetDb()
 	helpers.PanicErr(err)
 	var groupId int
@@ -333,12 +334,12 @@ func insertUserIntoMongo(userInfo CustomerData) {
 			bson.EC.String("email", userInfo.Email),
 			bson.EC.String("firstname", userInfo.FirstName),
 			bson.EC.String("lastname", userInfo.LastName),
-			bson.EC.Int32("group_id", userInfo.GroupID),
-			bson.EC.String("id", userInfo.ID),
+			bson.EC.Int64("group_id", userInfo.GroupID),
+			bson.EC.Int64("id", userInfo.ID),
 			bson.EC.Int32("store_id", userInfo.StoreID),
 			bson.EC.Time("updated_at", userInfo.UpdatedAt),
 			bson.EC.Int32("website_id", userInfo.WebsiteID),
-			bson.EC.Interface("address", userInfo.Addresses)))
+			bson.EC.Interface("addresses", userInfo.Addresses)))
 	helpers.PanicErr(err)
 }
 
@@ -350,7 +351,7 @@ func getUserFromMongo(id string) CustomerData {
 		bson.EC.String("type", "User info"))).Decode(&userInfo)
 	helpers.PanicErr(err)
 	if len(userInfo.Addresses) == 0 {
-		userInfo.Addresses = []Address{}
+		userInfo.Addresses = []addresses.Address{}
 	}
 	fmt.Println(userInfo.Addresses)
 	return userInfo

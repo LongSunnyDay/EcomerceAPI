@@ -105,7 +105,7 @@ type AddressData struct {
 	} `json:"addressInformation"`
 }
 
-func (t *Totals) CalculateTotals(urlCartId string, addressInformation AddressData, groupId float64) {
+func (t *Totals) CalculateTotals(urlCartId string, addressInformation AddressData, groupId int64) {
 	t.GetItems(urlCartId)
 	t.GetSubtotal()
 	t.GetShipping(addressInformation)
@@ -151,7 +151,7 @@ func (t *Totals) GetSubtotal() {
 	}
 }
 
-func (t *Totals) GetTaxRates(groupId float64) tax.Rules {
+func (t *Totals) GetTaxRates(groupId int64) tax.Rules {
 	var taxRates tax.Rules
 	taxRates.GroupId = int(groupId)
 	rules := taxRates.GetRates()

@@ -3,6 +3,7 @@ package user
 import (
 	"encoding/json"
 	"github.com/dgrijalva/jwt-go"
+	"go-api-ws/addresses"
 	"go-api-ws/auth"
 	"go-api-ws/cart"
 	"go-api-ws/config"
@@ -58,8 +59,8 @@ func meEndpoint(w http.ResponseWriter, r *http.Request) {
 			userId, err := strconv.Atoi(claims["sub"].(string))
 			helpers.PanicErr(err)
 			userId64 := int64(userId)
-			userInfo := getUserFromMySQLById(userId64)
-			userInfo.Addresses = getAddressesFromMySQL(userId64)
+			userInfo := GetUserFromMySQLById(userId64)
+			userInfo.Addresses = addresses.GetAddressesFromMySQL(userId64)
 			response := helpers.Response{
 				Code:   http.StatusOK,
 				Result: userInfo}
@@ -80,7 +81,7 @@ func registerUser(w http.ResponseWriter, r *http.Request) {
 	validationResult := helpers.CheckJSONSchemaWithGoStruct("file://user/jsonSchemaModels/userRegister.schema.json", user)
 	if validationResult.Valid() {
 		id := insertUserIntoMySQL(user)
-		customer := getUserFromMySQLById(id)
+		customer := GetUserFromMySQLById(id)
 		//userInfo := CustomerData{
 		//	Address:              []*Address{},
 		//	CreatedAt:              time.Now().Unix(),
@@ -114,7 +115,7 @@ func updateUser(w http.ResponseWriter, r *http.Request) {
 	helpers.PanicErr(err)
 	//fmt.Printf("%+v\n",user)
 	for i := range user.UpdateUser.Addresses {
-		user.UpdateUser.Addresses[i].insertOrUpdateAddressIntoMySQL(user.UpdateUser.ID)
+		user.UpdateUser.Addresses[i].InsertOrUpdateAddressIntoMySQL(user.UpdateUser.ID)
 	}
 	for _, address := range user.UpdateUser.Addresses {
 		if address.DefaultShipping == true {
@@ -136,7 +137,7 @@ func refreshToken(w http.ResponseWriter, req *http.Request) {
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		if claims.VerifyExpiresAt(time.Now().Unix(), true) {
 
-			groupId := getGroupIdFromMySQLById(claims["sub"].(int))
+			groupId := GetGroupIdFromMySQLById(claims["sub"].(int))
 
 			//role := roleByGroupId(groupId)
 
