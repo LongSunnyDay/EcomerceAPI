@@ -1,6 +1,8 @@
 package order
 
 import (
+	"go-api-ws/config"
+	"go-api-ws/helpers"
 	"time"
 )
 
@@ -39,7 +41,7 @@ type History struct {
 	IsVirtual                             int            `json:"is_virtual"`
 	OrderCurrencyCode                     string         `json:"order_currency_code"`
 	ProtectCode                           string         `json:"protect_code"`
-	QuoteId                               int64            `json:"quote_id"`
+	QuoteId                               string         `json:"quote_id"`
 	ShippingAmount                        float64        `json:"shipping_amount"`
 	ShippingDescription                   string         `json:"shipping_description"`
 	ShippingDiscountAmount                float64        `json:"shipping_discount_amount"`
@@ -168,19 +170,7 @@ type ParentItem struct {
 	Weight                            float64   `json:"weight"`
 }
 
-type BillingAddress struct {
-	AddressType string   `json:"address_type"`
-	City        string   `json:"city"`
-	CountryId   string   `json:"country_id"`
-	Email       string   `json:"email"`
-	EntityId    int      `json:"entity_id"`
-	Firstname   string   `json:"firstname"`
-	Lastname    string   `json:"lastname"`
-	ParentId    int      `json:"parent_id"`
-	Postcode    string   `json:"postcode"`
-	Street      []string `json:"street"`
-	Telephone   string
-}
+type BillingAddress Address
 
 type Payment struct {
 	AccountStatus         string   `json:"account_status"`
@@ -197,8 +187,8 @@ type Payment struct {
 
 type ShippingAssignment struct {
 	Shipping struct {
-		Address BillingAddress `json:"addresses"`
-		Method  string         `json:"method"`
+		Address Address `json:"addresses"`
+		Method  string  `json:"method"`
 		Total   struct {
 			BaseShippingAmount                    float64 `json:"base_shipping_amount"`
 			BaseShippingDiscountAmount            float64 `json:"base_shipping_discount_amount"`
@@ -385,6 +375,8 @@ type ConfigurableItemOption struct {
 	OptionValue string `json:"option_value"`
 }
 
-func (placeOrderData *PlaceOrderData) GetUserGroup() {
-
+func (order *History) SaveOrder() {
+	db, err := config.Conf.GetDb()
+	helpers.PanicErr(err)
+	res, err := db.Exec("INSER")
 }

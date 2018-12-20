@@ -49,7 +49,8 @@ func GetTotalsWithPaymentMethods(w http.ResponseWriter, r *http.Request) {
 		helpers.PanicErr(err)
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 			if claims.VerifyExpiresAt(time.Now().Unix(), true) {
-				groupId = claims["groupId"].(int64)
+				groupIdFloat := claims["groupId"].(float64)
+				groupId = int64(groupIdFloat)
 			}
 		}
 	} else {

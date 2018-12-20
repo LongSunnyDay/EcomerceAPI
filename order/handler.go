@@ -6,6 +6,7 @@ import (
 	"go-api-ws/addresses"
 	"go-api-ws/cart"
 	"go-api-ws/helpers"
+	"go-api-ws/payment"
 	"go-api-ws/product"
 	"go-api-ws/stock"
 	"go-api-ws/total"
@@ -17,16 +18,15 @@ import (
 
 func PlaceOrder(w http.ResponseWriter, r *http.Request) {
 	var orderData PlaceOrderData
-
 	err := json.NewDecoder(r.Body).Decode(&orderData)
 	helpers.PanicErr(err)
 
-	//fmt.Printf("%+v\n", orderData)
-
 	// Gets user cart from mongoDb by userId
+
 	cartItemsFromMongo := cart.GetUserCartFromMongoByID(orderData.UserId)
 
 	// Does check if items send with request match items in user cart
+
 	if len(cartItemsFromMongo) == len(orderData.Products) {
 		for i, item := range orderData.Products {
 			if cartItemsFromMongo[i].SKU != item.Sku || cartItemsFromMongo[i].QTY != item.Qty {
@@ -41,6 +41,7 @@ func PlaceOrder(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Performs stock check
+
 	var orderStock []stock.DataStock
 	for _, item := range orderData.Products {
 		var SSOTItem stock.DataStock
@@ -57,6 +58,7 @@ func PlaceOrder(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Performs FinalPrice check between items send and items in SSOT
+
 	for _, item := range orderData.Products {
 		checkPrice := product.GetProductPriceFromDbBySku(item.Sku, item.FinalPrice)
 		if !checkPrice {
@@ -65,12 +67,14 @@ func PlaceOrder(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get customer data from MySql by id send in request
+
 	userId, err := strconv.Atoi(orderData.UserId)
 	helpers.PanicErr(err)
 	userIdInt64 := int64(userId)
 	customerData := user.GetUserFromMySQLById(userIdInt64)
 
 	// Saves billing addresses to MySQL
+
 	var billingAddress addresses.Address
 	billingAddress.RegionID = orderData.AddressInformation.BillingAddress.RegionId
 	billingAddress.CountryID = orderData.AddressInformation.BillingAddress.CountryId
@@ -81,20 +85,21 @@ func PlaceOrder(w http.ResponseWriter, r *http.Request) {
 	billingAddress.Firstname = orderData.AddressInformation.BillingAddress.Firstname
 	billingAddress.Lastname = orderData.AddressInformation.BillingAddress.Lastname
 	billingAddress.Email = orderData.AddressInformation.BillingAddress.Email
+	billingAddress.DefaultBilling = true
+	// Address saved to DB
 	billingAddress.InsertOrUpdateAddressIntoMySQL(userIdInt64)
 
 	// Calculates order totals using cart from MongoDB
+
 	var orderTotals total.Totals
 	var addressForTotals total.AddressData
-
 	addressForTotals.AddressInformation.ShippingCarrierCode = orderData.AddressInformation.ShippingCarrierCode
 	addressForTotals.AddressInformation.ShippingMethodCode = orderData.AddressInformation.ShippingMethodCode
-
 	orderTotals.CalculateTotals(orderData.CartId, addressForTotals, customerData.GroupID)
 
 	// Preparing order history
-	var orderHistory History
 
+	var orderHistory History
 	orderHistory.BaseCurrencyCode = orderTotals.BaseCurrencyCode
 	orderHistory.BaseDiscountAmount = orderTotals.BaseDiscountAmount
 	orderHistory.BaseGrandTotal = orderTotals.BaseGrandTotal
@@ -104,16 +109,15 @@ func PlaceOrder(w http.ResponseWriter, r *http.Request) {
 	orderHistory.BaseShippingTaxAmount = orderTotals.BaseShippingTaxAmount
 	orderHistory.BaseSubtotal = orderTotals.BaseSubtotal
 	orderHistory.BaseTaxAmount = orderTotals.BaseTaxAmount
-
 	// orderHistory.BaseSubtotalInclTax
 	// orderHistory.BaseTotalDue
 	// orderHistory.BaseToGlobalRate
 	// orderHistory.BaseToOrderRate
 	orderHistory.BillingAddressId = billingAddress.ID
-
 	orderHistory.CreatedAt = time.Now().UTC()
 
 	// Customer data
+
 	orderHistory.CustomerEmail = customerData.Email
 	orderHistory.CustomerFirstname = customerData.FirstName
 	orderHistory.CustomerGroupId = customerData.GroupID
@@ -121,7 +125,6 @@ func PlaceOrder(w http.ResponseWriter, r *http.Request) {
 	orderHistory.CustomerIsGuest = 0 // ToDo Orders for Guest users needs to be implemented
 	orderHistory.CustomerLastname = customerData.LastName
 	// orderHistory.CustomerNoteNotify
-
 	orderHistory.DiscountAmount = orderTotals.DiscountAmount
 	orderHistory.EmailSent = 1 // ToDo Email service implementation needed
 	orderHistory.EntityId = customerData.ID
@@ -154,5 +157,86 @@ func PlaceOrder(w http.ResponseWriter, r *http.Request) {
 	orderHistory.TotalQtyOrdered = orderTotals.ItemsQty
 	// orderHistory.Weight
 
-	// orderHistory.Items
+	// Working on Items in Order history []items
+
+	var orderItems []Item
+	for _, itemFromTotals := range orderTotals.Items {
+		var orderItem Item
+		//orderItem.AmountRefunded
+		//orderItem.BaseAmountRefunded
+		orderItem.BaseDiscountAmount = itemFromTotals.BaseDiscountAmount
+		//orderItem.BaseDiscountInvoiced
+		orderItem.BasePrice = itemFromTotals.BasePrice
+		//orderItem.BaseRowInvoiced
+		orderItem.RowTotal = itemFromTotals.RowTotal
+		orderItem.BaseTaxAmount = itemFromTotals.BaseTaxAmount
+		orderItem.CreatedAt = time.Now().UTC()
+		orderItem.DiscountAmount = itemFromTotals.DiscountAmount
+		// orderItem.DiscountInvoiced
+		orderItem.DiscountPercent = itemFromTotals.DiscountPercent
+		// orderItem.FreeShipping
+		// orderItem.IsQtyDecimal
+		// orderItem.IsVirtual
+		orderItem.ItemId = itemFromTotals.ItemId
+		orderItem.Name = itemFromTotals.Name
+		// orderItem.NoDiscount
+		// orderItem.OrderId  ToDo Assign orderId to items after order has been placed to db
+		// orderItem.OriginalPrice
+		// orderItem.ParentItemId
+		// orderItem.Price
+		// orderItem.ProductId
+		// orderItem.ProductType
+		// orderItem.QtyCanceled
+		// orderItem.QtyInvoiced
+		orderItem.QtyOrdered = itemFromTotals.Qty
+		// orderItem.QtyRefunded
+		// orderItem.QtyShipped
+		// orderItem.QuoteItemId
+		// orderItem.RowInvoiced
+		orderItem.RowTotal = itemFromTotals.RowTotal
+		// orderItem.RowWeight
+		// orderItem.Sku ToDo Assign Sku from MySQL or Cart service
+		// orderItem.StoreId
+		orderItem.TaxAmount = itemFromTotals.TaxAmount
+		orderItem.TaxPercent = itemFromTotals.TaxPercent
+		// orderItem.TaxInvoiced
+		// orderItem.UpdatedAt
+		// orderItem.Weight
+		orderItems = append(orderItems, orderItem)
+	}
+	orderHistory.Items = orderItems
+
+	// Working on Payment information
+
+	paymentMethod := payment.GetPaymentMethodFromDbByMethodCode(orderData.AddressInformation.PaymentMethodCode)
+	var orderPayment Payment
+	orderPayment.AdditionalInformation = []string{paymentMethod.Title}
+	orderPayment.AmountOrdered = orderHistory.BaseGrandTotal
+	orderPayment.BaseAmountOrdered = orderHistory.BaseGrandTotal
+	orderPayment.ShippingAmount = orderHistory.ShippingAmount
+	orderPayment.EntityId = userId
+	orderPayment.Method = paymentMethod.Code
+	orderPayment.ParentId = userId
+	orderPayment.ShippingAmount = orderHistory.ShippingAmount
+	// orderPayment.AccountStatus
+	// orderPayment.CcLast4
+
+	// Shipping assignment
+
+	var shippingAssignment ShippingAssignment
+	shippingAssignment.Items = orderHistory.Items
+	shippingAssignment.Shipping.Address = orderData.AddressInformation.ShippingAddress
+	// Method constructed from Carrier Code and Method Code
+	shippingAssignment.Shipping.Method = orderData.AddressInformation.ShippingCarrierCode + "_" + orderData.AddressInformation.ShippingMethodCode
+
+	shippingAssignment.Shipping.Total.BaseShippingAmount = orderTotals.BaseShippingAmount
+	shippingAssignment.Shipping.Total.BaseShippingDiscountAmount = orderTotals.BaseShippingDiscountAmount
+	shippingAssignment.Shipping.Total.BaseShippingInclTax = orderTotals.BaseShippingInclTax
+	shippingAssignment.Shipping.Total.BaseShippingTaxAmount = orderTotals.BaseShippingTaxAmount
+	shippingAssignment.Shipping.Total.ShippingAmount = orderTotals.ShippingAmount
+	shippingAssignment.Shipping.Total.ShippingDiscountAmount = orderTotals.ShippingDiscountAmount
+	// shippingAssignment.Shipping.Total.ShippingDiscountTaxCompensationAmount
+	shippingAssignment.Shipping.Total.ShippingInclTax = orderTotals.ShippingInclTax
+	shippingAssignment.Shipping.Total.ShippingTaxAmount = orderTotals.ShippingTaxAmount
+
 }

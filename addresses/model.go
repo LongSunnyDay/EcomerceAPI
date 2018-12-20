@@ -70,6 +70,12 @@ func GetAddressesFromMySQL(userId int64) []Address {
 func (address *Address) InsertOrUpdateAddressIntoMySQL(customerId int64) {
 	db, err := config.Conf.GetDb()
 	helpers.PanicErr(err)
+	if len(address.Street) == 1 {
+		address.Street = []string{address.Street[0], ""}
+	} else if len(address.Street) == 0 {
+		address.Street = []string{"", ""}
+	}
+
 	res, err := db.Exec("INSERT INTO addresses("+
 		"id, "+
 		"customer_id, "+
@@ -81,10 +87,11 @@ func (address *Address) InsertOrUpdateAddressIntoMySQL(customerId int64) {
 		"firstname, "+
 		"lastname, "+
 		"default_shipping, "+
+		"default_billing, "+
 		"email, "+
 		"street_line_0, "+
 		"street_line_1)"+
-		" VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE "+
+		" VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE "+
 		"region_id=VALUES(region_id), "+
 		"country_id=VALUES(country_id), "+
 		"telephone=VALUES(telephone), "+
@@ -92,9 +99,10 @@ func (address *Address) InsertOrUpdateAddressIntoMySQL(customerId int64) {
 		"city=VALUES(city), "+
 		"firstname=VALUES(firstname), "+
 		"lastname=VALUES(lastname), "+
-		"default_shipping=VALUES(default_shipping),"+
-		"email=VALUES(email)"+
-		"street_line_0=VALUES(street_line_0),"+
+		"default_shipping=VALUES(default_shipping), "+
+		"default_billing=VALUES(default_billing), "+
+		"email=VALUES(email), "+
+		"street_line_0=VALUES(street_line_0), "+
 		"street_line_1=VALUES(street_line_1)",
 		address.ID,
 		customerId,
@@ -106,6 +114,7 @@ func (address *Address) InsertOrUpdateAddressIntoMySQL(customerId int64) {
 		address.Firstname,
 		address.Lastname,
 		address.DefaultShipping,
+		address.DefaultBilling,
 		address.Email,
 		address.Street[0],
 		address.Street[1])

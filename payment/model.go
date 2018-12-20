@@ -97,7 +97,6 @@ func GetActualPaymentMethodsFromDb() Methods {
 	rows, err := db.Query("SELECT Code, Title, IsServerMethod FROM paymentMethods WHERE id != 17")
 	helpers.PanicErr(err)
 	var methods []Method
-	defer rows.Close()
 	for rows.Next() {
 		var method Method
 		if err := rows.Scan(&method.Code, &method.Title, &method.IsServerMethod); err != nil {
@@ -106,4 +105,13 @@ func GetActualPaymentMethodsFromDb() Methods {
 		methods = append(methods, method)
 	}
 	return methods
+}
+
+func GetPaymentMethodFromDbByMethodCode(methodCode string) Method {
+	db, err := config.Conf.GetDb()
+	helpers.PanicErr(err)
+	var method Method
+	err = db.QueryRow("SELECT Code, Title, IsServerMethod FROM paymentMethods WHERE code = ?", methodCode).Scan(&method.Code, &method.Title, &method.IsServerMethod)
+	helpers.PanicErr(err)
+	return method
 }

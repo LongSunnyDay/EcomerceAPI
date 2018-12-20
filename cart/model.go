@@ -2,6 +2,7 @@ package cart
 
 import (
 	"context"
+	"fmt"
 	"github.com/mongodb/mongo-go-driver/bson"
 	"github.com/mongodb/mongo-go-driver/bson/objectid"
 	"go-api-ws/config"
@@ -26,7 +27,7 @@ type Item struct {
 	ProductType   string  `json:"product_type,omitempty" bson:"product_type"`
 	Name          string  `json:"name,omitempty" bson:"name"`
 	ItemID        int     `json:"item_id,omitempty" bson:"item_id,omitempty"`
-	QuoteId       int64  `json:"quoteId,omitempty" bson:"quoteId"`
+	QuoteId       string  `json:"quoteId,omitempty" bson:"quoteId"`
 	ProductOption struct {
 		ExtensionAttributes struct {
 			ConfigurableItemOptions []Options `json:"configurable_item_options,omitempty" bson:"configurable_item_options"`
@@ -116,8 +117,9 @@ func GetUserCartFromMongoByID(userID string) []Item {
 	err := db.Collection(collectionName).FindOne(context.Background(), bson.NewDocument(
 		bson.EC.String("id", userID))).Decode(&cart)
 	if err != nil {
-		carID := CreateCartInMongoDB(userID)
-		getGuestCartFromMongoByID(carID)
+		fmt.Println("ERROR IN GetUserCartFromMongoByID: ", err)
+		CreateCartInMongoDB(userID)
+		GetUserCartFromMongoByID(userID)
 	}
 	return cart.Items
 }
