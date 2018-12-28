@@ -7,6 +7,7 @@ import (
 )
 
 type History struct {
+	ID                                    int64          `json:"id,omitempty"`
 	AppliedRuleIds                        string         `json:"applied_rule_ids"`
 	BaseCurrencyCode                      string         `json:"base_currency_code"`
 	BaseDiscountAmount                    float64        `json:"base_discount_amount"`
@@ -378,5 +379,187 @@ type ConfigurableItemOption struct {
 func (order *History) SaveOrder() {
 	db, err := config.Conf.GetDb()
 	helpers.PanicErr(err)
-	res, err := db.Exec("INSER")
+	res, err := db.Exec("INSERT INTO order("+
+		"applied_rule_ids, "+
+		"base_currency_code, "+
+		"base_discount_amount, "+
+		"base_grand_total, "+
+		"base_discount_tax_compensation_amount, "+
+		"base_shipping_amount, "+
+		"base_shipping_discount_amount, "+
+		"base_shipping_incl_tax, "+
+		"base_shipping_tax_amount, "+
+		"base_subtotal, "+
+		"base_subtotal_incl_tax, "+
+		"base_tax_amount, "+
+		"base_total_due, "+
+		"base_to_global_rate, "+
+		"base_to_order_rate, "+
+		"billing_address_id, "+
+		"created_at, "+
+		"customer_email, "+
+		"customer_firstname, "+
+		"customer_group_id, "+
+		"customer_id, "+
+		"customer_is_guest, "+
+		"customer_lastname, "+
+		"customer_note_notify, "+
+		"discount_amount, "+
+		"email_sent, "+
+		"entity_id, "+
+		"global_currency_code, "+
+		"grand_total, "+
+		"discount_tax_compensation_amount, "+
+		"increment_id, "+
+		"is_virtual, "+
+		"order_currency_code, "+
+		"protect_code, "+
+		"quote_id, "+
+		"shipping_amount, "+
+		"shipping_description, "+
+		"shipping_discount_amount, "+
+		"shipping_discount_tax_compensation_amount, "+
+		"shipping_incl_tax, "+
+		"shipping_tax_amount, "+
+		"state, "+
+		"status, "+
+		"store_currency_code, "+
+		"store_id, "+
+		"store_name, "+
+		"store_to_base_rate, "+
+		"store_to_order_rate, "+
+		"subtotal, "+
+		"subtotal_incl_tax, "+
+		"tax_amount, "+
+		"total_due, "+
+		"total_item_count, "+
+		"total_qty_ordered, "+
+		"updated_at, "+
+		"weight) "+
+		"VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+		order.AppliedRuleIds,
+		order.BaseCurrencyCode,
+		order.BaseDiscountAmount,
+		order.BaseGrandTotal,
+		order.BaseDiscountTaxCompensationAmount,
+		order.BaseShippingAmount,
+		order.BaseShippingDiscountAmount,
+		order.BaseShippingInclTax,
+		order.BaseShippingTaxAmount,
+		order.BaseSubtotal,
+		order.BaseSubtotalInclTax,
+		order.BaseTaxAmount,
+		order.BaseTotalDue,
+		order.BaseToGlobalRate,
+		order.BaseToOrderRate,
+		order.BillingAddressId,
+		order.CreatedAt,
+		order.CustomerEmail,
+		order.CustomerFirstname,
+		order.CustomerGroupId,
+		order.CustomerId,
+		order.CustomerIsGuest,
+		order.CustomerLastname,
+		order.CustomerNoteNotify,
+		order.DiscountAmount,
+		order.EmailSent,
+		order.EntityId,
+		order.GlobalCurrencyCode,
+		order.ProtectCode,
+		order.QuoteId,
+		order.ShippingAmount,
+		order.ShippingDescription,
+		order.ShippingDiscountAmount,
+		order.ShippingDiscountTaxCompensationAmount,
+		order.ShippingInclTax,
+		order.ShippingTaxAmount,
+		order.State,
+		order.Status,
+		order.StoreCurrencyCode,
+		order.StoreId,
+		order.StoreName,
+		order.StoreToBaseRate,
+		order.StoreToOrderRate,
+		order.Subtotal,
+		order.SubtotalInclTax,
+		order.TaxAmount,
+		order.TotalDue,
+		order.TotalItemCount,
+		order.TotalQtyOrdered,
+		order.UpdatedAt,
+		order.Weight)
+	helpers.PanicErr(err)
+	id, err := res.LastInsertId()
+	helpers.PanicErr(err)
+	order.ID = id
+}
+
+func GetAllCustomerOrderHistory(customerId int) (customerHistoryArray []History) {
+	db, err := config.Conf.GetDb()
+	helpers.PanicErr(err)
+	rows, err := db.Query("SELECT * FROM order WHERE customer_id = ?", customerId)
+	for rows.Next() {
+		var customerHistory History
+		if err := rows.Scan(
+			&customerHistory.ID,
+			&customerHistory.AppliedRuleIds,
+			&customerHistory.BaseCurrencyCode,
+			&customerHistory.BaseDiscountAmount,
+			&customerHistory.BaseGrandTotal,
+			&customerHistory.BaseDiscountTaxCompensationAmount,
+			&customerHistory.BaseShippingAmount,
+			&customerHistory.BaseShippingDiscountAmount,
+			&customerHistory.BaseShippingInclTax,
+			&customerHistory.BaseShippingTaxAmount,
+			&customerHistory.BaseSubtotal,
+			&customerHistory.BaseSubtotalInclTax,
+			&customerHistory.BaseTaxAmount,
+			&customerHistory.BaseTotalDue,
+			&customerHistory.BaseToGlobalRate,
+			&customerHistory.BaseToOrderRate,
+			&customerHistory.BillingAddressId,
+			&customerHistory.CreatedAt,
+			&customerHistory.CustomerEmail,
+			&customerHistory.CustomerFirstname,
+			&customerHistory.CustomerGroupId,
+			&customerHistory.CustomerId,
+			&customerHistory.CustomerIsGuest,
+			&customerHistory.CustomerLastname,
+			&customerHistory.CustomerNoteNotify,
+			&customerHistory.DiscountAmount,
+			&customerHistory.EmailSent,
+			&customerHistory.GlobalCurrencyCode,
+			&customerHistory.GrandTotal,
+			&customerHistory.DiscountTaxCompensationAmount,
+			&customerHistory.IncrementId,
+			&customerHistory.IsVirtual,
+			&customerHistory.OrderCurrencyCode,
+			&customerHistory.ProtectCode,
+			&customerHistory.QuoteId,
+			&customerHistory.ShippingAmount,
+			&customerHistory.ShippingDescription,
+			&customerHistory.ShippingDiscountAmount,
+			&customerHistory.ShippingDiscountTaxCompensationAmount,
+			&customerHistory.ShippingInclTax,
+			&customerHistory.ShippingTaxAmount,
+			&customerHistory.State,
+			&customerHistory.Status,
+			&customerHistory.StoreCurrencyCode,
+			&customerHistory.StoreId,
+			&customerHistory.StoreName,
+			&customerHistory.StoreToBaseRate,
+			&customerHistory.StoreToOrderRate,
+			&customerHistory.Subtotal,
+			&customerHistory.SubtotalInclTax,
+			&customerHistory.TaxAmount,
+			&customerHistory.TotalDue,
+			&customerHistory.TotalItemCount,
+			&customerHistory.TotalQtyOrdered,
+			&customerHistory.UpdatedAt,
+			&customerHistory.Weight); err != nil {
+			helpers.PanicErr(err)
+		}
+		customerHistoryArray = append(customerHistoryArray, customerHistory)
+	}
+	return
 }
