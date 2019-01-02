@@ -1,6 +1,7 @@
 package order
 
 import (
+	"fmt"
 	"go-api-ws/config"
 	"go-api-ws/helpers"
 	"time"
@@ -74,49 +75,54 @@ type History struct {
 }
 
 type Item struct {
-	AmountRefunded       float64    `json:"amount_refunded"`
-	BaseAmountRefunded   float64    `json:"base_amount_refunded"`
-	BaseDiscountAmount   float64    `json:"base_discount_amount"`
-	BaseDiscountInvoiced float64    `json:"base_discount_invoiced"`
-	BasePrice            float64    `json:"base_price"`
-	BaseRowInvoiced      float64    `json:"base_row_invoiced"`
-	BaseRowTotal         float64    `json:"base_row_total"`
-	BaseTaxAmount        float64    `json:"base_tax_amount"`
-	BaseTaxInvoiced      float64    `json:"base_tax_invoiced"`
-	CreatedAt            time.Time  `json:"created_at"`
-	DiscountAmount       float64    `json:"discount_amount"`
-	DiscountInvoiced     float64    `json:"discount_invoiced"`
-	DiscountPercent      float64    `json:"discount_percent"`
-	FreeShipping         int        `json:"free_shipping"`
-	IsQtyDecimal         int        `json:"is_qty_decimal"`
-	IsVirtual            int        `json:"is_virtual"`
-	ItemId               int        `json:"item_id"`
-	Name                 string     `json:"name"`
-	NoDiscount           int        `json:"no_discount"`
-	OrderId              int        `json:"order_id"`
-	OriginalPrice        float64    `json:"original_price"`
-	ParentItemId         int        `json:"parent_item_id,omitempty"`
-	Price                float64    `json:"price"`
-	ProductId            int        `json:"product_id"`
-	ProductType          string     `json:"product_type"`
-	QtyCanceled          float64    `json:"qty_canceled"`
-	QtyInvoiced          float64    `json:"qty_invoiced"`
-	QtyOrdered           float64    `json:"qty_ordered"`
-	QtyRefunded          float64    `json:"qty_refunded"`
-	QtyShipped           float64    `json:"qty_shipped"`
-	QuoteItemId          int        `json:"quote_item_id"`
-	RowInvoiced          float64    `json:"row_invoiced"`
-	RowTotal             float64    `json:"row_total"`
-	RowTotalInclTax      float64    `json:"row_total_incl_tax,omitempty"`
-	RowWeight            float64    `json:"row_weight"`
-	Sku                  string     `json:"sku"`
-	StoreId              int        `json:"store_id"`
-	TaxAmount            float64    `json:"tax_amount"`
-	TaxInvoiced          float64    `json:"tax_invoiced"`
-	TaxPercent           float64    `json:"tax_percent"`
-	UpdatedAt            time.Time  `json:"updated_at"`
-	Weight               float64    `json:"weight"`
-	ParentItem           ParentItem `json:"parent_item,omitempty"`
+	AmountRefunded                    float64    `json:"amount_refunded"`
+	AppliedRuleIds                    string     `json:"applied_rule_ids"`
+	BaseAmountRefunded                float64    `json:"base_amount_refunded"`
+	BaseDiscountAmount                float64    `json:"base_discount_amount"`
+	BaseDiscountInvoiced              float64    `json:"base_discount_invoiced"`
+	BaseDiscountTaxCompensationAmount float64    `json:"base_discount_tax_compensation_amount"`
+	BaseOriginalPrice                 float64    `json:"base_original_price"`
+	BasePrice                         float64    `json:"base_price"`
+	BasePriceInclTax                  float64    `json:"base_price_incl_tax"`
+	BaseRowInvoiced                   float64    `json:"base_row_invoiced"`
+	BaseRowTotal                      float64    `json:"base_row_total"`
+	BaseRowTotalInclTax               float64    `json:"base_row_total_incl_tax"`
+	BaseTaxAmount                     float64    `json:"base_tax_amount"`
+	BaseTaxInvoiced                   float64    `json:"base_tax_invoiced"`
+	CreatedAt                         time.Time  `json:"created_at"`
+	DiscountAmount                    float64    `json:"discount_amount"`
+	DiscountInvoiced                  float64    `json:"discount_invoiced"`
+	DiscountPercent                   float64    `json:"discount_percent"`
+	FreeShipping                      int        `json:"free_shipping"`
+	IsQtyDecimal                      int        `json:"is_qty_decimal"`
+	IsVirtual                         int        `json:"is_virtual"`
+	ItemId                            int        `json:"item_id"`
+	Name                              string     `json:"name"`
+	NoDiscount                        int        `json:"no_discount"`
+	OrderId                           int64      `json:"order_id"`
+	OriginalPrice                     float64    `json:"original_price"`
+	ParentItemId                      int        `json:"parent_item_id,omitempty"`
+	Price                             float64    `json:"price"`
+	ProductId                         int        `json:"product_id"`
+	ProductType                       string     `json:"product_type"`
+	QtyCanceled                       float64    `json:"qty_canceled"`
+	QtyInvoiced                       float64    `json:"qty_invoiced"`
+	QtyOrdered                        float64    `json:"qty_ordered"`
+	QtyRefunded                       float64    `json:"qty_refunded"`
+	QtyShipped                        float64    `json:"qty_shipped"`
+	QuoteItemId                       int        `json:"quote_item_id"`
+	RowInvoiced                       float64    `json:"row_invoiced"`
+	RowTotal                          float64    `json:"row_total"`
+	RowTotalInclTax                   float64    `json:"row_total_incl_tax,omitempty"`
+	RowWeight                         float64    `json:"row_weight"`
+	Sku                               string     `json:"sku"`
+	StoreId                           int        `json:"store_id"`
+	TaxAmount                         float64    `json:"tax_amount"`
+	TaxInvoiced                       float64    `json:"tax_invoiced"`
+	TaxPercent                        float64    `json:"tax_percent"`
+	UpdatedAt                         time.Time  `json:"updated_at"`
+	Weight                            float64    `json:"weight"`
+	ParentItem                        ParentItem `json:"parent_item,omitempty"`
 }
 
 type ParentItem struct {
@@ -174,6 +180,7 @@ type ParentItem struct {
 type BillingAddress Address
 
 type Payment struct {
+	OrderId               int64    `json:"order_id"`
 	AccountStatus         string   `json:"account_status"`
 	AdditionalInformation []string `json:"additional_information"`
 	AmountOrdered         float64  `json:"amount_ordered"`
@@ -379,7 +386,7 @@ type ConfigurableItemOption struct {
 func (order *History) SaveOrder() {
 	db, err := config.Conf.GetDb()
 	helpers.PanicErr(err)
-	res, err := db.Exec("INSERT INTO order("+
+	res, err := db.Exec("INSERT INTO `order` ("+
 		"applied_rule_ids, "+
 		"base_currency_code, "+
 		"base_discount_amount, "+
@@ -436,7 +443,7 @@ func (order *History) SaveOrder() {
 		"total_qty_ordered, "+
 		"updated_at, "+
 		"weight) "+
-		"VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+		"VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
 		order.AppliedRuleIds,
 		order.BaseCurrencyCode,
 		order.BaseDiscountAmount,
@@ -465,6 +472,11 @@ func (order *History) SaveOrder() {
 		order.EmailSent,
 		order.EntityId,
 		order.GlobalCurrencyCode,
+		order.GrandTotal,
+		order.DiscountTaxCompensationAmount,
+		order.IncrementId,
+		order.IsVirtual,
+		order.OrderCurrencyCode,
 		order.ProtectCode,
 		order.QuoteId,
 		order.ShippingAmount,
@@ -562,4 +574,327 @@ func GetAllCustomerOrderHistory(customerId int) (customerHistoryArray []History)
 		customerHistoryArray = append(customerHistoryArray, customerHistory)
 	}
 	return
+}
+
+func GetOrder(orderId int) (order History) {
+	db, err := config.Conf.GetDb()
+	helpers.PanicErr(err)
+	err = db.QueryRow("SELECT * FROM order WHERE id = ?", orderId).Scan(&order.ID,
+		&order.AppliedRuleIds,
+		&order.BaseCurrencyCode,
+		&order.BaseDiscountAmount,
+		&order.BaseGrandTotal,
+		&order.BaseDiscountTaxCompensationAmount,
+		&order.BaseShippingAmount,
+		&order.BaseShippingDiscountAmount,
+		&order.BaseShippingInclTax,
+		&order.BaseShippingTaxAmount,
+		&order.BaseSubtotal,
+		&order.BaseSubtotalInclTax,
+		&order.BaseTaxAmount,
+		&order.BaseTotalDue,
+		&order.BaseToGlobalRate,
+		&order.BaseToOrderRate,
+		&order.BillingAddressId,
+		&order.CreatedAt,
+		&order.CustomerEmail,
+		&order.CustomerFirstname,
+		&order.CustomerGroupId,
+		&order.CustomerId,
+		&order.CustomerIsGuest,
+		&order.CustomerLastname,
+		&order.CustomerNoteNotify,
+		&order.DiscountAmount,
+		&order.EmailSent,
+		&order.GlobalCurrencyCode,
+		&order.GrandTotal,
+		&order.DiscountTaxCompensationAmount,
+		&order.IncrementId,
+		&order.IsVirtual,
+		&order.OrderCurrencyCode,
+		&order.ProtectCode,
+		&order.QuoteId,
+		&order.ShippingAmount,
+		&order.ShippingDescription,
+		&order.ShippingDiscountAmount,
+		&order.ShippingDiscountTaxCompensationAmount,
+		&order.ShippingInclTax,
+		&order.ShippingTaxAmount,
+		&order.State,
+		&order.Status,
+		&order.StoreCurrencyCode,
+		&order.StoreId,
+		&order.StoreName,
+		&order.StoreToBaseRate,
+		&order.StoreToOrderRate,
+		&order.Subtotal,
+		&order.SubtotalInclTax,
+		&order.TaxAmount,
+		&order.TotalDue,
+		&order.TotalItemCount,
+		&order.TotalQtyOrdered,
+		&order.UpdatedAt,
+		&order.Weight)
+	helpers.PanicErr(err)
+	return
+}
+
+func RemoveOrder(orderId int) {
+	db, err := config.Conf.GetDb()
+	helpers.PanicErr(err)
+	_, err = db.Exec("DELETE FROM order WHERE id = ?", orderId)
+	helpers.PanicErr(err)
+}
+
+func (order History) UpdateOrder() {
+	db, err := config.Conf.GetDb()
+	helpers.PanicErr(err)
+	order.UpdatedAt = time.Now().UTC()
+	res, err := db.Exec("UPDATE order o SET "+
+		"o.applied_rule_ids = ?, "+
+		"o.base_currency_code  = ?, "+
+		"o.base_discount_amount = ?, "+
+		"o.base_grand_total = ?, "+
+		"o.base_discount_tax_compensation_amount = ?, "+
+		"o.base_shipping_amount = ?, "+
+		"o.base_shipping_discount_amount = ?, "+
+		"o.base_shipping_incl_tax = ?, "+
+		"o.base_shipping_tax_amount = ?, "+
+		"o.base_subtotal = ?, "+
+		"o.base_subtotal_incl_tax = ?, "+
+		"o.base_tax_amount = ?, "+
+		"o.base_total_due = ?, "+
+		"o.base_to_global_rate = ?, "+
+		"o.base_to_order_rate = ?, "+
+		"o.billing_address_id = ?, "+
+		"o.created_at = ?, "+
+		"o.customer_email = ?, "+
+		"o.customer_firstname = ?, "+
+		"o.customer_group_id = ?, "+
+		"o.customer_id = ?, "+
+		"o.customer_is_guest = ?, "+
+		"o.customer_lastname = ?, "+
+		"o.customer_note_notify = ?, "+
+		"o.discount_amount = ?, "+
+		"o.email_sent = ?, "+
+		"o.entity_id = ?, "+
+		"o.global_currency_code = ?, "+
+		"o.grand_total = ?, "+
+		"o.discount_tax_compensation_amount = ?, "+
+		"o.increment_id = ?, "+
+		"o.is_virtual = ?, "+
+		"o.order_currency_code = ?, "+
+		"o.protect_code = ?, "+
+		"o.quote_id = ?, "+
+		"o.shipping_amount = ?, "+
+		"o.shipping_description = ?, "+
+		"o.shipping_discount_amount = ?, "+
+		"o.shipping_discount_tax_compensation_amount = ?, "+
+		"o.shipping_incl_tax = ?, "+
+		"o.shipping_tax_amount = ?, "+
+		"o.state = ?, "+
+		"o.status = ?, "+
+		"o.store_currency_code = ?, "+
+		"o.store_id = ?, "+
+		"o.store_name = ?, "+
+		"o.store_to_base_rate = ?, "+
+		"o.store_to_order_rate = ?, "+
+		"o.subtotal = ?, "+
+		"o.subtotal_incl_tax = ?, "+
+		"o.tax_amount = ?, "+
+		"o.total_due = ?, "+
+		"o.total_item_count = ?, "+
+		"o.total_qty_ordered = ?, "+
+		"o.updated_at = ?, "+
+		"o.weight = ? "+
+		"WHERE o.id = ?",
+		order.AppliedRuleIds,
+		order.BaseCurrencyCode,
+		order.BaseDiscountAmount,
+		order.BaseGrandTotal,
+		order.BaseDiscountTaxCompensationAmount,
+		order.BaseShippingAmount,
+		order.BaseShippingDiscountAmount,
+		order.BaseShippingInclTax,
+		order.BaseShippingTaxAmount,
+		order.BaseSubtotal,
+		order.BaseSubtotalInclTax,
+		order.BaseTaxAmount,
+		order.BaseTotalDue,
+		order.BaseToGlobalRate,
+		order.BaseToOrderRate,
+		order.BillingAddressId,
+		order.CreatedAt,
+		order.CustomerEmail,
+		order.CustomerFirstname,
+		order.CustomerGroupId,
+		order.CustomerId,
+		order.CustomerIsGuest,
+		order.CustomerLastname,
+		order.CustomerNoteNotify,
+		order.DiscountAmount,
+		order.EmailSent,
+		order.EntityId,
+		order.GlobalCurrencyCode,
+		order.GrandTotal,
+		order.DiscountTaxCompensationAmount,
+		order.IncrementId,
+		order.IsVirtual,
+		order.OrderCurrencyCode,
+		order.ProtectCode,
+		order.QuoteId,
+		order.ShippingAmount,
+		order.ShippingDescription,
+		order.ShippingDiscountAmount,
+		order.ShippingDiscountTaxCompensationAmount,
+		order.ShippingInclTax,
+		order.ShippingTaxAmount,
+		order.State,
+		order.Status,
+		order.StoreCurrencyCode,
+		order.StoreId,
+		order.StoreName,
+		order.StoreToBaseRate,
+		order.StoreToOrderRate,
+		order.Subtotal,
+		order.SubtotalInclTax,
+		order.TaxAmount,
+		order.TotalDue,
+		order.TotalItemCount,
+		order.TotalQtyOrdered,
+		order.UpdatedAt,
+		order.Weight,
+		order.ID)
+	helpers.PanicErr(err)
+	rowsAffected, err := res.RowsAffected()
+	helpers.PanicErr(err)
+	fmt.Println("Order ID: ", order.ID, " got ", rowsAffected, " rows updated")
+}
+
+func (item Item) SaveItem() {
+	db, err := config.Conf.GetDb()
+	helpers.PanicErr(err)
+	_, err = db.Exec("INSERT INTO order_items ("+
+		"amount_refunded, "+
+		"applied_rule_ids, "+
+		"base_amount_refunded, "+
+		"base_discount_amount, "+
+		"base_discount_invoiced, "+
+		"base_discount_tax_compensation_amount, "+
+		"base_original_price, "+
+		"base_price, "+
+		"base_price_incl_tax, "+
+		"base_row_invoiced, "+
+		"base_row_total, "+
+		"base_row_total_incl_tax, "+
+		"base_tax_amount, "+
+		"base_tax_invoiced, "+
+		"created_at, "+
+		"discount_amount, "+
+		"discount_invoiced, "+
+		"discount_percent, "+
+		"free_shipping, "+
+		"discount_tax_compensation_amount, "+
+		"is_qty_decimal, "+
+		"is_virtual, "+
+		"name, "+
+		"no_discount, "+
+		"order_id, "+
+		"original_price, "+
+		"parent_item_id, "+
+		"product_id, "+
+		"product_type, "+
+		"qty_canceled, "+
+		"qty_invoiced, "+
+		"qty_ordered, "+
+		"qty_refunded, "+
+		"qty_shipped, "+
+		"quote_item_id, "+
+		"row_invoiced, "+
+		"row_total, "+
+		"row_total_incl_tax, "+
+		"row_weight, "+
+		"sku, "+
+		"store_id, "+
+		"tax_amount, "+
+		"tax_invoiced, "+
+		"tax_percent, "+
+		"updated_at, "+
+		"weight) "+
+		"VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+		item.AmountRefunded,
+		item.AppliedRuleIds,
+		item.BaseAmountRefunded,
+		item.BaseDiscountAmount,
+		item.BaseDiscountInvoiced,
+		item.BaseDiscountTaxCompensationAmount,
+		item.BaseOriginalPrice,
+		item.BasePrice,
+		item.BasePriceInclTax,
+		item.BaseRowInvoiced,
+		item.BaseRowTotal,
+		item.BaseRowTotalInclTax,
+		item.BaseTaxAmount,
+		item.BaseTaxInvoiced,
+		item.CreatedAt,
+		item.DiscountAmount,
+		item.DiscountInvoiced,
+		item.DiscountPercent,
+		item.FreeShipping,
+		item.BaseDiscountTaxCompensationAmount,
+		item.IsQtyDecimal,
+		item.IsVirtual,
+		item.Name,
+		item.NoDiscount,
+		item.OrderId,
+		item.OriginalPrice,
+		item.ParentItemId,
+		item.ProductId,
+		item.ProductType,
+		item.QtyCanceled,
+		item.QtyInvoiced,
+		item.QtyOrdered,
+		item.QtyRefunded,
+		item.QtyShipped,
+		item.QuoteItemId,
+		item.RowInvoiced,
+		item.RowTotal,
+		item.RowTotalInclTax,
+		item.RowWeight,
+		item.Sku,
+		item.StoreId,
+		item.TaxAmount,
+		item.TaxInvoiced,
+		item.TaxPercent,
+		item.UpdatedAt,
+		item.Weight)
+	helpers.PanicErr(err)
+}
+
+func (paymentData Payment) SavePaymentData(orderId int64) {
+	db, err := config.Conf.GetDb()
+	helpers.PanicErr(err)
+	_, err = db.Exec("INSERT INTO payment (" +
+		"account_status, " +
+		"amount_ordered, " +
+		"base_amount_ordered, " +
+		"base_shipping_amount, " +
+		"cc_last4, " +
+		"entity_id, " +
+		"method, " +
+		"parent_id ," +
+		"shipping_amount, " +
+		"order_id) " +
+		"VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+		paymentData.AccountStatus,
+		paymentData.AmountOrdered,
+		paymentData.BaseAmountOrdered,
+		paymentData.BaseShippingAmount,
+		paymentData.CcLast4,
+		paymentData.EntityId,
+		paymentData.Method,
+		paymentData.ParentId,
+		paymentData.ShippingAmount,
+		orderId)
+
 }
