@@ -75,54 +75,55 @@ type History struct {
 }
 
 type Item struct {
-	AmountRefunded                    float64    `json:"amount_refunded"`
-	AppliedRuleIds                    string     `json:"applied_rule_ids"`
-	BaseAmountRefunded                float64    `json:"base_amount_refunded"`
-	BaseDiscountAmount                float64    `json:"base_discount_amount"`
-	BaseDiscountInvoiced              float64    `json:"base_discount_invoiced"`
-	BaseDiscountTaxCompensationAmount float64    `json:"base_discount_tax_compensation_amount"`
-	BaseOriginalPrice                 float64    `json:"base_original_price"`
-	BasePrice                         float64    `json:"base_price"`
-	BasePriceInclTax                  float64    `json:"base_price_incl_tax"`
-	BaseRowInvoiced                   float64    `json:"base_row_invoiced"`
-	BaseRowTotal                      float64    `json:"base_row_total"`
-	BaseRowTotalInclTax               float64    `json:"base_row_total_incl_tax"`
-	BaseTaxAmount                     float64    `json:"base_tax_amount"`
-	BaseTaxInvoiced                   float64    `json:"base_tax_invoiced"`
-	CreatedAt                         time.Time  `json:"created_at"`
-	DiscountAmount                    float64    `json:"discount_amount"`
-	DiscountInvoiced                  float64    `json:"discount_invoiced"`
-	DiscountPercent                   float64    `json:"discount_percent"`
-	FreeShipping                      int        `json:"free_shipping"`
-	IsQtyDecimal                      int        `json:"is_qty_decimal"`
-	IsVirtual                         int        `json:"is_virtual"`
-	ItemId                            int        `json:"item_id"`
-	Name                              string     `json:"name"`
-	NoDiscount                        int        `json:"no_discount"`
-	OrderId                           int64      `json:"order_id"`
-	OriginalPrice                     float64    `json:"original_price"`
-	ParentItemId                      int        `json:"parent_item_id,omitempty"`
-	Price                             float64    `json:"price"`
-	ProductId                         int        `json:"product_id"`
-	ProductType                       string     `json:"product_type"`
-	QtyCanceled                       float64    `json:"qty_canceled"`
-	QtyInvoiced                       float64    `json:"qty_invoiced"`
-	QtyOrdered                        float64    `json:"qty_ordered"`
-	QtyRefunded                       float64    `json:"qty_refunded"`
-	QtyShipped                        float64    `json:"qty_shipped"`
-	QuoteItemId                       int        `json:"quote_item_id"`
-	RowInvoiced                       float64    `json:"row_invoiced"`
-	RowTotal                          float64    `json:"row_total"`
-	RowTotalInclTax                   float64    `json:"row_total_incl_tax,omitempty"`
-	RowWeight                         float64    `json:"row_weight"`
-	Sku                               string     `json:"sku"`
-	StoreId                           int        `json:"store_id"`
-	TaxAmount                         float64    `json:"tax_amount"`
-	TaxInvoiced                       float64    `json:"tax_invoiced"`
-	TaxPercent                        float64    `json:"tax_percent"`
-	UpdatedAt                         time.Time  `json:"updated_at"`
-	Weight                            float64    `json:"weight"`
-	ParentItem                        ParentItem `json:"parent_item,omitempty"`
+	AmountRefunded                    float64   `json:"amount_refunded"`
+	AppliedRuleIds                    string    `json:"applied_rule_ids"`
+	BaseAmountRefunded                float64   `json:"base_amount_refunded"`
+	BaseDiscountAmount                float64   `json:"base_discount_amount"`
+	BaseDiscountInvoiced              float64   `json:"base_discount_invoiced"`
+	BaseDiscountTaxCompensationAmount float64   `json:"base_discount_tax_compensation_amount"`
+	BaseOriginalPrice                 float64   `json:"base_original_price"`
+	BasePrice                         float64   `json:"base_price"`
+	BasePriceInclTax                  float64   `json:"base_price_incl_tax"`
+	BaseRowInvoiced                   float64   `json:"base_row_invoiced"`
+	BaseRowTotal                      float64   `json:"base_row_total"`
+	BaseRowTotalInclTax               float64   `json:"base_row_total_incl_tax"`
+	BaseTaxAmount                     float64   `json:"base_tax_amount"`
+	BaseTaxInvoiced                   float64   `json:"base_tax_invoiced"`
+	CreatedAt                         time.Time `json:"created_at"`
+	DiscountAmount                    float64   `json:"discount_amount"`
+	DiscountInvoiced                  float64   `json:"discount_invoiced"`
+	DiscountPercent                   float64   `json:"discount_percent"`
+	FreeShipping                      int       `json:"free_shipping"`
+	DiscountTaxCompensationAmount     float64   `json:"discount_tax_compensation_amount"`
+	IsQtyDecimal                      int       `json:"is_qty_decimal"`
+	IsVirtual                         int       `json:"is_virtual"`
+	ItemId                            int       `json:"item_id"`
+	Name                              string    `json:"name"`
+	NoDiscount                        int       `json:"no_discount"`
+	OrderId                           int64     `json:"order_id"`
+	OriginalPrice                     float64   `json:"original_price"`
+	ParentItemId                      int       `json:"parent_item_id,omitempty"`
+	Price                             float64   `json:"price"`
+	ProductId                         int       `json:"product_id"`
+	ProductType                       string    `json:"product_type"`
+	QtyCanceled                       float64   `json:"qty_canceled"`
+	QtyInvoiced                       float64   `json:"qty_invoiced"`
+	QtyOrdered                        float64   `json:"qty_ordered"`
+	QtyRefunded                       float64   `json:"qty_refunded"`
+	QtyShipped                        float64   `json:"qty_shipped"`
+	QuoteItemId                       int       `json:"quote_item_id"`
+	RowInvoiced                       float64   `json:"row_invoiced"`
+	RowTotal                          float64   `json:"row_total"`
+	RowTotalInclTax                   float64   `json:"row_total_incl_tax,omitempty"`
+	RowWeight                         float64   `json:"row_weight"`
+	Sku                               string    `json:"sku"`
+	StoreId                           int       `json:"store_id"`
+	TaxAmount                         float64   `json:"tax_amount"`
+	TaxInvoiced                       float64   `json:"tax_invoiced"`
+	TaxPercent                        float64   `json:"tax_percent"`
+	UpdatedAt                         time.Time `json:"updated_at"`
+	Weight                            float64   `json:"weight"`
+	//ParentItem                        ParentItem `json:"parent_item,omitempty"`
 }
 
 type ParentItem struct {
@@ -235,18 +236,23 @@ type AddressInformation struct {
 }
 
 type Address struct {
-	City       string   `json:"city"`
-	Company    string   `json:"company"`
-	CountryId  string   `json:"country_id"`
-	Email      string   `json:"email"`
-	Firstname  string   `json:"firstname"`
-	Lastname   string   `json:"lastname"`
-	Postcode   string   `json:"postcode"`
-	Region     string   `json:"region"`
-	RegionCode string   `json:"region_code"`
-	RegionId   int64    `json:"region_id"`
-	Street     []string `json:"street"`
-	Telephone  string   `json:"telephone"`
+	AddressType string   `json:"address_type"`
+	City        string   `json:"city"`
+	Company     string   `json:"company"`
+	CountryId   string   `json:"country_id"`
+	Email       string   `json:"email"`
+	Firstname   string   `json:"firstname"`
+	Lastname    string   `json:"lastname"`
+	Postcode    string   `json:"postcode"`
+	Region      string   `json:"region"`
+	RegionCode  string   `json:"region_code"`
+	RegionId    int64    `json:"region_id"`
+	Street      []string `json:"street"`
+	Telephone   string   `json:"telephone"`
+	StreetLine0 string   `json:"street_line_0,omitempty"`
+	StreetLine1 string   `json:"street_line_1,omitempty"`
+	OrderId     int64    `json:"order_id"`
+	EntityId    string   `json:"entity_id"`
 }
 
 type Product struct {
@@ -383,6 +389,16 @@ type ConfigurableItemOption struct {
 	OptionValue string `json:"option_value"`
 }
 
+type response struct {
+	Code   int    `json:"code"`
+	Result result `json:"result"`
+}
+
+type result struct {
+	Items      []History `json:"items"`
+	TotalCount int       `json:"total_count"`
+}
+
 func (order *History) SaveOrder() {
 	db, err := config.Conf.GetDb()
 	helpers.PanicErr(err)
@@ -509,11 +525,11 @@ func (order *History) SaveOrder() {
 func GetAllCustomerOrderHistory(customerId int) (customerHistoryArray []History) {
 	db, err := config.Conf.GetDb()
 	helpers.PanicErr(err)
-	rows, err := db.Query("SELECT * FROM order WHERE customer_id = ?", customerId)
+	rows, err := db.Query("SELECT * FROM `order` WHERE customer_id = ?", customerId)
+	helpers.PanicErr(err)
 	for rows.Next() {
 		var customerHistory History
 		if err := rows.Scan(
-			&customerHistory.ID,
 			&customerHistory.AppliedRuleIds,
 			&customerHistory.BaseCurrencyCode,
 			&customerHistory.BaseDiscountAmount,
@@ -540,6 +556,7 @@ func GetAllCustomerOrderHistory(customerId int) (customerHistoryArray []History)
 			&customerHistory.CustomerNoteNotify,
 			&customerHistory.DiscountAmount,
 			&customerHistory.EmailSent,
+			&customerHistory.EntityId,
 			&customerHistory.GlobalCurrencyCode,
 			&customerHistory.GrandTotal,
 			&customerHistory.DiscountTaxCompensationAmount,
@@ -568,9 +585,11 @@ func GetAllCustomerOrderHistory(customerId int) (customerHistoryArray []History)
 			&customerHistory.TotalItemCount,
 			&customerHistory.TotalQtyOrdered,
 			&customerHistory.UpdatedAt,
-			&customerHistory.Weight); err != nil {
+			&customerHistory.Weight,
+			&customerHistory.ID); err != nil {
 			helpers.PanicErr(err)
 		}
+			customerHistory.GetOrderItems()
 		customerHistoryArray = append(customerHistoryArray, customerHistory)
 	}
 	return
@@ -874,17 +893,17 @@ func (item Item) SaveItem() {
 func (paymentData Payment) SavePaymentData(orderId int64) {
 	db, err := config.Conf.GetDb()
 	helpers.PanicErr(err)
-	_, err = db.Exec("INSERT INTO payment (" +
-		"account_status, " +
-		"amount_ordered, " +
-		"base_amount_ordered, " +
-		"base_shipping_amount, " +
-		"cc_last4, " +
-		"entity_id, " +
-		"method, " +
-		"parent_id ," +
-		"shipping_amount, " +
-		"order_id) " +
+	_, err = db.Exec("INSERT INTO payment ("+
+		"account_status, "+
+		"amount_ordered, "+
+		"base_amount_ordered, "+
+		"base_shipping_amount, "+
+		"cc_last4, "+
+		"entity_id, "+
+		"method, "+
+		"parent_id ,"+
+		"shipping_amount, "+
+		"order_id) "+
 		"VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
 		paymentData.AccountStatus,
 		paymentData.AmountOrdered,
@@ -897,4 +916,106 @@ func (paymentData Payment) SavePaymentData(orderId int64) {
 		paymentData.ShippingAmount,
 		orderId)
 
+}
+
+func (address *Address) SaveOrderShippingAddress(orderId int64) {
+	db, err := config.Conf.GetDb()
+	helpers.PanicErr(err)
+	_, err = db.Exec("INSERT INTO order_shipping_address ("+
+		"city, "+
+		"company, "+
+		"country_id, "+
+		"email, "+
+		"firstname, "+
+		"lastname, "+
+		"postcode, "+
+		"region, "+
+		"region_code, "+
+		"region_id, "+
+		"telephone, "+
+		"street_line_0, "+
+		"street_line_1, "+
+		"address_type, "+
+		"entity_id, "+
+		"parent_id) "+
+		"VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+		address.City,
+		address.Company,
+		address.CountryId,
+		address.Email,
+		address.Firstname,
+		address.Lastname,
+		address.Postcode,
+		address.Region,
+		address.RegionCode,
+		address.RegionId,
+		address.Telephone,
+		address.Street[0],
+		address.Street[1],
+		"shipping",
+		address.EntityId,
+		orderId)
+	helpers.PanicErr(err)
+}
+
+func (order *History) GetOrderItems() {
+	order.Items = []Item{}
+	db, err := config.Conf.GetDb()
+	helpers.PanicErr(err)
+	rows, err := db.Query("SELECT * FROM order_items WHERE order_id = ?", order.ID)
+	helpers.PanicErr(err)
+	for rows.Next() {
+		var item Item
+		if err := rows.Scan(
+			&item.AmountRefunded,
+			&item.AppliedRuleIds,
+			&item.BaseAmountRefunded,
+			&item.BaseDiscountAmount,
+			&item.BaseDiscountInvoiced,
+			&item.BaseDiscountTaxCompensationAmount,
+			&item.BaseOriginalPrice,
+			&item.BasePrice,
+			&item.BasePriceInclTax,
+			&item.BaseRowInvoiced,
+			&item.BaseRowTotal,
+			&item.BaseRowTotalInclTax,
+			&item.BaseTaxAmount,
+			&item.BaseTaxInvoiced,
+			&item.CreatedAt,
+			&item.DiscountAmount,
+			&item.DiscountInvoiced,
+			&item.DiscountPercent,
+			&item.FreeShipping,
+			&item.DiscountTaxCompensationAmount,
+			&item.IsQtyDecimal,
+			&item.IsVirtual,
+			&item.Name,
+			&item.NoDiscount,
+			&item.OrderId,
+			&item.OriginalPrice,
+			&item.ParentItemId,
+			&item.ProductId,
+			&item.ProductType,
+			&item.QtyCanceled,
+			&item.QtyInvoiced,
+			&item.QtyOrdered,
+			&item.QtyRefunded,
+			&item.QtyShipped,
+			&item.QuoteItemId,
+			&item.RowInvoiced,
+			&item.RowTotal,
+			&item.RowTotalInclTax,
+			&item.RowWeight,
+			&item.Sku,
+			&item.StoreId,
+			&item.TaxAmount,
+			&item.TaxInvoiced,
+			&item.TaxPercent,
+			&item.UpdatedAt,
+			&item.Weight,
+			&item.ItemId); err != nil {
+			helpers.PanicErr(err)
+		}
+		order.Items = append(order.Items, item)
+	}
 }

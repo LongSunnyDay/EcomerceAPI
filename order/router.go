@@ -8,5 +8,6 @@ import (
 func RouterOrder() http.Handler {
 	r := chi.NewRouter()
 	r.Post("/", PlaceOrder)
+	r.Get("/order-history", GetCustomerOrderHistory)
 	return r
 }

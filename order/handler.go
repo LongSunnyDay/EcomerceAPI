@@ -3,7 +3,9 @@ package order
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/dgrijalva/jwt-go"
 	"go-api-ws/addresses"
+	"go-api-ws/auth"
 	"go-api-ws/cart"
 	"go-api-ws/helpers"
 	"go-api-ws/payment"
@@ -121,7 +123,7 @@ func PlaceOrder(w http.ResponseWriter, r *http.Request) {
 	orderHistory.EmailSent = 1 // ToDo Email service implementation needed
 	orderHistory.EntityId = customerData.ID
 	orderHistory.GlobalCurrencyCode = orderTotals.BaseCurrencyCode // ToDo probably will need to change some time later
-	orderHistory.GrandTotal = orderTotals.GrandTotal
+	orderHistory.GrandTotal = orderTotals.BaseGrandTotal
 	// orderHistory.DiscountTaxCompensationAmount
 	// orderHistory.IncrementId
 	// orderHistory.IsVirtual ToDo virtual products needs some kind of identification
@@ -171,7 +173,7 @@ func PlaceOrder(w http.ResponseWriter, r *http.Request) {
 		orderItem.ItemId = itemFromTotals.ItemId
 		orderItem.Name = itemFromTotals.Name
 		// orderItem.NoDiscount
-		// orderItem.OrderId  ToDo Assign orderId to items after order has been placed to db
+		// orderItem.OrderId  ToDo Assign orderId to items after order has been placed to db  --> Done
 		// orderItem.OriginalPrice
 		// orderItem.ParentItemId
 		// orderItem.Price
@@ -241,6 +243,39 @@ func PlaceOrder(w http.ResponseWriter, r *http.Request) {
 	// Saves payment data to MySQL
 	orderPayment.SavePaymentData(orderHistory.ID)
 
+	//fmt.Printf("%+v", shippingAssignment)
 
+	// Saves shipping address to MySQL
+	shippingAssignment.Shipping.Address.SaveOrderShippingAddress(orderHistory.ID)
+	helpers.WriteResultWithStatusCode(w, http.StatusOK, http.StatusOK)
+}
 
+func GetCustomerOrderHistory(w http.ResponseWriter, r *http.Request) {
+	urlToken, err := helpers.GetTokenFromUrl(r)
+	helpers.PanicErr(err)
+	token, err := auth.ParseToken(urlToken)
+	helpers.PanicErr(err)
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		subInt, err := strconv.Atoi(claims["sub"].(string))
+		helpers.PanicErr(err)
+		orderHistory := GetAllCustomerOrderHistory(subInt)
+		//for i := 0; i < len(orderHistory); i++ {
+		//	orderHistory[i].GetOrderItems()
+		//	//fmt.Printf("%+v", orderHistory[i].Items)
+		//	fmt.Println("Items  ", len(orderHistory[i].Items))
+		//
+		//}
+		//fmt.Printf("%+v", orderHistory)
+		fmt.Println("Orders - ", len(orderHistory))
+		result := result{
+			Items:orderHistory,
+			TotalCount:len(orderHistory),
+		}
+		response := response{
+			Code:http.StatusOK,
+			Result:result,
+		}
+		helpers.WriteResultWithStatusCode(w, response, response.Code)
+
+	}
 }
