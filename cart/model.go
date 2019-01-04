@@ -6,11 +6,13 @@ import (
 	"github.com/mongodb/mongo-go-driver/bson"
 	"github.com/mongodb/mongo-go-driver/bson/objectid"
 	"go-api-ws/config"
+	"go-api-ws/counter"
 	"go-api-ws/helpers"
 	"time"
 )
 
 type Cart struct {
+	QuoteId   int64     `json:"quote_id" bson:"quote_id"`
 	ID        string    `json:"id,omitempty" bson:"id,omitempty"`
 	Items     []Item    `json:"items" bson:"items"`
 	CreatedAt time.Time `json:"created_at,omitempty" bson:"createdAt,omitempty"`
@@ -71,11 +73,13 @@ func getUserCartIDFromMongo(userID string) (cartID string, err error) {
 
 func CreateCartInMongoDB(userID string) (cartID string) {
 	db := config.Conf.GetMongoDb()
+	quoteId := counter.GetAndIncreaseQuoteCounterInMySQL()
 
 	if userID == "" {
 		cart := Cart{
 			Items:     []Item{},
-			CreatedAt: time.Now()}
+			CreatedAt: time.Now(),
+			QuoteId:   quoteId}
 		bsonCart, err := helpers.StructToBson(cart)
 		helpers.PanicErr(err)
 		result, err := db.Collection(collectionName).InsertOne(context.Background(), bsonCart)
@@ -83,8 +87,9 @@ func CreateCartInMongoDB(userID string) (cartID string) {
 		return cartID
 	} else {
 		cart := Cart{
-			Items: []Item{},
-			ID:    userID}
+			Items:   []Item{},
+			ID:      userID,
+			QuoteId: quoteId}
 		bsonCart, err := helpers.StructToBson(cart)
 		helpers.PanicErr(err)
 		_, err = db.Collection(collectionName).InsertOne(context.Background(), bsonCart)
@@ -110,18 +115,19 @@ func getGuestCartFromMongoByID(guestCartID string) []Item {
 	return cart.Items
 }
 
-func GetUserCartFromMongoByID(userID string) []Item {
+func GetUserCartFromMongoByID(userID string) Cart {
 	db := config.Conf.GetMongoDb()
 
 	cart := Cart{Items: []Item{}}
 	err := db.Collection(collectionName).FindOne(context.Background(), bson.NewDocument(
 		bson.EC.String("id", userID))).Decode(&cart)
+	//fmt.Printf("%+v", cart)
 	if err != nil {
 		fmt.Println("ERROR IN GetUserCartFromMongoByID: ", err)
 		CreateCartInMongoDB(userID)
 		GetUserCartFromMongoByID(userID)
 	}
-	return cart.Items
+	return cart
 }
 
 func updateUserCartInMongo(cartID string, item Item) {

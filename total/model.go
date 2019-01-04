@@ -115,8 +115,8 @@ func (t *Totals) CalculateTotals(urlCartId string, addressInformation AddressDat
 }
 
 func (t *Totals) GetItems(cartId string) {
-	cartItems := cart.GetUserCartFromMongoByID(cartId)
-	for _, item := range cartItems {
+	cart := cart.GetUserCartFromMongoByID(cartId)
+	for _, item := range cart.Items {
 		totalsItem := Item{
 			ItemId: item.ItemID,
 			Qty:    item.QTY,

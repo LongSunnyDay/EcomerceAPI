@@ -103,7 +103,7 @@ func (address *Address) InsertOrUpdateAddressIntoMySQL(customerId int64) {
 		"default_billing=VALUES(default_billing), "+
 		"email=VALUES(email), "+
 		"street_line_0=VALUES(street_line_0), "+
-		"street_line_1=VALUES(street_line_1)", +
+		"street_line_1=VALUES(street_line_1)",+
 		address.ID,
 		customerId,
 		address.RegionID,

@@ -9,11 +9,6 @@ type Transaction interface {
 	QueryRow(query string, args ...interface{}) *sql.Row
 }
 
-type PipelineStmt struct {
-	query string
-	args  []interface{}
-}
-
 type TxFn func(Transaction) error
 
 func WithTransaction(db *sql.DB, fn TxFn) (err error) {
@@ -33,24 +28,4 @@ func WithTransaction(db *sql.DB, fn TxFn) (err error) {
 	}()
 	err = fn(tx)
 	return err
-}
-func NewPipelineStmt(query string, args ...interface{}) *PipelineStmt {
-	return &PipelineStmt{query, args}
-}
-
-func (ps *PipelineStmt) Exec(tx Transaction) (sql.Result, error) {
-	return tx.Exec(ps.query, ps.args)
-}
-
-func RunPipeline(tx Transaction, stmts ...*PipelineStmt) (sql.Result, error) {
-	var res sql.Result
-	var err error
-
-	for _, ps := range stmts {
-		res, err = ps.Exec(tx)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
 }

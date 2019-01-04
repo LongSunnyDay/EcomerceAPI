@@ -8,70 +8,72 @@ import (
 )
 
 type History struct {
-	ID                                    int64          `json:"id,omitempty"`
-	AppliedRuleIds                        string         `json:"applied_rule_ids"`
-	BaseCurrencyCode                      string         `json:"base_currency_code"`
-	BaseDiscountAmount                    float64        `json:"base_discount_amount"`
-	BaseGrandTotal                        float64        `json:"base_grand_total"`
-	BaseDiscountTaxCompensationAmount     float64        `json:"base_discount_tax_compensation_amount"`
-	BaseShippingAmount                    float64        `json:"base_shipping_amount"`
-	BaseShippingDiscountAmount            float64        `json:"base_shipping_discount_amount"`
-	BaseShippingInclTax                   float64        `json:"base_shipping_incl_tax"`
-	BaseShippingTaxAmount                 float64        `json:"base_shipping_tax_amount"`
-	BaseSubtotal                          float64        `json:"base_subtotal"`
-	BaseSubtotalInclTax                   float64        `json:"base_subtotal_incl_tax"`
-	BaseTaxAmount                         float64        `json:"base_tax_amount"`
-	BaseTotalDue                          float64        `json:"base_total_due"`
-	BaseToGlobalRate                      float64        `json:"base_to_global_rate"`
-	BaseToOrderRate                       float64        `json:"base_to_order_rate"`
-	BillingAddressId                      int64          `json:"billing_address_id"`
-	CreatedAt                             time.Time      `json:"created_at"`
-	CustomerEmail                         string         `json:"customer_email"`
-	CustomerFirstname                     string         `json:"customer_firstname"`
-	CustomerGroupId                       int64          `json:"customer_group_id"`
-	CustomerId                            int64          `json:"customer_id"`
-	CustomerIsGuest                       int            `json:"customer_is_guest"`
-	CustomerLastname                      string         `json:"customer_lastname"`
-	CustomerNoteNotify                    int            `json:"customer_note_notify"`
-	DiscountAmount                        float64        `json:"discount_amount"`
-	EmailSent                             int            `json:"email_sent"`
-	EntityId                              int64          `json:"entity_id"`
-	GlobalCurrencyCode                    string         `json:"global_currency_code"`
-	GrandTotal                            float64        `json:"grand_total"`
-	DiscountTaxCompensationAmount         float64        `json:"discount_tax_compensation_amount"`
-	IncrementId                           string         `json:"increment_id"`
-	IsVirtual                             int            `json:"is_virtual"`
-	OrderCurrencyCode                     string         `json:"order_currency_code"`
-	ProtectCode                           string         `json:"protect_code"`
-	QuoteId                               string         `json:"quote_id"`
-	ShippingAmount                        float64        `json:"shipping_amount"`
-	ShippingDescription                   string         `json:"shipping_description"`
-	ShippingDiscountAmount                float64        `json:"shipping_discount_amount"`
-	ShippingDiscountTaxCompensationAmount float64        `json:"shipping_discount_tax_compensation_amount"`
-	ShippingInclTax                       float64        `json:"shipping_incl_tax"`
-	ShippingTaxAmount                     float64        `json:"shipping_tax_amount"`
-	State                                 string         `json:"state"`
-	Status                                string         `json:"status"`
-	StoreCurrencyCode                     string         `json:"store_currency_code"`
-	StoreId                               int            `json:"store_id"`
-	StoreName                             string         `json:"store_name"`
-	StoreToBaseRate                       float64        `json:"store_to_base_rate"`
-	StoreToOrderRate                      float64        `json:"store_to_order_rate"`
-	Subtotal                              float64        `json:"subtotal"`
-	SubtotalInclTax                       float64        `json:"subtotal_incl_tax"`
-	TaxAmount                             float64        `json:"tax_amount"`
-	TotalDue                              float64        `json:"total_due"`
-	TotalItemCount                        float64        `json:"total_item_count"`
-	TotalQtyOrdered                       float64        `json:"total_qty_ordered"`
-	UpdatedAt                             time.Time      `json:"updated_at"`
-	Weight                                float64        `json:"weight"`
-	Items                                 []Item         `json:"items"`
-	BillingAddress                        BillingAddress `json:"billing_address"`
-	Payment                               Payment        `json:"payment"`
-	StatusHistories                       []string       `json:"status_histories"`
-	ExtensionAttributes                   struct {
-		ShippingAssignments []ShippingAssignment `json:"shipping_assignments"`
-	} `json:"extension_attributes"`
+	ID                                    int64              `json:"id,omitempty"`
+	AppliedRuleIds                        string             `json:"applied_rule_ids"`
+	BaseCurrencyCode                      string             `json:"base_currency_code"`
+	BaseDiscountAmount                    float64            `json:"base_discount_amount"`
+	BaseGrandTotal                        float64            `json:"base_grand_total"`
+	BaseDiscountTaxCompensationAmount     float64            `json:"base_discount_tax_compensation_amount"`
+	BaseShippingAmount                    float64            `json:"base_shipping_amount"`
+	BaseShippingDiscountAmount            float64            `json:"base_shipping_discount_amount"`
+	BaseShippingInclTax                   float64            `json:"base_shipping_incl_tax"`
+	BaseShippingTaxAmount                 float64            `json:"base_shipping_tax_amount"`
+	BaseSubtotal                          float64            `json:"base_subtotal"`
+	BaseSubtotalInclTax                   float64            `json:"base_subtotal_incl_tax"`
+	BaseTaxAmount                         float64            `json:"base_tax_amount"`
+	BaseTotalDue                          float64            `json:"base_total_due"`
+	BaseToGlobalRate                      float64            `json:"base_to_global_rate"`
+	BaseToOrderRate                       float64            `json:"base_to_order_rate"`
+	BillingAddressId                      int64              `json:"billing_address_id"`
+	CreatedAt                             time.Time          `json:"created_at"`
+	CustomerEmail                         string             `json:"customer_email"`
+	CustomerFirstname                     string             `json:"customer_firstname"`
+	CustomerGroupId                       int64              `json:"customer_group_id"`
+	CustomerId                            int64              `json:"customer_id"`
+	CustomerIsGuest                       int                `json:"customer_is_guest"`
+	CustomerLastname                      string             `json:"customer_lastname"`
+	CustomerNoteNotify                    int                `json:"customer_note_notify"`
+	DiscountAmount                        float64            `json:"discount_amount"`
+	EmailSent                             int                `json:"email_sent"`
+	EntityId                              int64              `json:"entity_id"`
+	GlobalCurrencyCode                    string             `json:"global_currency_code"`
+	GrandTotal                            float64            `json:"grand_total"`
+	DiscountTaxCompensationAmount         float64            `json:"discount_tax_compensation_amount"`
+	IncrementId                           string             `json:"increment_id"`
+	IsVirtual                             int                `json:"is_virtual"`
+	OrderCurrencyCode                     string             `json:"order_currency_code"`
+	ProtectCode                           string             `json:"protect_code"`
+	QuoteId                               int64              `json:"quote_id"`
+	ShippingAmount                        float64            `json:"shipping_amount"`
+	ShippingDescription                   string             `json:"shipping_description"`
+	ShippingDiscountAmount                float64            `json:"shipping_discount_amount"`
+	ShippingDiscountTaxCompensationAmount float64            `json:"shipping_discount_tax_compensation_amount"`
+	ShippingInclTax                       float64            `json:"shipping_incl_tax"`
+	ShippingTaxAmount                     float64            `json:"shipping_tax_amount"`
+	State                                 string             `json:"state"`
+	Status                                string             `json:"status"`
+	StoreCurrencyCode                     string             `json:"store_currency_code"`
+	StoreId                               int                `json:"store_id"`
+	StoreName                             string             `json:"store_name"`
+	StoreToBaseRate                       float64            `json:"store_to_base_rate"`
+	StoreToOrderRate                      float64            `json:"store_to_order_rate"`
+	Subtotal                              float64            `json:"subtotal"`
+	SubtotalInclTax                       float64            `json:"subtotal_incl_tax"`
+	TaxAmount                             float64            `json:"tax_amount"`
+	TotalDue                              float64            `json:"total_due"`
+	TotalItemCount                        float64            `json:"total_item_count"`
+	TotalQtyOrdered                       float64            `json:"total_qty_ordered"`
+	UpdatedAt                             time.Time          `json:"updated_at"`
+	Weight                                float64            `json:"weight"`
+	Items                                 []Item             `json:"items"`
+	BillingAddress                        BillingAddress     `json:"billing_address"`
+	Payment                               Payment            `json:"payment"`
+	StatusHistories                       []string           `json:"status_histories"`
+	ExtensionAttributes                   ExtensionAttribute `json:"extension_attributes"`
+}
+
+type ExtensionAttribute struct {
+	ShippingAssignments []ShippingAssignment `json:"shipping_assignments"`
 }
 
 type Item struct {
@@ -111,7 +113,7 @@ type Item struct {
 	QtyOrdered                        float64   `json:"qty_ordered"`
 	QtyRefunded                       float64   `json:"qty_refunded"`
 	QtyShipped                        float64   `json:"qty_shipped"`
-	QuoteItemId                       int       `json:"quote_item_id"`
+	QuoteItemId                       int64     `json:"quote_item_id"`
 	RowInvoiced                       float64   `json:"row_invoiced"`
 	RowTotal                          float64   `json:"row_total"`
 	RowTotalInclTax                   float64   `json:"row_total_incl_tax,omitempty"`
@@ -181,6 +183,7 @@ type ParentItem struct {
 type BillingAddress Address
 
 type Payment struct {
+	Id                    int64    `json:"id,omitempty"`
 	OrderId               int64    `json:"order_id"`
 	AccountStatus         string   `json:"account_status"`
 	AdditionalInformation []string `json:"additional_information"`
@@ -188,29 +191,33 @@ type Payment struct {
 	BaseAmountOrdered     float64  `json:"base_amount_ordered"`
 	BaseShippingAmount    float64  `json:"base_shipping_amount"`
 	CcLast4               int      `json:"cc_last4"`
-	EntityId              int      `json:"entity_id"`
+	EntityId              int64    `json:"entity_id"`
 	Method                string   `json:"method"`
 	ParentId              int      `json:"parent_id"`
 	ShippingAmount        float64  `json:"shipping_amount"`
 }
 
 type ShippingAssignment struct {
-	Shipping struct {
-		Address Address `json:"addresses"`
-		Method  string  `json:"method"`
-		Total   struct {
-			BaseShippingAmount                    float64 `json:"base_shipping_amount"`
-			BaseShippingDiscountAmount            float64 `json:"base_shipping_discount_amount"`
-			BaseShippingInclTax                   float64 `json:"base_shipping_incl_tax"`
-			BaseShippingTaxAmount                 float64 `json:"base_shipping_tax_amount"`
-			ShippingAmount                        float64 `json:"shipping_amount"`
-			ShippingDiscountAmount                float64 `json:"shipping_discount_amount"`
-			ShippingDiscountTaxCompensationAmount float64 `json:"shipping_discount_tax_compensation_amount"`
-			ShippingInclTax                       float64 `json:"shipping_incl_tax"`
-			ShippingTaxAmount                     float64 `json:"shipping_tax_amount"`
-		} `json:"total"`
-	} `json:"shipping"`
-	Items []Item `json:"items"`
+	Shipping Shipping `json:"shipping"`
+	Items    []Item   `json:"items"`
+}
+
+type Shipping struct {
+	Address Address `json:"address"`
+	Method  string  `json:"method"`
+	Total   Total   `json:"total"`
+}
+
+type Total struct {
+	BaseShippingAmount                    float64 `json:"base_shipping_amount"`
+	BaseShippingDiscountAmount            float64 `json:"base_shipping_discount_amount"`
+	BaseShippingInclTax                   float64 `json:"base_shipping_incl_tax"`
+	BaseShippingTaxAmount                 float64 `json:"base_shipping_tax_amount"`
+	ShippingAmount                        float64 `json:"shipping_amount"`
+	ShippingDiscountAmount                float64 `json:"shipping_discount_amount"`
+	ShippingDiscountTaxCompensationAmount float64 `json:"shipping_discount_tax_compensation_amount"`
+	ShippingInclTax                       float64 `json:"shipping_incl_tax"`
+	ShippingTaxAmount                     float64 `json:"shipping_tax_amount"`
 }
 
 type PlaceOrderData struct {
@@ -236,23 +243,28 @@ type AddressInformation struct {
 }
 
 type Address struct {
-	AddressType string   `json:"address_type"`
-	City        string   `json:"city"`
-	Company     string   `json:"company"`
-	CountryId   string   `json:"country_id"`
-	Email       string   `json:"email"`
-	Firstname   string   `json:"firstname"`
-	Lastname    string   `json:"lastname"`
-	Postcode    string   `json:"postcode"`
-	Region      string   `json:"region"`
-	RegionCode  string   `json:"region_code"`
-	RegionId    int64    `json:"region_id"`
-	Street      []string `json:"street"`
-	Telephone   string   `json:"telephone"`
-	StreetLine0 string   `json:"street_line_0,omitempty"`
-	StreetLine1 string   `json:"street_line_1,omitempty"`
-	OrderId     int64    `json:"order_id"`
-	EntityId    string   `json:"entity_id"`
+	Id              int64
+	CustomerId      int64    `json:"customer_id"`
+	AddressType     string   `json:"address_type"`
+	City            string   `json:"city"`
+	Company         string   `json:"company"`
+	CountryId       string   `json:"country_id"`
+	Email           string   `json:"email"`
+	Firstname       string   `json:"firstname"`
+	Lastname        string   `json:"lastname"`
+	Postcode        string   `json:"postcode"`
+	Region          string   `json:"region"`
+	RegionCode      string   `json:"region_code"`
+	RegionId        int64    `json:"region_id"`
+	Street          []string `json:"street"`
+	Telephone       string   `json:"telephone"`
+	StreetLine0     string   `json:"street_line_0,omitempty"`
+	StreetLine1     string   `json:"street_line_1,omitempty"`
+	OrderId         int64    `json:"order_id"`
+	EntityId        string   `json:"entity_id"`
+	DefaultShipping bool     `json:"default_shipping"`
+	DefaultBilling  bool     `json:"default_billing"`
+	ParentId        int64    `json:"parent_id"`
 }
 
 type Product struct {
@@ -589,7 +601,10 @@ func GetAllCustomerOrderHistory(customerId int) (customerHistoryArray []History)
 			&customerHistory.ID); err != nil {
 			helpers.PanicErr(err)
 		}
-			customerHistory.GetOrderItems()
+		customerHistory.GetOrderItems()
+		customerHistory.GetOrderPaymentData()
+		customerHistory.GetOrderBillingAddress()
+		customerHistory.GetOrderShippingAddress()
 		customerHistoryArray = append(customerHistoryArray, customerHistory)
 	}
 	return
@@ -903,8 +918,9 @@ func (paymentData Payment) SavePaymentData(orderId int64) {
 		"method, "+
 		"parent_id ,"+
 		"shipping_amount, "+
-		"order_id) "+
-		"VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+		"order_id, "+
+		"additional_information) "+
+		"VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
 		paymentData.AccountStatus,
 		paymentData.AmountOrdered,
 		paymentData.BaseAmountOrdered,
@@ -914,8 +930,32 @@ func (paymentData Payment) SavePaymentData(orderId int64) {
 		paymentData.Method,
 		paymentData.ParentId,
 		paymentData.ShippingAmount,
-		orderId)
+		orderId,
+		paymentData.AdditionalInformation[0])
+	helpers.PanicErr(err)
 
+}
+
+func (order *History) GetOrderPaymentData() {
+	fmt.Println("order id - ", order.ID)
+	order.Payment.AdditionalInformation = make([]string, 2)
+	db, err := config.Conf.GetDb()
+	helpers.PanicErr(err)
+	err = db.QueryRow("SELECT * FROM payment WHERE order_id = ?", order.ID).
+		Scan(
+			&order.Payment.Id,
+			&order.Payment.AccountStatus,
+			&order.Payment.AmountOrdered,
+			&order.Payment.BaseAmountOrdered,
+			&order.Payment.BaseShippingAmount,
+			&order.Payment.CcLast4,
+			&order.Payment.EntityId,
+			&order.Payment.Method,
+			&order.Payment.ParentId,
+			&order.Payment.ShippingAmount,
+			&order.Payment.OrderId,
+			&order.Payment.AdditionalInformation[0])
+	helpers.PanicErr(err)
 }
 
 func (address *Address) SaveOrderShippingAddress(orderId int64) {
@@ -1018,4 +1058,59 @@ func (order *History) GetOrderItems() {
 		}
 		order.Items = append(order.Items, item)
 	}
+}
+
+func (order *History) GetOrderBillingAddress() {
+	db, err := config.Conf.GetDb()
+	helpers.PanicErr(err)
+	err = db.QueryRow("SELECT * FROM addresses WHERE id = ?", order.BillingAddressId).
+		Scan(
+			&order.BillingAddress.Id,
+			&order.BillingAddress.CustomerId,
+			&order.BillingAddress.RegionId,
+			&order.BillingAddress.CountryId,
+			&order.BillingAddress.Telephone,
+			&order.BillingAddress.Postcode,
+			&order.BillingAddress.City,
+			&order.BillingAddress.Firstname,
+			&order.BillingAddress.Lastname,
+			&order.BillingAddress.DefaultShipping,
+			&order.BillingAddress.StreetLine0,
+			&order.BillingAddress.StreetLine1,
+			&order.BillingAddress.DefaultBilling,
+			&order.BillingAddress.Email)
+	helpers.PanicErr(err)
+	order.BillingAddress.Street = formatStreet(order.BillingAddress.StreetLine0, order.BillingAddress.StreetLine1)
+}
+
+func formatStreet(line0 string, line1 string) []string {
+	lines := []string{line0, line1}
+	return lines
+}
+
+func (order *History) GetOrderShippingAddress() {
+	var sa ShippingAssignment
+	db, err := config.Conf.GetDb()
+	helpers.PanicErr(err)
+	err = db.QueryRow("SELECT * FROM order_shipping_address WHERE parent_id = ?", order.ID).
+		Scan(&sa.Shipping.Address.Id,
+			&sa.Shipping.Address.City,
+			&sa.Shipping.Address.Company,
+			&sa.Shipping.Address.CountryId,
+			&sa.Shipping.Address.Email,
+			&sa.Shipping.Address.Firstname,
+			&sa.Shipping.Address.Lastname,
+			&sa.Shipping.Address.Postcode,
+			&sa.Shipping.Address.Region,
+			&sa.Shipping.Address.RegionCode,
+			&sa.Shipping.Address.RegionId,
+			&sa.Shipping.Address.Telephone,
+			&sa.Shipping.Address.StreetLine0,
+			&sa.Shipping.Address.StreetLine1,
+			&sa.Shipping.Address.AddressType,
+			&sa.Shipping.Address.EntityId,
+			&sa.Shipping.Address.ParentId)
+	helpers.PanicErr(err)
+	sa.Shipping.Address.Street = formatStreet(sa.Shipping.Address.StreetLine0, sa.Shipping.Address.StreetLine1)
+	order.ExtensionAttributes.ShippingAssignments = append(order.ExtensionAttributes.ShippingAssignments, sa)
 }

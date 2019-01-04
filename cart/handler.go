@@ -54,7 +54,7 @@ func pullCart(w http.ResponseWriter, r *http.Request) {
 				cart := GetUserCartFromMongoByID(urlCartId)
 				response := helpers.Response{
 					Code:   http.StatusOK,
-					Result: cart}
+					Result: cart.Items}
 				response.SendResponse(w)
 			}
 		}

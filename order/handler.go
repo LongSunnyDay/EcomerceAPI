@@ -24,19 +24,20 @@ func PlaceOrder(w http.ResponseWriter, r *http.Request) {
 	helpers.PanicErr(err)
 
 	// Gets user cart from mongoDb by userId
-	cartItemsFromMongo := cart.GetUserCartFromMongoByID(orderData.UserId)
+	cartFromMongo := cart.GetUserCartFromMongoByID(orderData.UserId)
+	carItems := cartFromMongo.Items
 
 	// Does check if items send with request match items in user cart
-	if len(cartItemsFromMongo) == len(orderData.Products) {
+	if len(carItems) == len(orderData.Products) {
 		for i, item := range orderData.Products {
-			if cartItemsFromMongo[i].SKU != item.Sku || cartItemsFromMongo[i].QTY != item.Qty {
+			if carItems[i].SKU != item.Sku || carItems[i].QTY != item.Qty {
 				fmt.Println("Items in order and in cart doesn't match by SKU or QTY")
 			} else {
 				fmt.Println("All good, order item SKU -> ", item.Sku)
 			}
 		}
 	} else {
-		fmt.Println("Items amount in cart and in order is not the same. Cart items -> ", len(cartItemsFromMongo),
+		fmt.Println("Items amount in cart and in order is not the same. Cart items -> ", len(cartFromMongo.Items),
 			". Order items -> ", len(orderData.Products))
 	}
 
@@ -82,6 +83,7 @@ func PlaceOrder(w http.ResponseWriter, r *http.Request) {
 	billingAddress.Lastname = orderData.AddressInformation.BillingAddress.Lastname
 	billingAddress.Email = orderData.AddressInformation.BillingAddress.Email
 	billingAddress.DefaultBilling = true
+
 	// Address saved to DB
 	billingAddress.InsertOrUpdateAddressIntoMySQL(userIdInt64)
 
@@ -121,7 +123,7 @@ func PlaceOrder(w http.ResponseWriter, r *http.Request) {
 	// orderHistory.CustomerNoteNotify
 	orderHistory.DiscountAmount = orderTotals.DiscountAmount
 	orderHistory.EmailSent = 1 // ToDo Email service implementation needed
-	orderHistory.EntityId = customerData.ID
+	orderHistory.EntityId = cartFromMongo.QuoteId
 	orderHistory.GlobalCurrencyCode = orderTotals.BaseCurrencyCode // ToDo probably will need to change some time later
 	orderHistory.GrandTotal = orderTotals.BaseGrandTotal
 	// orderHistory.DiscountTaxCompensationAmount
@@ -129,7 +131,7 @@ func PlaceOrder(w http.ResponseWriter, r *http.Request) {
 	// orderHistory.IsVirtual ToDo virtual products needs some kind of identification
 	// orderHistory.OrderCurrencyCode
 	// orderHistory.ProtectCode
-	orderHistory.QuoteId = cartItemsFromMongo[0].QuoteId
+	orderHistory.QuoteId = cartFromMongo.QuoteId
 	orderHistory.ShippingAmount = orderTotals.ShippingAmount
 	// orderHistory.ShippingDescription
 	orderHistory.ShippingDiscountAmount = orderTotals.ShippingDiscountAmount
@@ -184,7 +186,7 @@ func PlaceOrder(w http.ResponseWriter, r *http.Request) {
 		orderItem.QtyOrdered = itemFromTotals.Qty
 		// orderItem.QtyRefunded
 		// orderItem.QtyShipped
-		// orderItem.QuoteItemId
+		orderItem.QuoteItemId = cartFromMongo.QuoteId
 		// orderItem.RowInvoiced
 		orderItem.RowTotal = itemFromTotals.RowTotal
 		// orderItem.RowWeight
@@ -206,7 +208,7 @@ func PlaceOrder(w http.ResponseWriter, r *http.Request) {
 	orderPayment.AmountOrdered = orderHistory.BaseGrandTotal
 	orderPayment.BaseAmountOrdered = orderHistory.BaseGrandTotal
 	orderPayment.ShippingAmount = orderHistory.ShippingAmount
-	orderPayment.EntityId = userId
+	orderPayment.EntityId = cartFromMongo.QuoteId
 	orderPayment.Method = paymentMethod.Code
 	orderPayment.ParentId = userId
 	orderPayment.ShippingAmount = orderHistory.ShippingAmount
@@ -241,9 +243,9 @@ func PlaceOrder(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Saves payment data to MySQL
+	orderPayment.OrderId = orderHistory.ID
 	orderPayment.SavePaymentData(orderHistory.ID)
 
-	//fmt.Printf("%+v", shippingAssignment)
 
 	// Saves shipping address to MySQL
 	shippingAssignment.Shipping.Address.SaveOrderShippingAddress(orderHistory.ID)
@@ -259,14 +261,7 @@ func GetCustomerOrderHistory(w http.ResponseWriter, r *http.Request) {
 		subInt, err := strconv.Atoi(claims["sub"].(string))
 		helpers.PanicErr(err)
 		orderHistory := GetAllCustomerOrderHistory(subInt)
-		//for i := 0; i < len(orderHistory); i++ {
-		//	orderHistory[i].GetOrderItems()
-		//	//fmt.Printf("%+v", orderHistory[i].Items)
-		//	fmt.Println("Items  ", len(orderHistory[i].Items))
-		//
-		//}
-		//fmt.Printf("%+v", orderHistory)
-		fmt.Println("Orders - ", len(orderHistory))
+
 		result := result{
 			Items:orderHistory,
 			TotalCount:len(orderHistory),
