@@ -2,6 +2,7 @@ package cart
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"go-api-ws/attribute"
 	"go-api-ws/auth"
@@ -16,23 +17,28 @@ func createCart(w http.ResponseWriter, r *http.Request) {
 	urlToken := r.URL.Query()["token"][0]
 	if len(urlToken) > 0 {
 		token, _ := auth.ParseToken(urlToken)
-
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 			if claims.VerifyExpiresAt(time.Now().Unix(), true) {
-				cartID, err := getUserCartIDFromMongo(claims["sub"].(string))
-				helpers.CheckErr(err)
-				if err != nil {
-					cartID := CreateCartInMongoDB(claims["sub"].(string))
-					response := helpers.Response{
-						Code:   http.StatusOK,
-						Result: cartID}
-					response.SendResponse(w)
-				} else {
-					response := helpers.Response{
-						Code:   http.StatusOK,
-						Result: cartID}
-					response.SendResponse(w)
-				}
+				//cartID, err := getUserCartIDFromMongo(claims["sub"].(string))
+				//helpers.CheckErr(err)
+				//if err != nil {
+				//	cartID := CreateCartInMongoDB(claims["sub"].(string))
+				//	response := helpers.Response{
+				//		Code:   http.StatusOK,
+				//		Result: cartID}
+				//	response.SendResponse(w)
+				//} else {
+				//	response := helpers.Response{
+				//		Code:   http.StatusOK,
+				//		Result: cartID}
+				//	response.SendResponse(w)
+				//}
+				cartID := CreateCartInMongoDB(claims["sub"].(string))
+				fmt.Println(cartID)
+				response := helpers.Response{
+					Code:   http.StatusOK,
+					Result: cartID}
+				response.SendResponse(w)
 			}
 		}
 	} else {
@@ -59,7 +65,8 @@ func pullCart(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	} else {
-		cart := getGuestCartFromMongoByID(urlCartId)
+		//cart := getGuestCartFromMongoByID(urlCartId)
+		cart := GetUserCartFromMongoByID(urlCartId)
 		response := helpers.Response{
 			Code:   http.StatusOK,
 			Result: cart}

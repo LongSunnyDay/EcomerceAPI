@@ -8,6 +8,7 @@ import (
 	"go-api-ws/config"
 	"go-api-ws/counter"
 	"go-api-ws/helpers"
+	"strconv"
 	"time"
 )
 
@@ -16,6 +17,7 @@ type Cart struct {
 	ID        string    `json:"id,omitempty" bson:"id,omitempty"`
 	Items     []Item    `json:"items" bson:"items"`
 	CreatedAt time.Time `json:"created_at,omitempty" bson:"createdAt,omitempty"`
+	Status    string    `json:"status" bson:"status"`
 }
 
 type CartItem struct {
@@ -71,7 +73,7 @@ func getUserCartIDFromMongo(userID string) (cartID string, err error) {
 	return cartID, nil
 }
 
-func CreateCartInMongoDB(userID string) (cartID string) {
+func CreateCartInMongoDB(userID string) int64 {
 	db := config.Conf.GetMongoDb()
 	quoteId := counter.GetAndIncreaseQuoteCounterInMySQL()
 
@@ -79,53 +81,58 @@ func CreateCartInMongoDB(userID string) (cartID string) {
 		cart := Cart{
 			Items:     []Item{},
 			CreatedAt: time.Now(),
-			QuoteId:   quoteId}
-		bsonCart, err := helpers.StructToBson(cart)
-		helpers.PanicErr(err)
-		result, err := db.Collection(collectionName).InsertOne(context.Background(), bsonCart)
-		cartID := result.InsertedID.(objectid.ObjectID).Hex()
-		return cartID
-	} else {
-		cart := Cart{
-			Items:   []Item{},
-			ID:      userID,
-			QuoteId: quoteId}
+			QuoteId:   quoteId,
+			Status:    "Active"}
 		bsonCart, err := helpers.StructToBson(cart)
 		helpers.PanicErr(err)
 		_, err = db.Collection(collectionName).InsertOne(context.Background(), bsonCart)
 		helpers.PanicErr(err)
-		cartID, err = getUserCartIDFromMongo(userID)
+		return quoteId
+	} else {
+		cart := Cart{
+			Items:   []Item{},
+			ID:      userID,
+			QuoteId: quoteId,
+			Status:  "Active"}
+		bsonCart, err := helpers.StructToBson(cart)
 		helpers.PanicErr(err)
-		return cartID
+		_, err = db.Collection(collectionName).InsertOne(context.Background(), bsonCart)
+		helpers.PanicErr(err)
+		//cartID, err = getUserCartIDFromMongo(userID)
+		//helpers.PanicErr(err)
+		return quoteId
 	}
 }
 
-func getGuestCartFromMongoByID(guestCartID string) []Item {
+func getGuestCartFromMongoByID(guestCartID int64) []Item {
 	db := config.Conf.GetMongoDb()
 
 	cart := Cart{Items: []Item{}}
-	objectIDFromUserID, err := objectid.FromHex(guestCartID)
-	helpers.PanicErr(err)
-	err = db.Collection(collectionName).FindOne(context.Background(), bson.NewDocument(
-		bson.EC.ObjectID("_id", objectIDFromUserID))).Decode(&cart)
+	//objectIDFromUserID, err := objectid.FromHex(guestCartID)
+	//helpers.PanicErr(err)
+	err := db.Collection(collectionName).FindOne(context.Background(), bson.NewDocument(
+		bson.EC.Int64("quote_id", guestCartID))).Decode(&cart)
 	if err != nil {
-		carID := CreateCartInMongoDB(guestCartID)
+		carID := CreateCartInMongoDB("")
 		getGuestCartFromMongoByID(carID)
 	}
 	return cart.Items
 }
 
-func GetUserCartFromMongoByID(userID string) Cart {
+func GetUserCartFromMongoByID(cartId string) Cart {
 	db := config.Conf.GetMongoDb()
 
+	cartIdInt, err := strconv.Atoi(cartId)
+	cartIdInt64 := int64(cartIdInt)
+
 	cart := Cart{Items: []Item{}}
-	err := db.Collection(collectionName).FindOne(context.Background(), bson.NewDocument(
-		bson.EC.String("id", userID))).Decode(&cart)
-	//fmt.Printf("%+v", cart)
-	if err != nil {
+	err = db.Collection(collectionName).FindOne(context.Background(), bson.NewDocument(
+		bson.EC.Int64("quote_id", cartIdInt64),
+		bson.EC.String("status", "Active"))).Decode(&cart)
+	if err != nil { // ToDo gets in to fucking loop
 		fmt.Println("ERROR IN GetUserCartFromMongoByID: ", err)
-		CreateCartInMongoDB(userID)
-		GetUserCartFromMongoByID(userID)
+		CreateCartInMongoDB(cartId)
+		GetUserCartFromMongoByID(cartId)
 	}
 	return cart
 }
@@ -136,14 +143,21 @@ func updateUserCartInMongo(cartID string, item Item) {
 
 	db := config.Conf.GetMongoDb()
 
-	db.Collection(collectionName).UpdateOne(nil,
+	cartIdInt, err := strconv.Atoi(cartID)
+	helpers.PanicErr(err)
+
+	cartIdInt64 := int64(cartIdInt)
+
+	_, err = db.Collection(collectionName).UpdateOne(nil,
 		bson.NewDocument(
-			bson.EC.String("id", cartID)),
+			bson.EC.Int64("quote_id", cartIdInt64),
+			bson.EC.String("status", "Active")),
 		bson.NewDocument(
 			bson.EC.SubDocumentFromElements("$pull",
 				bson.EC.SubDocument("items",
 					bson.NewDocument(
 						bson.EC.String("sku", item.SKU))))))
+	helpers.PanicErr(err)
 
 	_, err = db.Collection(collectionName).UpdateOne(nil,
 		bson.NewDocument(
@@ -163,7 +177,7 @@ func updateGuestCartInMongo(cartID string, item Item) {
 
 	db := config.Conf.GetMongoDb()
 
-	db.Collection(collectionName).UpdateOne(nil,
+	_, err = db.Collection(collectionName).UpdateOne(nil,
 		bson.NewDocument(
 			bson.EC.ObjectID("_id", bsonCartID)),
 		bson.NewDocument(
@@ -171,6 +185,7 @@ func updateGuestCartInMongo(cartID string, item Item) {
 				bson.EC.SubDocument("items",
 					bson.NewDocument(
 						bson.EC.String("sku", item.SKU))))))
+	helpers.PanicErr(err)
 
 	_, err = db.Collection(collectionName).UpdateOne(nil,
 		bson.NewDocument(

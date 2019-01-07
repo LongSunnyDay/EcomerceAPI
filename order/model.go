@@ -287,7 +287,7 @@ type Product struct {
 	Visibility          int64       `json:"visibility"`
 	TypeId              string      `json:"type_id"`
 	TaxClassId          int         `json:"tax_class_id"`
-	Climate             string      `json:"climate"`
+	Climate             []string      `json:"climate"`
 	StyleGeneral        string      `json:"style_general"`
 	UrlKey              string      `json:"url_key"`
 	PerformanceFabric   string      `json:"performance_fabric"`
