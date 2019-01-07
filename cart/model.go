@@ -14,7 +14,7 @@ import (
 
 type Cart struct {
 	QuoteId   int64     `json:"quote_id" bson:"quote_id"`
-	ID        string    `json:"id,omitempty" bson:"id,omitempty"`
+	UserId    string    `json:"user_id,omitempty" bson:"user_id,omitempty"`
 	Items     []Item    `json:"items" bson:"items"`
 	CreatedAt time.Time `json:"created_at,omitempty" bson:"createdAt,omitempty"`
 	Status    string    `json:"status" bson:"status"`
@@ -91,7 +91,7 @@ func CreateCartInMongoDB(userID string) int64 {
 	} else {
 		cart := Cart{
 			Items:   []Item{},
-			ID:      userID,
+			UserId:  userID,
 			QuoteId: quoteId,
 			Status:  "Active"}
 		bsonCart, err := helpers.StructToBson(cart)
@@ -123,6 +123,7 @@ func GetUserCartFromMongoByID(cartId string) Cart {
 	db := config.Conf.GetMongoDb()
 
 	cartIdInt, err := strconv.Atoi(cartId)
+	helpers.PanicErr(err)
 	cartIdInt64 := int64(cartIdInt)
 
 	cart := Cart{Items: []Item{}}
@@ -137,15 +138,25 @@ func GetUserCartFromMongoByID(cartId string) Cart {
 	return cart
 }
 
-func updateUserCartInMongo(cartID string, item Item) {
+func CheckDoesUserHasACart(userId string) (cartId int64, err error) {
+	db := config.Conf.GetMongoDb()
+
+	var cart Cart
+	err = db.Collection(collectionName).FindOne(nil, bson.NewDocument(
+		bson.EC.String("user_id", userId),
+		bson.EC.String("status", "Active"))).
+		Decode(&cart)
+	return cart.QuoteId, err
+}
+
+func updateUserCartInMongo(cartId string, item Item) {
 	bsonItem, err := helpers.StructToBson(item)
 	helpers.PanicErr(err)
 
 	db := config.Conf.GetMongoDb()
 
-	cartIdInt, err := strconv.Atoi(cartID)
+	cartIdInt, err := strconv.Atoi(cartId)
 	helpers.PanicErr(err)
-
 	cartIdInt64 := int64(cartIdInt)
 
 	_, err = db.Collection(collectionName).UpdateOne(nil,
@@ -161,7 +172,8 @@ func updateUserCartInMongo(cartID string, item Item) {
 
 	_, err = db.Collection(collectionName).UpdateOne(nil,
 		bson.NewDocument(
-			bson.EC.String("id", cartID)),
+			bson.EC.Int64("quote_id", cartIdInt64),
+			bson.EC.String("status", "Active")),
 		bson.NewDocument(
 			bson.EC.SubDocumentFromElements("$push",
 				bson.EC.SubDocument("items", bsonItem))))
@@ -196,12 +208,16 @@ func updateGuestCartInMongo(cartID string, item Item) {
 	helpers.PanicErr(err)
 }
 
-func deleteItemFromCartInMongo(carId string, item CartItem) {
-	db := config.Conf.GetMongoDb()
+func deleteItemFromCartInMongo(cartId string, item CartItem) {
+	cartIdInt, err := strconv.Atoi(cartId)
+	helpers.PanicErr(err)
+	cartIdInt64 := int64(cartIdInt)
 
-	_, err := db.Collection(collectionName).UpdateOne(nil,
+	db := config.Conf.GetMongoDb()
+	_, err = db.Collection(collectionName).UpdateOne(nil,
 		bson.NewDocument(
-			bson.EC.String("id", carId)),
+			bson.EC.Int64("quote_id", cartIdInt64),
+			bson.EC.String("status", "Active")),
 		bson.NewDocument(
 			bson.EC.SubDocumentFromElements("$pull",
 				bson.EC.SubDocument("items",

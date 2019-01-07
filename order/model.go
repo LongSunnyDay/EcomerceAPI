@@ -937,7 +937,6 @@ func (paymentData Payment) SavePaymentData(orderId int64) {
 }
 
 func (order *History) GetOrderPaymentData() {
-	fmt.Println("order id - ", order.ID)
 	order.Payment.AdditionalInformation = make([]string, 2)
 	db, err := config.Conf.GetDb()
 	helpers.PanicErr(err)

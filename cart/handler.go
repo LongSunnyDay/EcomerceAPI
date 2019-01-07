@@ -33,7 +33,12 @@ func createCart(w http.ResponseWriter, r *http.Request) {
 				//		Result: cartID}
 				//	response.SendResponse(w)
 				//}
-				cartID := CreateCartInMongoDB(claims["sub"].(string))
+
+				cartID, err := CheckDoesUserHasACart(claims["sub"].(string))
+				if err != nil {
+					fmt.Println(err)
+					cartID = CreateCartInMongoDB(claims["sub"].(string))
+				}
 				fmt.Println(cartID)
 				response := helpers.Response{
 					Code:   http.StatusOK,
@@ -69,13 +74,13 @@ func pullCart(w http.ResponseWriter, r *http.Request) {
 		cart := GetUserCartFromMongoByID(urlCartId)
 		response := helpers.Response{
 			Code:   http.StatusOK,
-			Result: cart}
+			Result: cart.Items}
 		response.SendResponse(w)
 	}
 }
 
 func updateCart(w http.ResponseWriter, r *http.Request) {
-	urlUserToken := r.URL.Query()["token"][0]
+	//urlUserToken := r.URL.Query()["token"][0]
 	urlCartId := r.URL.Query()["cartId"][0]
 
 	var item CartItem
@@ -94,38 +99,39 @@ func updateCart(w http.ResponseWriter, r *http.Request) {
 	item.Item.Name = productFromSolr.Name
 	item.Item.ItemID = counter.GetAndIncreaseItemIdCounterInMongo()
 
-	if len(urlUserToken) > 0 {
+	//if len(urlUserToken) > 0 {
 		updateUserCartInMongo(urlCartId, item.Item)
 		response := helpers.Response{
 			Code:   http.StatusOK,
 			Result: item.Item}
 		response.SendResponse(w)
-	} else {
-		updateGuestCartInMongo(urlCartId, item.Item)
-		response := helpers.Response{
-			Code:   http.StatusOK,
-			Result: item.Item}
-		response.SendResponse(w)
-	}
+	//}
+	//else {
+	//	updateGuestCartInMongo(urlCartId, item.Item)
+	//	response := helpers.Response{
+	//		Code:   http.StatusOK,
+	//		Result: item.Item}
+	//	response.SendResponse(w)
+	//}
 }
 
 func deleteFromUserCart(w http.ResponseWriter, r *http.Request) {
-	urlUserToken := r.URL.Query()["token"][0]
+	//urlUserToken := r.URL.Query()["token"][0]
 	urlCartId := r.URL.Query()["cartId"][0]
 	var item CartItem
 	_ = json.NewDecoder(r.Body).Decode(&item)
 
-	if len(urlUserToken) > 0 {
+	//if len(urlUserToken) > 0 {
 		deleteItemFromCartInMongo(urlCartId, item)
 		response := helpers.Response{
 			Code:   http.StatusOK,
 			Result: true}
 		response.SendResponse(w)
-	} else {
-		deleteItemFromGuestCartInMongo(urlCartId, item)
-		response := helpers.Response{
-			Code:   http.StatusOK,
-			Result: true}
-		response.SendResponse(w)
-	}
+	//} else {
+	//	deleteItemFromGuestCartInMongo(urlCartId, item)
+	//	response := helpers.Response{
+	//		Code:   http.StatusOK,
+	//		Result: true}
+	//	response.SendResponse(w)
+	//}
 }
