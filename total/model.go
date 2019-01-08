@@ -8,6 +8,9 @@ import (
 	"go-api-ws/shipping"
 	"go-api-ws/tax"
 	"strconv"
+	c "go-api-ws/config"
+	m "go-api-ws/discount/models"
+	"fmt"
 )
 
 type TotalsResp struct {
@@ -44,6 +47,7 @@ type Totals struct {
 }
 
 type Item struct {
+	SKU string `json:"sku"`
 	ItemId               int       `json:"item_id"`
 	Price                float64   `json:"price"`
 	BasePrice            float64   `json:"base_price"`
@@ -114,10 +118,24 @@ func (t *Totals) CalculateTotals(urlCartId string, addressInformation AddressDat
 	t.CalculateGrandtotal(rates)
 }
 
+//NOT tested yet
+func (t *Totals) GetDiscounts(int int){
+	var discount m.Discount
+	db, err := c.Conf.GetDb()
+	helpers.CheckErr(err)
+	for _, item := range t.Items{
+		err = db.QueryRow("SELECT discountPercent, discountAmount FROM discount c WHERE sku=?", item.SKU).
+			Scan(&item.DiscountPercent, &item.DiscountAmount, &discount.Sku)
+		helpers.CheckErr(err)
+		fmt.Println(item.DiscountPercent, item.DiscountAmount)
+	}
+}
+
 func (t *Totals) GetItems(cartId string) {
 	cart := cart.GetUserCartFromMongoByID(cartId)
 	for _, item := range cart.Items {
 		totalsItem := Item{
+			SKU: item.SKU,
 			ItemId: item.ItemID,
 			Qty:    item.QTY,
 			Name:   item.Name,
