@@ -1,0 +1,18 @@
+{
+  "additionalProperties": true,
+  "required": [
+    "sku"
+
+  ],
+  "properties": {
+    "sku": {
+      "type": "string"
+    },
+    "discountPercent": {
+      "type": "integer"
+    },
+    "discountAmount": {
+      "type": "integer"
+    }
+  }
+}

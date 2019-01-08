@@ -16,6 +16,7 @@ import (
 	"go-api-ws/total"
 	"go-api-ws/user"
 	"net/http"
+	"go-api-ws/discount"
 )
 
 func init() {
@@ -37,5 +38,6 @@ func main() {
 	r.Mount("/api/totals", total.RoutesTotal())
 	r.Mount("/api/order", order.RouterOrder())
 	r.Mount("/api/product", product.RouterProduct())
+	r.Mount("/api/discount", discount.DiscountRouter())
 	http.ListenAndServe(":8080", r)
 }
