@@ -4,7 +4,7 @@ import (
 	"go-api-ws/attribute"
 	"go-api-ws/cart"
 	"go-api-ws/helpers"
-	"go-api-ws/payment"
+	"go-api-ws/payment_methods"
 	"go-api-ws/shipping"
 	"go-api-ws/tax"
 	"strconv"
@@ -14,8 +14,8 @@ import (
 )
 
 type TotalsResp struct {
-	Totals         Totals           `json:"totals"`
-	PaymentMethods []payment.Method `json:"payment_methods"`
+	Totals         Totals                   `json:"totals"`
+	PaymentMethods []payment_methods.Method `json:"payment_methods"`
 }
 
 type Totals struct {

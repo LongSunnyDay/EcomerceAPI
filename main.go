@@ -8,7 +8,9 @@ import (
 	"go-api-ws/currency"
 	"go-api-ws/language"
 	"go-api-ws/order"
-	"go-api-ws/payment"
+	"go-api-ws/payment/klarna"
+	"go-api-ws/payment/paypal"
+	"go-api-ws/payment_methods"
 	"go-api-ws/product"
 	"go-api-ws/shipping"
 	"go-api-ws/stock"
@@ -26,6 +28,8 @@ func init() {
 
 func main() {
 
+	klarna.GetClient()
+
 	r := chi.NewRouter()
 	r.Mount("/api/user", user.RouterUser())
 	r.Mount("/api/cart", cart.RouterCart())
@@ -33,11 +37,12 @@ func main() {
 	r.Mount("/api/language", language.LanguageRouter())
 	r.Mount("/api/todo", todoMongo.TodoRouter())
 	r.Mount("/api/stock", stock.RouterStock())
-	r.Mount("/api/payment-methods", payment.RouterPayment())
+	r.Mount("/api/payment-methods", payment_methods.RouterPayment())
 	r.Mount("/api/shipping-methods", shipping.RoutesShippingMethods())
 	r.Mount("/api/totals", total.RoutesTotal())
 	r.Mount("/api/order", order.RouterOrder())
 	r.Mount("/api/product", product.RouterProduct())
 	r.Mount("/api/discount", discount.DiscountRouter())
+	r.Mount("/api/payment/paypal", paypal.RoutesPaypal())
 	http.ListenAndServe(":8080", r)
 }

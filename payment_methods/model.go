@@ -1,4 +1,4 @@
-package payment
+package payment_methods
 
 import (
 	"context"
@@ -16,7 +16,7 @@ type Method struct {
 	IsServerMethod bool   `json:"is_server_method,omitempty"`
 }
 
-const collectionName = "payment"
+const collectionName = "payment_methods"
 
 func insertPaymentMethodsToMongo(methods []interface{}) {
 	db := config.Conf.GetMongoDb()
@@ -46,7 +46,7 @@ func getPaymentMethodsFromMongo() []Method {
 func (m Method) insertToDb() {
 	db, err := config.Conf.GetDb()
 	helpers.PanicErr(err)
-	_, err = db.Exec("INSERT INTO paymentMethods("+
+	_, err = db.Exec("INSERT INTO payment_methods("+
 		"Code, "+
 		"Title, "+
 		"IsServerMethod)"+
@@ -58,7 +58,7 @@ func (m Method) insertToDb() {
 func getPaymentMethodsFromDb() Methods {
 	db, err := config.Conf.GetDb()
 	helpers.PanicErr(err)
-	rows, err := db.Query("SELECT Code, Title, IsServerMethod FROM paymentMethods")
+	rows, err := db.Query("SELECT Code, Title, IsServerMethod FROM payment_methods")
 	helpers.PanicErr(err)
 	var methods []Method
 	defer rows.Close()
@@ -75,7 +75,7 @@ func getPaymentMethodsFromDb() Methods {
 func (m Method) updatePaymentMethodInDb() {
 	db, err := config.Conf.GetDb()
 	helpers.PanicErr(err)
-	_, err = db.Exec("UPDATE paymentMethods p SET "+
+	_, err = db.Exec("UPDATE payment_methods p SET "+
 		"p.Code = ?, "+
 		"p.Title = ?, "+
 		"p.IsServerMethod = ? "+
@@ -87,14 +87,14 @@ func (m Method) updatePaymentMethodInDb() {
 func removePaymentMethodFromDb(id string) {
 	db, err := config.Conf.GetDb()
 	helpers.PanicErr(err)
-	_, err = db.Exec("DELETE FROM paymentMethods  WHERE Id = ?", id)
+	_, err = db.Exec("DELETE FROM payment_methods  WHERE Id = ?", id)
 	helpers.PanicErr(err)
 }
 
 func GetActualPaymentMethodsFromDb() Methods {
 	db, err := config.Conf.GetDb()
 	helpers.PanicErr(err)
-	rows, err := db.Query("SELECT Code, Title, IsServerMethod FROM paymentMethods WHERE id != 17")
+	rows, err := db.Query("SELECT Code, Title, IsServerMethod FROM payment_methods WHERE id != 17")
 	helpers.PanicErr(err)
 	var methods []Method
 	for rows.Next() {
@@ -111,7 +111,7 @@ func GetPaymentMethodFromDbByMethodCode(methodCode string) Method {
 	db, err := config.Conf.GetDb()
 	helpers.PanicErr(err)
 	var method Method
-	err = db.QueryRow("SELECT Code, Title, IsServerMethod FROM paymentMethods WHERE code = ?", methodCode).Scan(&method.Code, &method.Title, &method.IsServerMethod)
+	err = db.QueryRow("SELECT Code, Title, IsServerMethod FROM payment_methods WHERE code = ?", methodCode).Scan(&method.Code, &method.Title, &method.IsServerMethod)
 	helpers.PanicErr(err)
 	return method
 }

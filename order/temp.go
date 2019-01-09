@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"go-api-ws/addresses"
 	"go-api-ws/cart"
-	"go-api-ws/payment"
+	"go-api-ws/payment_methods"
 	"go-api-ws/product"
 	"go-api-ws/stock"
 	"go-api-ws/total"
@@ -205,7 +205,7 @@ func FormatOrderHistory(totals total.Totals, customerData user.CustomerData, bil
 	return
 }
 
-func FormatPaymentData(history History, method payment.Method, quoteId int64, userId int) (payment Payment) {
+func FormatPaymentData(history History, method payment_methods.Method, quoteId int64, userId int) (payment Payment) {
 	payment.AdditionalInformation = []string{method.Title}
 	payment.AmountOrdered = history.BaseGrandTotal
 	payment.BaseAmountOrdered = history.BaseGrandTotal

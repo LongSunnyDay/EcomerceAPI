@@ -47,6 +47,7 @@ func createCart(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	} else {
+		// ToDo After placing order request to createCart comes in without token in url
 		cartID := CreateCartInMongoDB("")
 		response := helpers.Response{
 			Code:   http.StatusOK,

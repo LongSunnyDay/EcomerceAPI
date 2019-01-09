@@ -13,6 +13,7 @@ import (
 )
 
 type Cart struct {
+	CartId    string    `json:"cart_id" bson:"cart_id"`
 	QuoteId   int64     `json:"quote_id" bson:"quote_id"`
 	UserId    string    `json:"user_id,omitempty" bson:"user_id,omitempty"`
 	Items     []Item    `json:"items" bson:"items"`
@@ -73,25 +74,29 @@ func getUserCartIDFromMongo(userID string) (cartID string, err error) {
 	return cartID, nil
 }
 
-func CreateCartInMongoDB(userID string) int64 {
+func CreateCartInMongoDB(userID string) string {
 	db := config.Conf.GetMongoDb()
 	quoteId := counter.GetAndIncreaseQuoteCounterInMySQL()
+
+	quoteIdString := strconv.Itoa(int(quoteId))
 
 	if userID == "" {
 		cart := Cart{
 			Items:     []Item{},
 			CreatedAt: time.Now(),
 			QuoteId:   quoteId,
+			CartId:    quoteIdString,
 			Status:    "Active"}
 		bsonCart, err := helpers.StructToBson(cart)
 		helpers.PanicErr(err)
 		_, err = db.Collection(collectionName).InsertOne(context.Background(), bsonCart)
 		helpers.PanicErr(err)
-		return quoteId
+		return quoteIdString
 	} else {
 		cart := Cart{
 			Items:   []Item{},
 			UserId:  userID,
+			CartId:  quoteIdString,
 			QuoteId: quoteId,
 			Status:  "Active"}
 		bsonCart, err := helpers.StructToBson(cart)
@@ -100,7 +105,7 @@ func CreateCartInMongoDB(userID string) int64 {
 		helpers.PanicErr(err)
 		//cartID, err = getUserCartIDFromMongo(userID)
 		//helpers.PanicErr(err)
-		return quoteId
+		return quoteIdString
 	}
 }
 
@@ -113,8 +118,8 @@ func getGuestCartFromMongoByID(guestCartID int64) []Item {
 	err := db.Collection(collectionName).FindOne(context.Background(), bson.NewDocument(
 		bson.EC.Int64("quote_id", guestCartID))).Decode(&cart)
 	if err != nil {
-		carID := CreateCartInMongoDB("")
-		getGuestCartFromMongoByID(carID)
+		//carID := CreateCartInMongoDB("")
+		//getGuestCartFromMongoByID(carID)
 	}
 	return cart.Items
 }
@@ -138,7 +143,7 @@ func GetUserCartFromMongoByID(cartId string) Cart {
 	return cart
 }
 
-func CheckDoesUserHasACart(userId string) (cartId int64, err error) {
+func CheckDoesUserHasACart(userId string) (cartId string, err error) {
 	db := config.Conf.GetMongoDb()
 
 	var cart Cart
@@ -146,7 +151,7 @@ func CheckDoesUserHasACart(userId string) (cartId int64, err error) {
 		bson.EC.String("user_id", userId),
 		bson.EC.String("status", "Active"))).
 		Decode(&cart)
-	return cart.QuoteId, err
+	return cart.CartId, err
 }
 
 func updateUserCartInMongo(cartId string, item Item) {
@@ -240,5 +245,17 @@ func deleteItemFromGuestCartInMongo(cartID string, item CartItem) {
 				bson.EC.SubDocument("items",
 					bson.NewDocument(
 						bson.EC.String("sku", item.Item.SKU))))))
+	helpers.PanicErr(err)
+}
+
+func UpdateCartStatus(cartId int64) {
+	db := config.Conf.GetMongoDb()
+	_, err := db.Collection(collectionName).UpdateOne(nil,
+		bson.NewDocument(
+			bson.EC.Int64("quote_id", cartId),
+			bson.EC.String("status", "Active")),
+		bson.NewDocument(
+			bson.EC.SubDocumentFromElements("$set",
+				bson.EC.String("status", "Inactive"))))
 	helpers.PanicErr(err)
 }

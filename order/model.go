@@ -67,7 +67,7 @@ type History struct {
 	Weight                                float64            `json:"weight"`
 	Items                                 []Item             `json:"items"`
 	BillingAddress                        BillingAddress     `json:"billing_address"`
-	Payment                               Payment            `json:"payment"`
+	Payment                               Payment            `json:"payment_methods"`
 	StatusHistories                       []string           `json:"status_histories"`
 	ExtensionAttributes                   ExtensionAttribute `json:"extension_attributes"`
 }

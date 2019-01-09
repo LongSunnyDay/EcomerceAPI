@@ -5,7 +5,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"go-api-ws/auth"
 	"go-api-ws/helpers"
-	"go-api-ws/payment"
+	"go-api-ws/payment_methods"
 	"net/http"
 	"time"
 )
@@ -62,7 +62,7 @@ func GetTotalsWithPaymentMethods(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewDecoder(r.Body).Decode(&addressInfo)
 
 	totals.CalculateTotals(urlCartId, addressInfo, groupId)
-	paymentMethods := payment.GetActualPaymentMethodsFromDb()
+	paymentMethods := payment_methods.GetActualPaymentMethodsFromDb()
 
 	totalsResp := TotalsResp{
 		Totals:         totals,

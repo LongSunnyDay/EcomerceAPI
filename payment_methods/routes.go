@@ -1,4 +1,4 @@
-package payment
+package payment_methods
 
 import (
 	"github.com/go-chi/chi"

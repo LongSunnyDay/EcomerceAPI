@@ -1,4 +1,4 @@
-package payment
+package payment_methods
 
 import (
 	"encoding/json"
@@ -11,7 +11,7 @@ func AddPaymentMethods(w http.ResponseWriter, r *http.Request) {
 	var methods []Method
 	_ = json.NewDecoder(r.Body).Decode(&methods)
 	validationResult := helpers.CheckJSONSchemaWithGoStruct(
-		"file://payment/jsonSchemaModels/add-payment-Methods.schema.json",
+		"file://payment_methods/jsonSchemaModels/add-payment_methods-Methods.schema.json",
 		methods)
 	if validationResult.Valid() {
 		for _, method := range methods {
@@ -36,7 +36,7 @@ func updatePaymentMethod(w http.ResponseWriter, r *http.Request) {
 	var method Method
 	_ = json.NewDecoder(r.Body).Decode(&method)
 	validationResult := helpers.CheckJSONSchemaWithGoStruct(
-		"file://payment/jsonSchemaModels/update-payment-Method.schema.json",
+		"file://payment_methods/jsonSchemaModels/update-payment_methods-Method.schema.json",
 		method)
 	if validationResult.Valid() {
 		method.updatePaymentMethodInDb()

@@ -6,7 +6,7 @@ import (
 	"go-api-ws/auth"
 	"go-api-ws/cart"
 	"go-api-ws/helpers"
-	"go-api-ws/payment"
+	"go-api-ws/payment_methods"
 	"go-api-ws/total"
 	"go-api-ws/user"
 	"net/http"
@@ -60,7 +60,7 @@ func PlaceOrder(w http.ResponseWriter, r *http.Request) {
 	orderHistory.Items = orderItems
 
 	// Working on Payment information
-	paymentMethod := payment.GetPaymentMethodFromDbByMethodCode(orderData.AddressInformation.PaymentMethodCode)
+	paymentMethod := payment_methods.GetPaymentMethodFromDbByMethodCode(orderData.AddressInformation.PaymentMethodCode)
 	orderPayment := FormatPaymentData(orderHistory, paymentMethod, cartFromMongo.QuoteId, userId)
 
 	// Shipping assignment
@@ -76,12 +76,14 @@ func PlaceOrder(w http.ResponseWriter, r *http.Request) {
 		orderHistory.Items[i].SaveItem()
 	}
 
-	// Saves payment data to MySQL
+	// Saves payment_methods data to MySQL
 	orderPayment.OrderId = orderHistory.ID
 	orderPayment.SavePaymentData(orderHistory.ID)
 
 	// Saves shipping address to MySQL
 	shippingAssignment.Shipping.Address.SaveOrderShippingAddress(orderHistory.ID)
+	// Changes cart status to "Inactive" in mongoDb
+	// cart.UpdateCartStatus(cartFromMongo.QuoteId) ToDo uncomment
 	helpers.WriteResultWithStatusCode(w, http.StatusOK, http.StatusOK)
 }
 
