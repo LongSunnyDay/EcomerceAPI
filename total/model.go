@@ -10,7 +10,7 @@ import (
 	"strconv"
 	c "go-api-ws/config"
 	m "go-api-ws/discount/models"
-	"fmt"
+		"fmt"
 )
 
 type TotalsResp struct {
@@ -111,23 +111,29 @@ type AddressData struct {
 
 func (t *Totals) CalculateTotals(urlCartId string, addressInformation AddressData, groupId int64) {
 	t.GetItems(urlCartId)
+	//t.GetDiscounts()
 	t.GetSubtotal()
 	t.GetShipping(addressInformation)
 	rates := t.GetTaxRates(groupId)
 	t.CalculateTax(rates)
+	t.GetDiscounts()
 	t.CalculateGrandtotal(rates)
 }
 
 //NOT tested yet
-func (t *Totals) GetDiscounts(int int){
+func (t *Totals) GetDiscounts(){
 	var discount m.Discount
+	//var percentToCurency float64
 	db, err := c.Conf.GetDb()
 	helpers.CheckErr(err)
 	for _, item := range t.Items{
 		err = db.QueryRow("SELECT discountPercent, discountAmount FROM discount c WHERE sku=?", item.SKU).
-			Scan(&item.DiscountPercent, &item.DiscountAmount, &discount.Sku)
+			Scan(&discount.DiscountPercent, &discount.DiscountAmount)
 		helpers.CheckErr(err)
-		fmt.Println(item.DiscountPercent, item.DiscountAmount)
+		percentToCurency := discount.DiscountAmount/100 * item.RowTotalInclTax
+		t.DiscountAmount = t.DiscountAmount + percentToCurency
+		fmt.Println(t.DiscountAmount, discount.DiscountAmount, percentToCurency)
+		fmt.Printf("%+v", item)
 	}
 }
 
@@ -216,9 +222,12 @@ func (t *Totals) GetShipping(information AddressData) {
 func (t *Totals) CalculateGrandtotal(rules tax.Rules) {
 	for _, item := range t.Items {
 		t.BaseTaxAmount = t.BaseTaxAmount + item.TaxAmount
-
 	}
-	t.BaseGrandTotal = t.Subtotal + t.DiscountAmount + t.TaxAmount + t.ShippingInclTax
+	for _, item := range t.Items {
+		t.BaseTaxAmount = t.BaseTaxAmount + item.TaxAmount
+	}
+
+	t.BaseGrandTotal = t.Subtotal - t.DiscountAmount + t.TaxAmount + t.ShippingInclTax
 	t.BaseSubtotalWithDiscount = t.Subtotal + t.DiscountAmount
 	t.SubtotalInclTax = t.Subtotal + t.TaxAmount
 	t.SubtotalWithDiscount = t.Subtotal - t.DiscountAmount

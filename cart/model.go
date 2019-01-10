@@ -126,18 +126,20 @@ func getGuestCartFromMongoByID(guestCartID int64) []Item {
 
 func GetUserCartFromMongoByID(cartId string) Cart {
 	db := config.Conf.GetMongoDb()
-
-	cartIdInt, err := strconv.Atoi(cartId)
-	helpers.PanicErr(err)
-	cartIdInt64 := int64(cartIdInt)
+	var cartIdInt64 int64
+	if len(cartId)>2 {
+		cartIdInt, err := strconv.Atoi(cartId)
+		helpers.PanicErr(err)
+		cartIdInt64 = int64(cartIdInt)
+	}
 
 	cart := Cart{Items: []Item{}}
-	err = db.Collection(collectionName).FindOne(context.Background(), bson.NewDocument(
+	err := db.Collection(collectionName).FindOne(context.Background(), bson.NewDocument(
 		bson.EC.Int64("quote_id", cartIdInt64),
 		bson.EC.String("status", "Active"))).Decode(&cart)
 	if err != nil { // ToDo gets in to fucking loop
 		fmt.Println("ERROR IN GetUserCartFromMongoByID: ", err)
-		CreateCartInMongoDB(cartId)
+		cartId = CreateCartInMongoDB(cartId)
 		GetUserCartFromMongoByID(cartId)
 	}
 	return cart
