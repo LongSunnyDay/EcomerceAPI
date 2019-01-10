@@ -87,10 +87,13 @@ func CreateCartInMongoDB(userID string) string {
 			QuoteId:   quoteId,
 			CartId:    quoteIdString,
 			Status:    "Active"}
+
 		bsonCart, err := helpers.StructToBson(cart)
 		helpers.PanicErr(err)
+
 		_, err = db.Collection(collectionName).InsertOne(context.Background(), bsonCart)
 		helpers.PanicErr(err)
+
 		return quoteIdString
 	} else {
 		cart := Cart{
@@ -99,8 +102,10 @@ func CreateCartInMongoDB(userID string) string {
 			CartId:  quoteIdString,
 			QuoteId: quoteId,
 			Status:  "Active"}
+
 		bsonCart, err := helpers.StructToBson(cart)
 		helpers.PanicErr(err)
+
 		_, err = db.Collection(collectionName).InsertOne(context.Background(), bsonCart)
 		helpers.PanicErr(err)
 		//cartID, err = getUserCartIDFromMongo(userID)
