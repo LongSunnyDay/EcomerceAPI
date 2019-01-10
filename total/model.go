@@ -247,7 +247,7 @@ func (t *Totals) CalculateGrandtotal(rules tax.Rules) {
 	segment = Segment{
 		Code:  "discount",
 		Title: "Discount",
-		Value: 0}
+		Value: t.DiscountAmount}
 	t.TotalSegments = append(t.TotalSegments, segment)
 
 	segment = Segment{
