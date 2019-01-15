@@ -10,8 +10,7 @@ import (
 	"strconv"
 	c "go-api-ws/config"
 	m "go-api-ws/discount/models"
-		"fmt"
-)
+		)
 
 type TotalsResp struct {
 	Totals         Totals                   `json:"totals"`
@@ -132,8 +131,8 @@ func (t *Totals) GetDiscounts(){
 		helpers.CheckErr(err)
 		percentToCurency := discount.DiscountAmount/100 * item.RowTotalInclTax
 		t.DiscountAmount = t.DiscountAmount + percentToCurency
-		fmt.Println(t.DiscountAmount, discount.DiscountAmount, percentToCurency)
-		fmt.Printf("%+v", item)
+		//fmt.Println(t.DiscountAmount, discount.DiscountAmount, percentToCurency)
+		//fmt.Printf("%+v", item)
 	}
 }
 

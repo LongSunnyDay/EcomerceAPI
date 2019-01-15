@@ -110,3 +110,30 @@ func updateDiscount(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(discount.Sku + " updated in mysql")
 
 }
+
+func createCoupon(w http.ResponseWriter, r *http.Request){
+	var coupon m.Coupon
+	err := json.NewDecoder(r.Body).Decode(&coupon)
+	helpers.CheckErr(err)
+	fmt.Println(coupon)
+
+	db, err := c.Conf.GetDb()
+	helpers.PanicErr(err)
+	result, err := db.Exec("INSERT INTO coupon("+
+		"id, "+
+		"discountPercent, "+
+		"discountAmount, "+
+		"expirationDate, "+
+		"usageLimit, "+
+		"timesUsed) "+
+		" VALUES(?, ?, ?, ?, ?, ?)",
+		coupon.Id,
+		coupon.DiscountPercent,
+		coupon.DiscountAmount,
+		coupon.ExpirationDate,
+		coupon.UsageLimit,
+		coupon.TimesUsed)
+	fmt.Println(result)
+	helpers.PanicErr(err)
+
+}

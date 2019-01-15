@@ -1,0 +1,27 @@
+{
+  "additionalProperties": true,
+  "required": [
+    "sku"
+
+  ],
+  "properties": {
+      "discountPercent": {
+      "type": "integer"
+    },
+    "discountAmount": {
+      "type": "integer"
+    },
+    "expirationDate": {
+      "type": "time"
+    },
+    "usageLimit": {
+      "type": "integer"
+    },
+    "timesUsed": {
+      "type": "integer"
+    },
+    "createdAt": {
+      "type": "time"
+    }
+  }
+}

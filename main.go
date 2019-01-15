@@ -43,6 +43,7 @@ func main() {
 	r.Mount("/api/order", order.RouterOrder())
 	r.Mount("/api/product", product.RouterProduct())
 	r.Mount("/api/discount", discount.DiscountRouter())
+	r.Mount("/api/coupon", discount.CouponRouter())
 	r.Mount("/api/payment/paypal", paypal.RoutesPaypal())
 	http.ListenAndServe(":8080", r)
 }
