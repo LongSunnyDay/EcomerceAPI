@@ -45,5 +45,6 @@ func main() {
 	r.Mount("/api/discount", discount.DiscountRouter())
 	r.Mount("/api/coupon", discount.CouponRouter())
 	r.Mount("/api/payment/paypal", paypal.RoutesPaypal())
+	r.Mount("/api/payment/klarna", klarna.RouterKlarna())
 	http.ListenAndServe(":8080", r)
 }

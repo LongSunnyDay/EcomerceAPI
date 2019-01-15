@@ -1,8 +1,6 @@
 package klarna
 
-const (
-	KlarnaTestingApiEndpoint = "https://api.playground.klarna.com"
-)
+
 
 func GetClient() {
 	//uri, _ := url.Parse(KlarnaTestingApiEndpoint)
