@@ -1,9 +1,14 @@
 package order
 
 import (
+	"encoding/json"
 	"fmt"
 	"go-api-ws/config"
 	"go-api-ws/helpers"
+	"go-api-ws/postNord"
+	"io/ioutil"
+	"os"
+	"strconv"
 	"time"
 )
 
@@ -67,7 +72,7 @@ type History struct {
 	Weight                                float64            `json:"weight"`
 	Items                                 []Item             `json:"items"`
 	BillingAddress                        BillingAddress     `json:"billing_address"`
-	Payment                               Payment            `json:"payment_methods"`
+	Payment                               Payment            `json:"payment"`
 	StatusHistories                       []string           `json:"status_histories"`
 	ExtensionAttributes                   ExtensionAttribute `json:"extension_attributes"`
 }
@@ -287,7 +292,7 @@ type Product struct {
 	Visibility          int64       `json:"visibility"`
 	TypeId              string      `json:"type_id"`
 	TaxClassId          int         `json:"tax_class_id"`
-	Climate             []string      `json:"climate"`
+	Climate             []string    `json:"climate"`
 	StyleGeneral        string      `json:"style_general"`
 	UrlKey              string      `json:"url_key"`
 	PerformanceFabric   string      `json:"performance_fabric"`
@@ -955,6 +960,7 @@ func (order *History) GetOrderPaymentData() {
 			&order.Payment.OrderId,
 			&order.Payment.AdditionalInformation[0])
 	helpers.PanicErr(err)
+	fmt.Println(order.Payment.AdditionalInformation)
 }
 
 func (address *Address) SaveOrderShippingAddress(orderId int64) {
@@ -1112,4 +1118,31 @@ func (order *History) GetOrderShippingAddress() {
 	helpers.PanicErr(err)
 	sa.Shipping.Address.Street = formatStreet(sa.Shipping.Address.StreetLine0, sa.Shipping.Address.StreetLine1)
 	order.ExtensionAttributes.ShippingAssignments = append(order.ExtensionAttributes.ShippingAssignments, sa)
+}
+
+func (order *History) WriteToJsonFile() {
+
+	orderIdInt := int(order.ID)
+	orderIdString := strconv.Itoa(orderIdInt) + ".json"
+
+	orderJson, err := json.Marshal(order)
+	helpers.PanicErr(err)
+
+	err = ioutil.WriteFile("./order/orders/"+orderIdString, orderJson, os.ModePerm)
+	helpers.PanicErr(err)
+}
+
+func (order *History) BuildOrderPickupForm() (form postNord.OrderPickupForm) {
+
+	for _, item := range order.Items {
+		idInt := int(item.QuoteItemId)
+		idString := strconv.Itoa(idInt)
+		form.Shipment.Items = append(form.Shipment.Items, &idString)
+	}
+
+	orderIdInt := int(order.ID)
+	orderIdString := strconv.Itoa(orderIdInt)
+	form.Order.OrderReference = orderIdString
+
+	return form
 }

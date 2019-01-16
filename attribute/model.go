@@ -10,7 +10,7 @@ import (
 
 type attribute struct {
 	Type                      string        `json:"_type"`
-	Id                        string        `json:"id"`
+	Id                        int        `json:"id"`
 	Score                     int           `json:"_score"`
 	IsWysiwygEnabled          bool          `json:"is_wysiwyg_enabled"`
 	IsHTMLAllowedOnFront      bool          `json:"is_html_allowed_on_front"`
@@ -22,7 +22,7 @@ type attribute struct {
 	IsFilterableInGrid        bool          `json:"is_filterable_in_grid"`
 	Position                  int           `json:"position"`
 	ApplyTo                   []interface{} `json:"apply_to"`
-	IsSearchable              string        `json:"is_searchable"`
+	IsSearchable              bool        `json:"is_searchable"`
 	IsVisibleInAdvancedSearch string        `json:"is_visible_in_advanced_search"`
 	IsComparable              string        `json:"is_comparable"`
 	IsUsedForPromoRules       string        `json:"is_used_for_promo_rules"`
@@ -30,7 +30,7 @@ type attribute struct {
 	UsedInProductListing      string        `json:"used_in_product_listing"`
 	IsVisible                 bool          `json:"is_visible"`
 	Scope                     string        `json:"scope"`
-	AttributeID               int           `json:"attribute_id"`
+	AttributeID               string           `json:"attribute_id"`
 	AttributeCode             string        `json:"attribute_code"`
 	FrontendInput             string        `json:"frontend_input"`
 	EntityTypeID              string        `json:"entity_type_id"`
@@ -84,7 +84,8 @@ func GetAttributeNameFromSolr(attributeId string, attributeValue string) ItemAtt
 		"filter": "id:" + attributeId,
 		"fields": "*, [child parentFilter=_type:attribute childFilter=value:" + attributeValue + " limit=30]"}
 	requestBytes := new(bytes.Buffer)
-	json.NewEncoder(requestBytes).Encode(request)
+	err := json.NewEncoder(requestBytes).Encode(request)
+	helpers.PanicErr(err)
 	resp, err := http.Post(
 		SolrQueryUrl,
 		ContentType,
@@ -92,7 +93,8 @@ func GetAttributeNameFromSolr(attributeId string, attributeValue string) ItemAtt
 	helpers.PanicErr(err)
 	b, _ := ioutil.ReadAll(resp.Body)
 	var solrResp solrResponse
-	json.Unmarshal(b, &solrResp)
+	err = json.Unmarshal(b, &solrResp)
+	helpers.PanicErr(err)
 
 	if solrResp.Response.NumFound == 1 {
 		itemAttribute := ItemAttribute{

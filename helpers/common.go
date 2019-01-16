@@ -46,7 +46,8 @@ func WriteJsonResult(w http.ResponseWriter, data interface{}) {
 	PanicErr(err)
 	w.Header().Set(HeaderContentType, MIMEApplicationJSON)
 	w.WriteHeader(http.StatusOK)
-	w.Write(jsonData)
+	_, err = w.Write(jsonData)
+	PanicErr(err)
 }
 
 func GetIntParameter(r *http.Request, name string) (int, error) {
@@ -74,7 +75,8 @@ func GetTokenFromUrl(r *http.Request) (string, error) {
 func WriteResultWithStatusCode(w http.ResponseWriter, data interface{}, statusCode int) {
 	w.Header().Set(HeaderContentType, MIMEApplicationJSON)
 	w.WriteHeader(statusCode)
-	json.NewEncoder(w).Encode(data)
+	err := json.NewEncoder(w).Encode(data)
+	PanicErr(err)
 }
 
 func StructToBson(v interface{}) (doc *bson.Document, err error) {

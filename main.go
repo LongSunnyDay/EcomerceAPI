@@ -11,6 +11,7 @@ import (
 	"go-api-ws/payment/klarna"
 	"go-api-ws/payment/paypal"
 	"go-api-ws/payment_methods"
+	"go-api-ws/postNord"
 	"go-api-ws/product"
 	"go-api-ws/shipping"
 	"go-api-ws/stock"
@@ -46,5 +47,6 @@ func main() {
 	r.Mount("/api/coupon", discount.CouponRouter())
 	r.Mount("/api/payment/paypal", paypal.RoutesPaypal())
 	r.Mount("/api/payment/klarna", klarna.RouterKlarna())
+	r.Mount("/api/postnord", postNord.RouterPostNord())
 	http.ListenAndServe(":8080", r)
 }

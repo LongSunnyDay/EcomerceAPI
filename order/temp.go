@@ -80,6 +80,7 @@ func AssignDataToBillingAddressAndSaveIt(data PlaceOrderData) (billingAddress ad
 // Pure function
 func FormatOrderHistoryItems(totals total.Totals, quoteId int64) (orderItems []Item) {
 	for _, itemFromTotals := range totals.Items {
+		fmt.Println("SKU ->>", itemFromTotals.SKU)
 		var orderItem Item
 		//orderItem.AmountRefunded
 		//orderItem.BaseAmountRefunded
@@ -114,7 +115,7 @@ func FormatOrderHistoryItems(totals total.Totals, quoteId int64) (orderItems []I
 		// orderItem.RowInvoiced
 		orderItem.RowTotal = itemFromTotals.RowTotal
 		// orderItem.RowWeight
-		// orderItem.Sku ToDo Assign Sku from MySQL or Cart service
+		orderItem.Sku = itemFromTotals.SKU
 		// orderItem.StoreId
 		orderItem.TaxAmount = itemFromTotals.TaxAmount
 		orderItem.TaxPercent = itemFromTotals.TaxPercent
@@ -218,3 +219,5 @@ func FormatPaymentData(history History, method payment_methods.Method, quoteId i
 	// orderPayment.CcLast4
 	return
 }
+
+

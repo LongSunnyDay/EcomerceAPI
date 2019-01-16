@@ -3,13 +3,13 @@ package total
 import (
 	"go-api-ws/attribute"
 	"go-api-ws/cart"
+	c "go-api-ws/config"
+	m "go-api-ws/discount/models"
 	"go-api-ws/helpers"
 	"go-api-ws/payment_methods"
 	"go-api-ws/shipping"
 	"go-api-ws/tax"
 	"strconv"
-	c "go-api-ws/config"
-	m "go-api-ws/discount/models"
 		)
 
 type TotalsResp struct {
@@ -271,9 +271,5 @@ func (t *Totals) CalculateGrandtotal(rules tax.Rules) {
 		Value: t.BaseGrandTotal,
 		Area:  "footer"}
 	t.TotalSegments = append(t.TotalSegments, segment)
-
-}
-
-func getDiscount() {
 
 }

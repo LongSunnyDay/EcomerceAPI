@@ -82,8 +82,16 @@ func PlaceOrder(w http.ResponseWriter, r *http.Request) {
 
 	// Saves shipping address to MySQL
 	shippingAssignment.Shipping.Address.SaveOrderShippingAddress(orderHistory.ID)
+
+	// Writes order to json file
+	orderHistory.WriteToJsonFile()
+
+	// Order Pickup
+	orderPickup := orderHistory.BuildOrderPickupForm()
+	orderPickup.MakeOrderPickup()
+
 	// Changes cart status to "Inactive" in mongoDb
-	// cart.UpdateCartStatus(cartFromMongo.QuoteId) ToDo uncomment
+	cart.UpdateCartStatus(cartFromMongo.QuoteId)
 	helpers.WriteResultWithStatusCode(w, http.StatusOK, http.StatusOK)
 }
 
