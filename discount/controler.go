@@ -121,13 +121,15 @@ func createCoupon(w http.ResponseWriter, r *http.Request){
 	helpers.PanicErr(err)
 	result, err := db.Exec("INSERT INTO coupon("+
 		"id, "+
+		"code, "+
 		"discountPercent, "+
 		"discountAmount, "+
 		"expirationDate, "+
 		"usageLimit, "+
 		"timesUsed) "+
-		" VALUES(?, ?, ?, ?, ?, ?)",
+		" VALUES(?, ?, ?, ?, ?, ?, ?)",
 		coupon.Id,
+		coupon.Code,
 		coupon.DiscountPercent,
 		coupon.DiscountAmount,
 		coupon.ExpirationDate,
@@ -135,5 +137,78 @@ func createCoupon(w http.ResponseWriter, r *http.Request){
 		coupon.TimesUsed)
 	fmt.Println(result)
 	helpers.PanicErr(err)
+
+}
+
+func getCoupon(w http.ResponseWriter, r *http.Request){
+	var coupon m.Coupon
+	couponID := chi.URLParam(r, "couponID")
+	db, err := c.Conf.GetDb()
+	helpers.CheckErr(err)
+
+	err = db.QueryRow("SELECT * FROM coupon c WHERE id=?", couponID).
+		Scan(&coupon.Id, &coupon.Code, &coupon.DiscountPercent, &coupon.DiscountAmount, &coupon.ExpirationDate, &coupon.UsageLimit, &coupon.TimesUsed, &coupon.CreatedAt)
+	helpers.CheckErr(err)
+	json.NewEncoder(w).Encode(coupon)
+}
+
+func getCouponList(w http.ResponseWriter, r *http.Request) {
+	var coupon m.Coupon
+	var coupons []m.Coupon
+	coupons = []m.Coupon{}
+
+	db, err := c.Conf.GetDb()
+	helpers.CheckErr(err)
+
+	rows, err := db.Query ("SELECT id, code, discountPercent, discountAmount, expirationDate, usageLimit, timesUsed, createdAt FROM coupon")
+	helpers.CheckErr(err)
+	defer rows.Close()
+
+	for rows.Next(){
+		err := rows.Scan(
+			&coupon.Id,
+			&coupon.Code,
+			&coupon.DiscountPercent,
+			&coupon.DiscountAmount,
+			&coupon.ExpirationDate,
+			&coupon.UsageLimit,
+			&coupon.TimesUsed,
+			&coupon.CreatedAt)
+		helpers.CheckErr(err)
+		coupons = append(coupons, coupon)
+	}
+	err = rows.Err()
+	helpers.CheckErr(err)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(coupons)
+}
+
+func removeCoupon(w http.ResponseWriter, r *http.Request) {
+	couponID := chi.URLParam(r, "couponID")
+	db, err := c.Conf.GetDb()
+	helpers.CheckErr(err)
+
+	res, err := db.Exec("DELETE c FROM coupon c WHERE c.id=?", couponID)
+	fmt.Println(res)
+	helpers.CheckErr(err)
+}
+
+func updateCoupon(w http.ResponseWriter, r *http.Request) {
+	couponID := chi.URLParam(r, "couponID")
+	var coupon m.Coupon
+	err := json.NewDecoder(r.Body).Decode(&coupon)
+	helpers.PanicErr(err)
+
+	db, err := c.Conf.GetDb()
+	helpers.PanicErr(err)
+	query, err := db.Prepare("Update coupon set code=?, discountPercent=?, discountAmount=?, expirationDate=?, usageLimit=? where id=?")
+	helpers.PanicErr(err)
+
+	_, er := query.Exec(coupon.Code, coupon.DiscountPercent, coupon.DiscountAmount, coupon.ExpirationDate, coupon.UsageLimit, couponID)
+	helpers.CheckIfRowExistsInMysql(db, "coupon", "id", couponID)
+	helpers.PanicErr(er)
+	if er == nil{
+		fmt.Println(coupon.Code + " updated in mysql")
+	}
 
 }

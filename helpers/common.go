@@ -10,6 +10,8 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"database/sql"
+	_ "go/scanner"
 )
 
 type Response struct {
@@ -90,4 +92,15 @@ func StructToBson(v interface{}) (doc *bson.Document, err error) {
 
 func (r Response) SendResponse(w http.ResponseWriter) {
 	WriteResultWithStatusCode(w, r, r.Code)
+}
+
+func CheckIfRowExistsInMysql(dataBaseName *sql.DB, tableName string, fieldName string, fieldValue string){
+	var value string
+	res := dataBaseName.QueryRow("SELECT "+ fieldName +" FROM "+ tableName +" WHERE "+ fieldName +" ="+ fieldValue)
+
+	err := res.Scan(&value)
+
+	fmt.Println(value)
+
+	PanicErr(err)
 }
