@@ -170,7 +170,11 @@ func FormatOrderHistory(totals total.Totals, customerData user.CustomerData, bil
 	history.CustomerFirstname = customerData.FirstName
 	history.CustomerGroupId = customerData.GroupID
 	history.CustomerId = customerData.ID
-	history.CustomerIsGuest = 0 // ToDo Orders for Guest users needs to be implemented
+	if customerData.ID != 0 {
+		history.CustomerIsGuest = 0 // ToDo Orders for Guest users needs to be implemented
+	} else {
+		history.CustomerIsGuest = 1
+	}
 	history.CustomerLastname = customerData.LastName
 	// orderHistory.CustomerNoteNotify
 	history.DiscountAmount = totals.DiscountAmount

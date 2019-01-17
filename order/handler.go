@@ -34,10 +34,23 @@ func PlaceOrder(w http.ResponseWriter, r *http.Request) {
 	helpers.PanicErr(err)
 
 	// Get customer data from MySql by id send in request
-	userId, err := strconv.Atoi(orderData.UserId)
-	helpers.PanicErr(err)
-	userIdInt64 := int64(userId)
-	customerData := user.GetUserFromMySQLById(userIdInt64)
+	var customerData user.CustomerData
+	var userId int
+	var userIdInt64 int64
+	if len(orderData.UserId) > 0 {
+		userId, err = strconv.Atoi(orderData.UserId)
+		helpers.PanicErr(err)
+		userIdInt64 = int64(userId)
+		customerData = user.GetUserFromMySQLById(userIdInt64)
+	} else {
+		customerData = user.CustomerData{
+			Email:     orderData.PersonalData.Email,
+			FirstName: orderData.PersonalData.Firstname,
+			LastName:  orderData.PersonalData.Lastname,
+			GroupID:   1}
+		userId = 0
+		userIdInt64 = 0
+	}
 
 	// Saves billing addresses to MySQL
 	billingAddress := AssignDataToBillingAddressAndSaveIt(orderData)
@@ -94,7 +107,7 @@ func PlaceOrder(w http.ResponseWriter, r *http.Request) {
 	defer cart.UpdateCartStatus(cartFromMongo.QuoteId)
 
 	resp := map[string]int{
-		"code":200}
+		"code": 200}
 
 	helpers.WriteResultWithStatusCode(w, resp, http.StatusOK)
 }
