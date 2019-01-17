@@ -8,7 +8,7 @@ import (
 	"go-api-ws/payment_methods"
 	"net/http"
 	"time"
-)
+	)
 
 func GetTotals(w http.ResponseWriter, r *http.Request) {
 	urlToken := r.URL.Query()["token"][0]

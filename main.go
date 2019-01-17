@@ -46,7 +46,7 @@ func main() {
 	r.Mount("/api/order", order.RouterOrder())
 	r.Mount("/api/product", product.RouterProduct())
 	r.Mount("/api/discount", discount.DiscountRouter())
-	r.Mount("/api/coupon", discount.CouponRouter())
+	r.Mount("/api/cart/apply-coupon", discount.CouponRouter())
 	r.Mount("/api/payment/paypal", paypal.RoutesPaypal())
 	r.Mount("/api/payment/klarna", klarna.RouterKlarna())
 	r.Mount("/api/postnord", postNord.RouterPostNord())

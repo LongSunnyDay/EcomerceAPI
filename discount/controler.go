@@ -9,6 +9,8 @@ import (
 	c "go-api-ws/config"
 	"fmt"
 	"github.com/go-chi/chi"
+	"time"
+	"log"
 )
 
 func createDiscount(w http.ResponseWriter, r *http.Request){
@@ -211,4 +213,40 @@ func updateCoupon(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(coupon.Code + " updated in mysql")
 	}
 
+}
+
+func applyCoupon(w http.ResponseWriter, r *http.Request){
+	couponCode := r.URL.Query()["coupon"][0]
+	db, err := c.Conf.GetDb()
+	var coupon m.Coupon
+	helpers.CheckErr(err)
+	helpers.CheckIfRowExistsInMysql(db, "coupon", "code", couponCode)
+
+	err = db.QueryRow("SELECT * FROM coupon c WHERE code=?", couponCode).
+		Scan(&coupon.Id, &coupon.Code, &coupon.DiscountPercent, &coupon.DiscountAmount, &coupon.ExpirationDate, &coupon.UsageLimit, &coupon.TimesUsed, &coupon.CreatedAt)
+	helpers.CheckErr(err)
+	json.NewEncoder(w).Encode(coupon)
+	fmt.Println(coupon)
+
+	diff,err := time.Parse(time.RFC3339, coupon.ExpirationDate)
+
+	helpers.CheckErr(err)
+
+	if diff.Sub(time.Now()) > 0 {
+		fmt.Println("Coupon valid")
+		if coupon.UsageLimit > coupon.TimesUsed {
+			query, err := db.Prepare("Update coupon set timesUsed=? where code=?")
+			helpers.PanicErr(err)
+
+			_, er := query.Exec(coupon.TimesUsed + 1, couponCode)
+			helpers.PanicErr(er)
+		}else{
+			log.Fatal("Coupon code used up")
+		}
+
+	}else {
+		fmt.Println(diff.Sub(time.Now()), diff)
+		log.Fatal("Coupon expired")
+
+	}
 }

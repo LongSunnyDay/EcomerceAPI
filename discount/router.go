@@ -17,7 +17,7 @@ func DiscountRouter() http.Handler {
 
 func CouponRouter() http.Handler {
 	r := chi.NewRouter()
-	r.Post("/", createCoupon)
+	r.Post("/", applyCoupon)
 	r.Get("/{couponID}", getCoupon)
 	r.Get("/list", getCouponList)
 	r.Delete("/{couponID}", removeCoupon)
