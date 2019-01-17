@@ -235,6 +235,13 @@ type PlaceOrderData struct {
 	TransmitedAt       string             `json:"transmited_at"`
 	AddressInformation AddressInformation `json:"addressInformation"`
 	Products           []Product          `json:"products"`
+	PersonalData       PersonalData       `json:"personalDetails"`
+}
+
+type PersonalData struct {
+	Email     string `json:"emailAddress"`
+	Firstname string `json:"firstName"`
+	Lastname  string `json:"lastName"`
 }
 
 type AddressInformation struct {
