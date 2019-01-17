@@ -76,7 +76,8 @@ func NewFlags() *FlagSettings {
 func GetConfig(configFile string) *Config {
 	Conf = &Config{}
 	if configFile != "" {
-		Conf.GetConfFromFile(configFile)
+		err := Conf.GetConfFromFile(configFile)
+		helpers.PanicErr(err)
 	}
 	return Conf
 }

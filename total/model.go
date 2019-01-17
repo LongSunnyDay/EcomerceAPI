@@ -10,7 +10,7 @@ import (
 	"go-api-ws/shipping"
 	"go-api-ws/tax"
 	"strconv"
-		)
+)
 
 type TotalsResp struct {
 	Totals         Totals                   `json:"totals"`
@@ -226,10 +226,19 @@ func (t *Totals) CalculateGrandtotal(rules tax.Rules) {
 		t.BaseTaxAmount = t.BaseTaxAmount + item.TaxAmount
 	}
 
+	dc := shipping.GetConfig("config.yml")
+
 	t.BaseGrandTotal = t.Subtotal - t.DiscountAmount + t.TaxAmount + t.ShippingInclTax
 	t.BaseSubtotalWithDiscount = t.Subtotal + t.DiscountAmount
 	t.SubtotalInclTax = t.Subtotal + t.TaxAmount
 	t.SubtotalWithDiscount = t.Subtotal - t.DiscountAmount
+
+	if dc.ShippingDiscountIsAvailable && dc.ShippingDiscountFrom < t.SubtotalInclTax && dc.ShippingDiscountTo > t.SubtotalInclTax {
+		t.DiscountAmount = t.ShippingInclTax
+		t.BaseGrandTotal = t.BaseGrandTotal - t.ShippingInclTax
+		t.ShippingInclTax = 0
+		t.BaseShippingInclTax = 0
+	}
 
 	segment := Segment{
 		Code:  "subtotal",
@@ -273,3 +282,5 @@ func (t *Totals) CalculateGrandtotal(rules tax.Rules) {
 	t.TotalSegments = append(t.TotalSegments, segment)
 
 }
+
+

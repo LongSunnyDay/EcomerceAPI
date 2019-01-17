@@ -3,10 +3,11 @@ package postNord
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
+	"github.com/labstack/gommon/log"
 	"go-api-ws/config"
 	"go-api-ws/helpers"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -191,6 +192,12 @@ func (transitData TransitTimeForm) PostTransitData() *http.Request {
 
 func (form *OrderPickupForm) MakeOrderPickup() {
 
+	f, err := os.OpenFile("./logs/Order_"+ form.Order.OrderReference + "_log.json", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+	helpers.CheckErr(err)
+	defer f.Close()
+
+	log.SetOutput(f)
+
 	form.Shipment.Service = OrderService{
 		BasicServiceCode: serviceCode}
 	sgc := serviceGroupCode
@@ -221,7 +228,7 @@ func (form *OrderPickupForm) MakeOrderPickup() {
 			NoUnits: 1}}
 
 	bodyBites := new(bytes.Buffer)
-	err := json.NewEncoder(bodyBites).Encode(form)
+	err = json.NewEncoder(bodyBites).Encode(form)
 	helpers.PanicErr(err)
 
 	req, err := http.NewRequest("POST", postNordUrl+orderPickupUrl, bodyBites)
@@ -234,17 +241,22 @@ func (form *OrderPickupForm) MakeOrderPickup() {
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("Accept", "application/json")
 
-	fmt.Printf("%+v", req)
+	log.Printf("%+v\n", req)
 
 	hc := &http.Client{}
 
 	resp, err := hc.Do(req)
 	helpers.PanicErr(err)
+	
+	log.Printf("%+v\n", resp)
 
 	var pickupResp OrderPickupResponse
 
 	err = json.NewDecoder(resp.Body).Decode(&pickupResp)
 	helpers.PanicErr(err)
+
+	log.Printf("%+v\n", pickupResp)
+
 
 	SavePickupData(pickupResp)
 

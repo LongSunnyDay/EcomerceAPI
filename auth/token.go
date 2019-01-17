@@ -22,7 +22,7 @@ func ParseToken(tokenString string) (*jwt.Token, error) {
 func GetNewAuthToken(sub string, groupId int) *jwt.Token {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"sub":     sub,
-		"exp":     time.Now().Add(time.Hour * 1).Unix(),
+		"exp":     time.Now().Add(time.Hour * 4).Unix(),
 		"groupId": groupId,
 	})
 	return token

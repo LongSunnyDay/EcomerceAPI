@@ -15,6 +15,8 @@ import (
 
 // Pure function
 func CheckIfItemsMatchInCart(cart cart.Cart, data PlaceOrderData) (err error) {
+	fmt.Println(len(cart.Items), "<- cart - data ->", len(data.Products))
+
 	if len(cart.Items) == len(data.Products) {
 		for i, item := range data.Products {
 			if cart.Items[i].SKU != item.Sku || cart.Items[i].QTY != item.Qty {
@@ -80,7 +82,6 @@ func AssignDataToBillingAddressAndSaveIt(data PlaceOrderData) (billingAddress ad
 // Pure function
 func FormatOrderHistoryItems(totals total.Totals, quoteId int64) (orderItems []Item) {
 	for _, itemFromTotals := range totals.Items {
-		fmt.Println("SKU ->>", itemFromTotals.SKU)
 		var orderItem Item
 		//orderItem.AmountRefunded
 		//orderItem.BaseAmountRefunded

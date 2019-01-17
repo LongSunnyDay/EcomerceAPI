@@ -1,25 +1,40 @@
 package shipping
 
 import (
+	"fmt"
 	"go-api-ws/config"
 	"go-api-ws/helpers"
+	"gopkg.in/yaml.v2"
+	"io/ioutil"
+	"log"
+	"os"
 )
 
-type methods []method
+type (
+	methods []method
 
-type method struct {
-	Id           int     `json:"id,omitempty"`
-	CarrierCode  string  `json:"carrier_code"`
-	MethodCode   string  `json:"method_code"`
-	CarrierTitle string  `json:"carrier_title"`
-	MethodTitle  string  `json:"method_title"`
-	Amount       float64 `json:"amount"`
-	BaseAmount   float64 `json:"base_amount"`
-	Available    bool    `json:"available"`
-	ErrorMessage string  `json:"error_message"`
-	PriceExclTax int     `json:"price_excl_tax"`
-	PriceInclTax float64 `json:"price_incl_tax"`
-}
+	method struct {
+		Id           int     `json:"id,omitempty"`
+		CarrierCode  string  `json:"carrier_code"`
+		MethodCode   string  `json:"method_code"`
+		CarrierTitle string  `json:"carrier_title"`
+		MethodTitle  string  `json:"method_title"`
+		Amount       float64 `json:"amount"`
+		BaseAmount   float64 `json:"base_amount"`
+		Available    bool    `json:"available"`
+		ErrorMessage string  `json:"error_message"`
+		PriceExclTax int     `json:"price_excl_tax"`
+		PriceInclTax float64 `json:"price_incl_tax"`
+	}
+
+	DiscountConfig struct {
+		ShippingDiscountIsAvailable bool `yaml:"shippingDiscountIsAvailable"`
+		ShippingDiscountFrom        float64  `yaml:"shippingDiscountFrom"`
+		ShippingDiscountTo          float64  `yaml:"shippingDiscountTo"`
+	}
+)
+
+var DisConf *DiscountConfig
 
 func (m method) insertToDb() {
 	db, err := config.Conf.GetDb()
@@ -55,7 +70,7 @@ func getShippingMethodsFromDb() methods {
 		"error_message, " +
 		"price_excl_tax, " +
 		"price_incl_tax" +
-		" FROM shippingMethods")
+		" FROM shippingMethods WHERE available = true")
 	var methods []method
 	defer rows.Close()
 	for rows.Next() {
@@ -97,7 +112,7 @@ func removePaymentMethodFromDb(id string) {
 }
 
 func GetShippingMethod(shippingCarrier string, shippingMethod string) method {
-	//fmt.Println(shippingCarrier, shippingMethod)
+	fmt.Println(shippingCarrier, "<<<<>>>>", shippingMethod)
 	db, err := config.Conf.GetDb()
 	helpers.PanicErr(err)
 	var method method
@@ -106,4 +121,31 @@ func GetShippingMethod(shippingCarrier string, shippingMethod string) method {
 			&method.Amount, &method.BaseAmount, &method.Available, &method.ErrorMessage, &method.PriceExclTax, &method.PriceInclTax)
 	helpers.PanicErr(err)
 	return method
+}
+
+func GetConfig(configFile string) *DiscountConfig {
+	DisConf = &DiscountConfig{}
+	if configFile != "" {
+		err := DisConf.GetConfFromFile(configFile)
+		helpers.PanicErr(err)
+	}
+	return DisConf
+}
+
+func (c *DiscountConfig) GetConfFromFile(fileName string) error {
+	pwd, _ := os.Getwd()
+	yamlFile, err := ioutil.ReadFile(pwd + "/shipping/" + fileName)
+	if err != nil {
+		log.Printf("%s file read error.  #%v\n", fileName, err)
+	}
+	return c.GetConfFromString(string(yamlFile))
+}
+
+func (c *DiscountConfig) GetConfFromString(yamlString string) error {
+
+	err := yaml.Unmarshal([]byte(yamlString), c)
+	if err != nil {
+		log.Fatalf("%s parse error %v\n", yamlString, err)
+	}
+	return err
 }

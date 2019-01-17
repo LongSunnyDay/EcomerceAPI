@@ -960,7 +960,7 @@ func (order *History) GetOrderPaymentData() {
 			&order.Payment.OrderId,
 			&order.Payment.AdditionalInformation[0])
 	helpers.PanicErr(err)
-	fmt.Println(order.Payment.AdditionalInformation)
+	//fmt.Println(order.Payment.AdditionalInformation)
 }
 
 func (address *Address) SaveOrderShippingAddress(orderId int64) {

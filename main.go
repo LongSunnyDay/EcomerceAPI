@@ -6,6 +6,7 @@ import (
 	"go-api-ws/cart"
 	"go-api-ws/config"
 	"go-api-ws/currency"
+	"go-api-ws/discount"
 	"go-api-ws/language"
 	"go-api-ws/order"
 	"go-api-ws/payment/klarna"
@@ -19,7 +20,6 @@ import (
 	"go-api-ws/total"
 	"go-api-ws/user"
 	"net/http"
-	"go-api-ws/discount"
 )
 
 func init() {
@@ -28,6 +28,8 @@ func init() {
 }
 
 func main() {
+
+
 
 	klarna.GetClient()
 

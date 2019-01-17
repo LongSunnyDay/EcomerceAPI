@@ -91,8 +91,12 @@ func PlaceOrder(w http.ResponseWriter, r *http.Request) {
 	orderPickup.MakeOrderPickup()
 
 	// Changes cart status to "Inactive" in mongoDb
-	cart.UpdateCartStatus(cartFromMongo.QuoteId)
-	helpers.WriteResultWithStatusCode(w, http.StatusOK, http.StatusOK)
+	defer cart.UpdateCartStatus(cartFromMongo.QuoteId)
+
+	resp := map[string]int{
+		"code":200}
+
+	helpers.WriteResultWithStatusCode(w, resp, http.StatusOK)
 }
 
 func GetCustomerOrderHistory(w http.ResponseWriter, r *http.Request) {
