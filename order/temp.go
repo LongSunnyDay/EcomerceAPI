@@ -74,7 +74,7 @@ func AssignDataToBillingAddressAndSaveIt(data PlaceOrderData) (billingAddress ad
 	billingAddress.Firstname = data.AddressInformation.BillingAddress.Firstname
 	billingAddress.Lastname = data.AddressInformation.BillingAddress.Lastname
 	billingAddress.Email = data.AddressInformation.BillingAddress.Email
-	billingAddress.DefaultBilling = true
+	billingAddress.DefaultBilling = false
 
 	return
 }

@@ -7,7 +7,7 @@ import (
 
 type Address struct {
 	ID              int64    `json:"id,omitempty"`
-	CustomerID      int      `json:"customer_id"`
+	CustomerID      int64      `json:"customer_id"`
 	Region          Region   `json:"region"`
 	RegionID        int64    `json:"region_id"`
 	CountryID       string   `json:"country_id"`
@@ -29,7 +29,7 @@ type Address struct {
 type Region struct {
 	RegionCode string `json:"region_code" bson:"region_code"`
 	Region     string `json:"region" bson:"region"`
-	RegionID   int    `json:"region_id" bson:"region_id"`
+	RegionID   int64    `json:"region_id" bson:"region_id"`
 }
 
 func GetAddressesFromMySQL(userId int64) []Address {
@@ -48,7 +48,7 @@ func GetAddressesFromMySQL(userId int64) []Address {
 		"lastname, "+
 		"default_shipping, "+
 		"street_line_0, "+
-		"street_line_1 FROM addresses WHERE customer_id = ?", userId)
+		"street_line_1 FROM addresses WHERE customer_id = ? AND default_shipping = true", userId)
 	for rows.Next() {
 		var address Address
 		if err := rows.Scan(&address.ID, &address.CustomerID, &address.RegionID,
@@ -120,7 +120,10 @@ func (address *Address) InsertOrUpdateAddressIntoMySQL(customerId int64) {
 		address.Street[1])
 	helpers.PanicErr(err)
 	addressId, err := res.LastInsertId()
-	address.ID = addressId
+	helpers.PanicErr(err)
+	if addressId !=0 {
+		address.ID = addressId
+	}
 }
 
 func (address *Address) GetRegion() {

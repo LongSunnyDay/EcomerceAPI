@@ -96,6 +96,30 @@ func PlaceOrder(w http.ResponseWriter, r *http.Request) {
 	// Saves shipping address to MySQL
 	shippingAssignment.Shipping.Address.SaveOrderShippingAddress(orderHistory.ID)
 
+	// Assign data to order history
+	orderHistory.BillingAddress = BillingAddress(
+		Address{
+			Id:          billingAddress.ID,
+			CustomerId:  billingAddress.CustomerID,
+			City:        billingAddress.City,
+			Company:     billingAddress.Company,
+			CountryId:   billingAddress.CountryID,
+			Email:       billingAddress.Email,
+			Firstname:   billingAddress.Firstname,
+			Lastname:    billingAddress.Lastname,
+			Postcode:    billingAddress.Postcode,
+			Region:      billingAddress.Region.Region,
+			RegionCode:  billingAddress.Region.RegionCode,
+			RegionId:    billingAddress.Region.RegionID,
+			Street:      billingAddress.Street,
+			StreetLine0: billingAddress.StreetLine0,
+			StreetLine1: billingAddress.StreetLine1,
+			Telephone:   billingAddress.Telephone,
+			OrderId:     orderHistory.ID})
+	orderHistory.Payment = orderPayment
+	shippingAssignment.Items = orderHistory.Items
+	orderHistory.ExtensionAttributes.ShippingAssignments = append(orderHistory.ExtensionAttributes.ShippingAssignments, shippingAssignment)
+
 	// Writes order to json file
 	orderHistory.WriteToJsonFile()
 
