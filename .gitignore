@@ -1,4 +1,4 @@
 .idea
-config.yml
+./config.yml
 /order/orders/*
 /logs/*
