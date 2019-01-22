@@ -94,11 +94,13 @@ func (r Response) SendResponse(w http.ResponseWriter) {
 	WriteResultWithStatusCode(w, r, r.Code)
 }
 
-func CheckIfRowExistsInMysql(dataBaseName *sql.DB, tableName string, fieldName string, fieldValue string){
+func CheckIfRowExistsInMysql(dataBaseName *sql.DB, tableName string, fieldName string, fieldValue string) string{
 	var value string
 	res := dataBaseName.QueryRow("SELECT "+ fieldName +" FROM "+ tableName +" WHERE "+ fieldName +" = ?", fieldValue)
 
 	err := res.Scan(&value)
 
 	PanicErr(err)
+
+	return value
 }

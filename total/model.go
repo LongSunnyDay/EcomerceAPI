@@ -10,6 +10,8 @@ import (
 	"go-api-ws/shipping"
 	"go-api-ws/tax"
 	"strconv"
+
+	discount2 "go-api-ws/discount"
 )
 
 type TotalsResp struct {
@@ -110,27 +112,31 @@ type AddressData struct {
 
 func (t *Totals) CalculateTotals(urlCartId string, addressInformation AddressData, groupId int64) {
 	t.GetItems(urlCartId)
-	//t.GetDiscounts()
 	t.GetSubtotal()
 	t.GetShipping(addressInformation)
 	rates := t.GetTaxRates(groupId)
 	t.CalculateTax(rates)
-	t.GetDiscounts()
+	t.GetDiscounts(urlCartId)
 	t.CalculateGrandtotal(rates)
 }
 
 //NOT tested yet
-func (t *Totals) GetDiscounts(){
+func (t *Totals) GetDiscounts(cartId string){
 	var discount m.Discount
 	//var percentToCurency float64
 	db, err := c.Conf.GetDb()
 	helpers.CheckErr(err)
+	if discount2.CouponUsed {
+		//percentToCurency := discount2.CouponDiscountPercent/100
+		t.DiscountAmount = t.DiscountAmount + discount2.CouponDiscountAmount
+		discount2.CouponUsed = false
+	}
 	for _, item := range t.Items{
 		err = db.QueryRow("SELECT discountPercent, discountAmount FROM discount c WHERE sku=?", item.SKU).
 			Scan(&discount.DiscountPercent, &discount.DiscountAmount)
 		helpers.CheckErr(err)
-		percentToCurency := discount.DiscountAmount/100 * item.RowTotalInclTax
-		t.DiscountAmount = t.DiscountAmount + percentToCurency
+		percentToCurency := discount.DiscountPercent/100 * item.RowTotalInclTax
+		t.DiscountAmount = t.DiscountAmount + percentToCurency + discount.DiscountAmount
 		//fmt.Println(t.DiscountAmount, discount.DiscountAmount, percentToCurency)
 		//fmt.Printf("%+v", item)
 	}
@@ -234,7 +240,7 @@ func (t *Totals) CalculateGrandtotal(rules tax.Rules) {
 	t.SubtotalWithDiscount = t.Subtotal - t.DiscountAmount
 
 	if dc.ShippingDiscountIsAvailable && dc.ShippingDiscountFrom < t.SubtotalInclTax && dc.ShippingDiscountTo > t.SubtotalInclTax {
-		t.DiscountAmount = t.ShippingInclTax
+		t.DiscountAmount = t.ShippingInclTax + t.DiscountAmount
 		t.BaseGrandTotal = t.BaseGrandTotal - t.ShippingInclTax
 		t.ShippingInclTax = 0
 		t.BaseShippingInclTax = 0

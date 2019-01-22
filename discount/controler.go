@@ -13,6 +13,10 @@ import (
 	"log"
 )
 
+var CouponDiscountPercent float64
+var CouponDiscountAmount float64
+var CouponUsed bool
+
 func createDiscount(w http.ResponseWriter, r *http.Request){
 	var schemaLoader = gojsonschema.NewReferenceLoader("file://discount/models/discountSchema.json")
 	var discount m.Discount
@@ -217,6 +221,7 @@ func updateCoupon(w http.ResponseWriter, r *http.Request) {
 
 func applyCoupon(w http.ResponseWriter, r *http.Request){
 	couponCode := r.URL.Query()["coupon"][0]
+	//cartId := r.URL.Query()["cartId"][0]
 	db, err := c.Conf.GetDb()
 	var coupon m.Coupon
 	helpers.CheckErr(err)
@@ -225,12 +230,13 @@ func applyCoupon(w http.ResponseWriter, r *http.Request){
 	err = db.QueryRow("SELECT * FROM coupon c WHERE code=?", couponCode).
 		Scan(&coupon.Id, &coupon.Code, &coupon.DiscountPercent, &coupon.DiscountAmount, &coupon.ExpirationDate, &coupon.UsageLimit, &coupon.TimesUsed, &coupon.CreatedAt)
 	helpers.CheckErr(err)
-	json.NewEncoder(w).Encode(coupon)
-	fmt.Println(coupon)
+	//json.NewEncoder(w).Encode(coupon)
+	//fmt.Println(coupon.Code)
 
 	diff,err := time.Parse(time.RFC3339, coupon.ExpirationDate)
 
 	helpers.CheckErr(err)
+	var responseResult bool
 
 	if diff.Sub(time.Now()) > 0 {
 		fmt.Println("Coupon valid")
@@ -240,6 +246,11 @@ func applyCoupon(w http.ResponseWriter, r *http.Request){
 
 			_, er := query.Exec(coupon.TimesUsed + 1, couponCode)
 			helpers.PanicErr(er)
+			CouponDiscountAmount = coupon.DiscountAmount
+			CouponDiscountPercent = coupon.DiscountPercent
+			CouponUsed = true
+
+			responseResult = true
 		}else{
 			log.Fatal("Coupon code used up")
 		}
@@ -249,4 +260,10 @@ func applyCoupon(w http.ResponseWriter, r *http.Request){
 		log.Fatal("Coupon expired")
 
 	}
+	response := helpers.Response{
+		Code:   http.StatusOK,
+		Result: responseResult}
+	//json.NewEncoder(w).Encode(response)
+	//fmt.Println(response)
+	response.SendResponse(w)
 }
