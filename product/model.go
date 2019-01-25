@@ -1,17 +1,5 @@
 package product
 
-import (
-	"bytes"
-	"encoding/json"
-	"fmt"
-	"go-api-ws/attribute"
-	"go-api-ws/config"
-	"go-api-ws/helpers"
-	"io/ioutil"
-	"math"
-	"net/http"
-)
-
 type (
 	SimpleProductStruct struct {
 		Index                          string        `json:"_index"`
@@ -170,4 +158,3 @@ type (
 		} `json:"response"`
 	}
 )
-

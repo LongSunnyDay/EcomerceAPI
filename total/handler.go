@@ -2,22 +2,32 @@ package total
 
 import (
 	"encoding/json"
-	"github.com/dgrijalva/jwt-go"
 	"go-api-ws/auth"
 	"go-api-ws/helpers"
 	"go-api-ws/payment_methods"
 	"net/http"
-	"time"
-	)
+)
+
+var (
+	totals      Totals
+	addressInfo AddressData
+	groupId     int64
+)
 
 func GetTotals(w http.ResponseWriter, r *http.Request) {
-	urlToken := r.URL.Query()["token"][0]
-	urlCartId := r.URL.Query()["cartId"][0]
-	var groupId int64
+
+	urlToken, err := helpers.GetTokenFromUrl(r)
+	helpers.PanicErr(err)
+	urlCartId, err := helpers.GetCartIdFromUrl(r)
+	helpers.PanicErr(err)
 	if len(urlToken) > 0 {
 		token := auth.ParseToken(urlToken)
-		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-			if claims.VerifyExpiresAt(time.Now().Unix(), true) {
+		claims, err := auth.GetTokenClaims(token)
+		helpers.CheckErr(err)
+		if err != nil {
+			helpers.WriteResultWithStatusCode(w, err, http.StatusForbidden)
+		} else {
+			if auth.CheckIfTokenIsNotExpired(claims) {
 				groupIdFloat := claims["groupId"].(float64)
 				groupId = int64(groupIdFloat)
 			}
@@ -26,9 +36,8 @@ func GetTotals(w http.ResponseWriter, r *http.Request) {
 		groupId = 1
 	}
 
-	var totals Totals
-	var addressInfo AddressData
-	_ = json.NewDecoder(r.Body).Decode(&addressInfo)
+	err = json.NewDecoder(r.Body).Decode(&addressInfo)
+	helpers.PanicErr(err)
 
 	totals.CalculateTotals(urlCartId, addressInfo, groupId)
 
@@ -41,13 +50,18 @@ func GetTotals(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetTotalsWithPaymentMethods(w http.ResponseWriter, r *http.Request) {
-	urlToken := r.URL.Query()["token"][0]
-	urlCartId := r.URL.Query()["cartId"][0]
-	var groupId int64
+	urlToken, err := helpers.GetTokenFromUrl(r)
+	helpers.PanicErr(err)
+	urlCartId, err := helpers.GetCartIdFromUrl(r)
+	helpers.PanicErr(err)
 	if len(urlToken) > 0 {
 		token := auth.ParseToken(urlToken)
-		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-			if claims.VerifyExpiresAt(time.Now().Unix(), true) {
+		claims, err := auth.GetTokenClaims(token)
+		helpers.CheckErr(err)
+		if err != nil {
+			helpers.WriteResultWithStatusCode(w, err, http.StatusForbidden)
+		} else {
+			if auth.CheckIfTokenIsNotExpired(claims) {
 				groupIdFloat := claims["groupId"].(float64)
 				groupId = int64(groupIdFloat)
 			}
@@ -56,9 +70,8 @@ func GetTotalsWithPaymentMethods(w http.ResponseWriter, r *http.Request) {
 		groupId = 1
 	}
 
-	var totals Totals
-	var addressInfo AddressData
-	_ = json.NewDecoder(r.Body).Decode(&addressInfo)
+	err = json.NewDecoder(r.Body).Decode(&addressInfo)
+	helpers.PanicErr(err)
 
 	totals.CalculateTotals(urlCartId, addressInfo, groupId)
 	paymentMethods := payment_methods.GetActualPaymentMethodsFromDb()
