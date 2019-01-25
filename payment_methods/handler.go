@@ -9,9 +9,10 @@ import (
 
 func AddPaymentMethods(w http.ResponseWriter, r *http.Request) {
 	var methods []Method
-	_ = json.NewDecoder(r.Body).Decode(&methods)
+	err := json.NewDecoder(r.Body).Decode(&methods)
+	helpers.PanicErr(err)
 	validationResult := helpers.CheckJSONSchemaWithGoStruct(
-		"file://payment_methods/jsonSchemaModels/add-payment_methods-Methods.schema.json",
+		"file://payment_methods/jsonSchemaModels/add-payment-methods-Methods.schema.json",
 		methods)
 	if validationResult.Valid() {
 		for _, method := range methods {
@@ -34,9 +35,10 @@ func GetPaymentMethods(w http.ResponseWriter, r *http.Request) {
 
 func updatePaymentMethod(w http.ResponseWriter, r *http.Request) {
 	var method Method
-	_ = json.NewDecoder(r.Body).Decode(&method)
+	err := json.NewDecoder(r.Body).Decode(&method)
+	helpers.PanicErr(err)
 	validationResult := helpers.CheckJSONSchemaWithGoStruct(
-		"file://payment_methods/jsonSchemaModels/update-payment_methods-Method.schema.json",
+		"file://payment_methods/jsonSchemaModels/update-payment-methods-Method.schema.json",
 		method)
 	if validationResult.Valid() {
 		method.updatePaymentMethodInDb()
@@ -48,7 +50,8 @@ func updatePaymentMethod(w http.ResponseWriter, r *http.Request) {
 }
 
 func removePaymentMethod(w http.ResponseWriter, r *http.Request) {
-	id := r.URL.Query()["id"][0]
+	id, err := helpers.GetParameterFromUrl("id", r)
+	helpers.CheckErr(err)
 	removePaymentMethodFromDb(id)
 	helpers.WriteResultWithStatusCode(w, "ok", http.StatusOK)
 }

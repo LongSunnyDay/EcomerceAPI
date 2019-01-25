@@ -1,4 +1,4 @@
-package models
+package currency
 
 type Currency struct {
 	Id              int    `json:"id,omitempty"`

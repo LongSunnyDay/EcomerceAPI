@@ -7,7 +7,8 @@ import (
 )
 
 func checkStock(w http.ResponseWriter, r *http.Request) {
-	itemSkuFromUrl := r.URL.Query()["sku"][0]
+	itemSkuFromUrl, err := helpers.GetParameterFromUrl("sku", r)
+	helpers.PanicErr(err)
 	var item DataStock
 	item.GetDataFromDbBySku(itemSkuFromUrl)
 	response := helpers.Response{
@@ -18,20 +19,23 @@ func checkStock(w http.ResponseWriter, r *http.Request) {
 
 func insertToStock(w http.ResponseWriter, r *http.Request) {
 	var stockData DataStock
-	_ = json.NewDecoder(r.Body).Decode(&stockData)
+	err := json.NewDecoder(r.Body).Decode(&stockData)
+	helpers.PanicErr(err)
 	stockData.insertDataToStock()
 	helpers.WriteResultWithStatusCode(w, "ok", http.StatusOK)
 }
 
 func updateStockItem(w http.ResponseWriter, r *http.Request) {
 	var stockData DataStock
-	_ = json.NewDecoder(r.Body).Decode(&stockData)
+	err := json.NewDecoder(r.Body).Decode(&stockData)
+	helpers.PanicErr(err)
 	stockData.updateDataInDb()
 	helpers.WriteResultWithStatusCode(w, "ok", http.StatusOK)
 }
 
 func removeItemFromStock(w http.ResponseWriter, r *http.Request) {
-	itemSkuFromUrl := r.URL.Query()["sku"][0]
+	itemSkuFromUrl, err := helpers.GetParameterFromUrl("sku", r)
+	helpers.PanicErr(err)
 	removeItemFromDb(itemSkuFromUrl)
 	helpers.WriteResultWithStatusCode(w, "ok", http.StatusOK)
 }

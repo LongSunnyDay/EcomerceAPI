@@ -1,27 +1,30 @@
 package middleware
 
 import (
-	"github.com/dgrijalva/jwt-go"
 	"go-api-ws/auth"
 	"go-api-ws/helpers"
 	"net/http"
-	"time"
 )
 
-const role = "user"
+const (
+	role = "user"
+)
 
 func protectedEndpoint(handlerFunc http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
-		urlToken := req.URL.Query()["token"][0]
+		urlToken, err := helpers.GetTokenFromUrl(req)
+		helpers.PanicErr(err)
 		token := auth.ParseToken(urlToken)
-		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-			if claims["role"] == role && claims.VerifyExpiresAt(time.Now().Unix(), true) {
+		claims, err := auth.GetTokenClaims(token)
+		helpers.CheckErr(err)
+		if err != nil {
+			helpers.WriteResultWithStatusCode(w, "Invalid token", http.StatusBadRequest)
+		} else {
+			if claims["role"] == role && auth.CheckIfTokenIsNotExpired(claims) {
 				handlerFunc.ServeHTTP(w, req)
 			} else {
 				helpers.WriteResultWithStatusCode(w, "Token expired", http.StatusForbidden)
 			}
-		} else {
-			helpers.WriteResultWithStatusCode(w, "Invalid token", http.StatusBadRequest)
 		}
 	}
 

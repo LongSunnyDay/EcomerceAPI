@@ -2,14 +2,14 @@ package shipping
 
 import (
 	"encoding/json"
-	"fmt"
 	"go-api-ws/helpers"
 	"net/http"
 )
 
 func AddShippingMethods(w http.ResponseWriter, r *http.Request) {
 	var methods []Method
-	_ = json.NewDecoder(r.Body).Decode(&methods)
+	err := json.NewDecoder(r.Body).Decode(&methods)
+	helpers.PanicErr(err)
 	validationResult := helpers.CheckJSONSchemaWithGoStruct("file://shipping/jsonSchemaModels/add-shipping-methods.json",
 		methods)
 	if validationResult.Valid() {
@@ -18,7 +18,6 @@ func AddShippingMethods(w http.ResponseWriter, r *http.Request) {
 		}
 		helpers.WriteResultWithStatusCode(w, "ok", http.StatusOK)
 	} else {
-		fmt.Println(validationResult.Errors())
 		helpers.WriteResultWithStatusCode(w, validationResult.Errors(), http.StatusBadRequest)
 	}
 }
@@ -33,20 +32,21 @@ func GetShippingMethods(w http.ResponseWriter, r *http.Request) {
 
 func updateShippingMethod(w http.ResponseWriter, r *http.Request) {
 	var method Method
-	_ = json.NewDecoder(r.Body).Decode(&method)
-	validationResult := helpers.CheckJSONSchemaWithGoStruct("file://shipping/jsonSchemaModels/update-shipping-Method.json",
+	err := json.NewDecoder(r.Body).Decode(&method)
+	helpers.PanicErr(err)
+	validationResult := helpers.CheckJSONSchemaWithGoStruct("file://shipping/jsonSchemaModels/update-shipping-method.json",
 		method)
 	if validationResult.Valid() {
 		method.updatePaymentMethodInDb()
 		helpers.WriteResultWithStatusCode(w, "ok", http.StatusOK)
 	} else {
-		fmt.Println(validationResult.Errors())
 		helpers.WriteResultWithStatusCode(w, validationResult.Errors(), http.StatusBadRequest)
 	}
 }
 
 func removePaymentMethod(w http.ResponseWriter, r *http.Request) {
-	id := r.URL.Query()["id"][0]
+	id, err := helpers.GetParameterFromUrl("id", r)
+	helpers.PanicErr(err)
 	removePaymentMethodFromDb(id)
 	helpers.WriteResultWithStatusCode(w, "ok", http.StatusOK)
 }

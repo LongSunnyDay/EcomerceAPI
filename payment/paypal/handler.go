@@ -19,33 +19,17 @@ const (
 
 func Create(w http.ResponseWriter, r *http.Request) {
 
-	//ReturnUrl := "localhost:3000"
-	//CancelUrl := "www.google.lt"
-
-	//requestBytes := new(bytes.Buffer)
-	//json.NewEncoder(requestBytes).Encode(request)
-	//
-	//req, err :=http.NewRequest("POST", paypalApi + "/v1/payments/payment", requestBytes)
-	//helpers.PanicErr(err)
-	//req.SetBasicAuth(user, pass)
-	////resp, err := http.Post(paypalApi + "/v1/payments/payment", contentType, requestBytes)
-	//client := &http.Client{}
-	//
-	//resp, err := client.Do(req)
-	//helpers.PanicErr(err)
-	//fmt.Println(resp)
-
 	var requestFromClient request
 	err := json.NewDecoder(r.Body).Decode(&requestFromClient)
 	helpers.PanicErr(err)
 
 	client, err := paypalsdk.NewClient(user, pass, paypalsdk.APIBaseSandBox)
 	helpers.PanicErr(err)
-	client.SetLog(os.Stdout)
+	err = client.SetLog(os.Stdout)
+	helpers.CheckErr(err)
 
 	_, err = client.GetAccessToken()
 	helpers.PanicErr(err)
-	//fmt.Println("ACCESS TOKEN ", accessToken)
 
 	amount := paypalsdk.Amount{
 		Total:    requestFromClient.Transactions[0].Amount.Total,
@@ -53,7 +37,6 @@ func Create(w http.ResponseWriter, r *http.Request) {
 
 	paymentResult, err := client.CreateDirectPaypalPayment(amount, redurectURL, cancelURL, "")
 	helpers.PanicErr(err)
-	//fmt.Printf("%+v", paymentResult)
 	helpers.WriteJsonResult(w, paymentResult)
 }
 
@@ -64,8 +47,8 @@ func Execute(w http.ResponseWriter, r *http.Request) {
 
 	client, err := paypalsdk.NewClient(user, pass, paypalsdk.APIBaseSandBox)
 	helpers.PanicErr(err)
-	client.SetLog(os.Stdout)
-
+	err = client.SetLog(os.Stdout)
+	helpers.CheckErr(err)
 	_, err = client.GetAccessToken()
 	helpers.PanicErr(err)
 

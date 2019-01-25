@@ -14,7 +14,8 @@ func InsertSimpleProductToDb(w http.ResponseWriter, r *http.Request) {
 }
 
 func getSimpleProductFromDb(w http.ResponseWriter, r *http.Request) {
-	productSKU := r.URL.Query()["sku"][0]
+	productSKU, err := helpers.GetParameterFromUrl("sku", r)
+	helpers.PanicErr(err)
 	product := getSimpleProductFromDbBySku(productSKU)
 	response := helpers.Response{
 		Code:   http.StatusOK,
@@ -23,7 +24,8 @@ func getSimpleProductFromDb(w http.ResponseWriter, r *http.Request) {
 }
 
 func deleteProductFromDb(w http.ResponseWriter, r *http.Request) {
-	productSKU := r.URL.Query()["sku"][0]
+	productSKU, err := helpers.GetParameterFromUrl("sku", r)
+	helpers.PanicErr(err)
 	removeProductFromDbBySku(productSKU)
 	response := helpers.Response{
 		Code: http.StatusOK}

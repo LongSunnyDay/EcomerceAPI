@@ -2,7 +2,6 @@ package order
 
 import (
 	"encoding/json"
-	"github.com/dgrijalva/jwt-go"
 	"go-api-ws/auth"
 	"go-api-ws/cart"
 	"go-api-ws/helpers"
@@ -14,7 +13,14 @@ import (
 )
 
 func PlaceOrder(w http.ResponseWriter, r *http.Request) {
-	var orderData PlaceOrderData
+	var (
+		orderData        PlaceOrderData
+		customerData     user.CustomerData
+		userId           int
+		userIdInt64      int64
+		orderTotals      total.Totals
+		addressForTotals total.AddressData
+	)
 	err := json.NewDecoder(r.Body).Decode(&orderData)
 	helpers.PanicErr(err)
 
@@ -34,9 +40,6 @@ func PlaceOrder(w http.ResponseWriter, r *http.Request) {
 	helpers.PanicErr(err)
 
 	// Get customer data from MySql by id send in request
-	var customerData user.CustomerData
-	var userId int
-	var userIdInt64 int64
 	if len(orderData.UserId) > 0 {
 		userId, err = strconv.Atoi(orderData.UserId)
 		helpers.PanicErr(err)
@@ -59,8 +62,7 @@ func PlaceOrder(w http.ResponseWriter, r *http.Request) {
 	billingAddress.InsertOrUpdateAddressIntoMySQL(userIdInt64)
 
 	// Calculates order totals using cart from MongoDB
-	var orderTotals total.Totals
-	var addressForTotals total.AddressData
+
 	addressForTotals.AddressInformation.ShippingCarrierCode = orderData.AddressInformation.ShippingCarrierCode
 	addressForTotals.AddressInformation.ShippingMethodCode = orderData.AddressInformation.ShippingMethodCode
 	orderTotals.CalculateTotals(orderData.CartId, addressForTotals, customerData.GroupID)
@@ -140,8 +142,11 @@ func GetCustomerOrderHistory(w http.ResponseWriter, r *http.Request) {
 	urlToken, err := helpers.GetTokenFromUrl(r)
 	helpers.PanicErr(err)
 	token := auth.ParseToken(urlToken)
-	helpers.PanicErr(err)
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+	claims, err := auth.GetTokenClaims(token)
+	helpers.CheckErr(err)
+	if err != nil {
+		helpers.WriteResultWithStatusCode(w, err, http.StatusBadRequest)
+	} else {
 		subInt, err := strconv.Atoi(claims["sub"].(string))
 		helpers.PanicErr(err)
 		orderHistory := GetAllCustomerOrderHistory(subInt)

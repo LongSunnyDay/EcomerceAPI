@@ -43,7 +43,8 @@ func HttpError(err error, w http.ResponseWriter) {
 	if err != nil {
 		log.Printf(err.Error())
 		a := ""
-		w.Write([]byte(a))
+		_, err = w.Write([]byte(a))
+		PanicErr(err)
 	}
 }
 

@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func CurrencyRouter() http.Handler {
+func RouterCurrency() http.Handler {
 	r := chi.NewRouter()
 	r.Post("/", createCurrency)
 	r.Get("/{currencyID}", getCurrency)

@@ -4,14 +4,13 @@ import (
 	"go-api-ws/attribute"
 	"go-api-ws/cart"
 	c "go-api-ws/config"
-	m "go-api-ws/discount/models"
 	"go-api-ws/helpers"
 	"go-api-ws/payment_methods"
 	"go-api-ws/shipping"
 	"go-api-ws/tax"
 	"strconv"
 
-	discount2 "go-api-ws/discount"
+	"go-api-ws/discount"
 )
 
 type TotalsResp struct {
@@ -48,7 +47,7 @@ type Totals struct {
 }
 
 type Item struct {
-	SKU string `json:"sku"`
+	SKU                  string    `json:"sku"`
 	ItemId               int       `json:"item_id"`
 	Price                float64   `json:"price"`
 	BasePrice            float64   `json:"base_price"`
@@ -121,23 +120,23 @@ func (t *Totals) CalculateTotals(urlCartId string, addressInformation AddressDat
 }
 
 //NOT tested yet
-func (t *Totals) GetDiscounts(cartId string){
-	var discount m.Discount
+func (t *Totals) GetDiscounts(cartId string) {
+	var totalDiscount discount.Discount
 	//var percentToCurency float64
 	db, err := c.Conf.GetDb()
 	helpers.CheckErr(err)
-	if discount2.CouponUsed {
+	if discount.CouponUsed {
 		//percentToCurency := discount2.CouponDiscountPercent/100
-		t.DiscountAmount = t.DiscountAmount + discount2.CouponDiscountAmount
-		discount2.CouponUsed = false
+		t.DiscountAmount = t.DiscountAmount + discount.CouponDiscountAmount
+		discount.CouponUsed = false
 	}
-	for _, item := range t.Items{
-		err = db.QueryRow("SELECT discountPercent, discountAmount FROM discount c WHERE sku=?", item.SKU).
-			Scan(&discount.DiscountPercent, &discount.DiscountAmount)
+	for _, item := range t.Items {
+		err = db.QueryRow("SELECT discountPercent, discountAmount FROM totalDiscount c WHERE sku=?", item.SKU).
+			Scan(&totalDiscount.DiscountPercent, &totalDiscount.DiscountAmount)
 		helpers.CheckErr(err)
-		percentToCurency := discount.DiscountPercent/100 * item.RowTotalInclTax
-		t.DiscountAmount = t.DiscountAmount + percentToCurency + discount.DiscountAmount
-		//fmt.Println(t.DiscountAmount, discount.DiscountAmount, percentToCurency)
+		percentToCurency := totalDiscount.DiscountPercent / 100 * item.RowTotalInclTax
+		t.DiscountAmount = t.DiscountAmount + percentToCurency + totalDiscount.DiscountAmount
+		//fmt.Println(t.DiscountAmount, totalDiscount.DiscountAmount, percentToCurency)
 		//fmt.Printf("%+v", item)
 	}
 }
@@ -146,7 +145,7 @@ func (t *Totals) GetItems(cartId string) {
 	userCart := cart.GetUserCartFromMongoByID(cartId)
 	for _, item := range userCart.Items {
 		totalsItem := Item{
-			SKU: item.SKU,
+			SKU:    item.SKU,
 			ItemId: item.ItemID,
 			Qty:    item.QTY,
 			Name:   item.Name,
@@ -289,5 +288,3 @@ func (t *Totals) CalculateGrandtotal(rules tax.Rules) {
 	t.TotalSegments = append(t.TotalSegments, segment)
 
 }
-
-

@@ -6,15 +6,14 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/xeipuuv/gojsonschema"
 	c "go-api-ws/config"
-	m "go-api-ws/currency/models"
 	"go-api-ws/helpers"
 	"net/http"
 )
 
 func createCurrency(w http.ResponseWriter, r *http.Request) {
-	var schemaLoader = gojsonschema.NewReferenceLoader("file://currency/models/currencySchema.json")
-	var currency m.Currency
-	var currencies []m.Currency
+	var schemaLoader = gojsonschema.NewReferenceLoader("file://currency/jsonSchemaModels/currencySchema.json")
+	var currency Currency
+	var currencies []Currency
 	_ = json.NewDecoder(r.Body).Decode(&currency)
 	documentLoader := gojsonschema.NewGoLoader(currency)
 	result, err := gojsonschema.Validate(schemaLoader, documentLoader)
@@ -41,10 +40,12 @@ func createCurrency(w http.ResponseWriter, r *http.Request) {
 
 		currencies = append(currencies, currency)
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode("Currency: " + currency.Name + " has been registered. ")
+		err = json.NewEncoder(w).Encode("Currency: " + currency.Name + " has been registered. ")
+		helpers.PanicErr(err)
 
 	} else {
-		json.NewEncoder(w).Encode("There is and error registering currency:")
+		err = json.NewEncoder(w).Encode("There is and error registering currency:")
+		helpers.PanicErr(err)
 		fmt.Printf("The document is not valid. See errors :\n")
 		for _, desc := range result.Errors() {
 			fmt.Printf("- %s\n", desc)
@@ -53,7 +54,7 @@ func createCurrency(w http.ResponseWriter, r *http.Request) {
 }
 
 func getCurrency(w http.ResponseWriter, r *http.Request) {
-	var currency m.Currency
+	var currency Currency
 	currencyID := chi.URLParam(r, "currencyID")
 	db, err := c.Conf.GetDb()
 	helpers.CheckErr(err)
@@ -61,13 +62,14 @@ func getCurrency(w http.ResponseWriter, r *http.Request) {
 	err = db.QueryRow("SELECT * FROM currency c WHERE id=?", currencyID).
 		Scan(&currency.Id, &currency.Name, &currency.Code, &currency.Sign, &currency.DefaultCurrency)
 	helpers.CheckErr(err)
-	json.NewEncoder(w).Encode(currency)
+	err = json.NewEncoder(w).Encode(currency)
+	helpers.PanicErr(err)
 }
 
 func getCurrencyList(w http.ResponseWriter, r *http.Request) {
-	var currency m.Currency
-	var currencies []m.Currency
-	currencies = []m.Currency{}
+	var currency Currency
+	var currencies []Currency
+	currencies = []Currency{}
 
 	db, err := c.Conf.GetDb()
 	helpers.CheckErr(err)
@@ -89,7 +91,8 @@ func getCurrencyList(w http.ResponseWriter, r *http.Request) {
 	err = rows.Err()
 	helpers.CheckErr(err)
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(currencies)
+	err = json.NewEncoder(w).Encode(currencies)
+	helpers.PanicErr(err)
 
 }
 
@@ -105,7 +108,7 @@ func removeCurrency(w http.ResponseWriter, r *http.Request) {
 
 func updateCurrency(w http.ResponseWriter, r *http.Request) {
 	currencyID := chi.URLParam(r, "currencyID")
-	var currency m.Currency
+	var currency Currency
 	err := json.NewDecoder(r.Body).Decode(&currency)
 	helpers.PanicErr(err)
 
