@@ -1,8 +1,8 @@
 package discount
 
 import (
-	"net/http"
 	"github.com/go-chi/chi"
+	"net/http"
 )
 
 func RouterDiscount() http.Handler {

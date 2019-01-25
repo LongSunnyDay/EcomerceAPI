@@ -51,7 +51,7 @@ func getPaymentMethodsFromDb() Methods {
 	rows, err := db.Query("SELECT Code, Title, IsServerMethod FROM payment_methods")
 	helpers.PanicErr(err)
 	var methods []Method
-	defer rows.Close()
+	defer helpers.CloseRows(rows)
 	for rows.Next() {
 		var method Method
 		if err := rows.Scan(&method.Code, &method.Title, &method.IsServerMethod); err != nil {

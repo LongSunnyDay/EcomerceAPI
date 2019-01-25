@@ -76,7 +76,7 @@ func getCurrencyList(w http.ResponseWriter, r *http.Request) {
 
 	rows, err := db.Query("SELECT id, name, code, sign, defaultCurrency FROM currency")
 	helpers.CheckErr(err)
-	defer rows.Close()
+	defer helpers.CloseRows(rows)
 
 	for rows.Next() {
 		err := rows.Scan(

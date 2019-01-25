@@ -134,7 +134,6 @@ func UpdateUserByIdMongo(user CustomerData) {
 	db := config.Conf.GetMongoDb()
 
 	db.Collection(collectionName).FindOneAndUpdate(context.Background(), filter, doc)
-	//helpers.PanicErr(err)
 
 }
 

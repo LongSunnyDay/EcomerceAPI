@@ -2,13 +2,9 @@ package db
 
 import (
 	"../helpers"
-	fr "github.com/DATA-DOG/fastroute"
 	"net/http"
 )
 
-func InitHandler(handler http.Handler) http.HandlerFunc {
-	return nil
-}
 
 type ErrorResponse struct {
 	Attributes map[string]string `json:"@attributes"`
@@ -38,6 +34,3 @@ func ShowTablesHandler(w http.ResponseWriter, r *http.Request) {
 	helpers.WriteJsonResult(w, tables)
 }
 
-func appendHandlers(router *fr.Router) fr.Router {
-	return nil
-}

@@ -70,7 +70,7 @@ func getLanguageList(w http.ResponseWriter, r *http.Request) {
 
 	rows, err := db.Query("SELECT id, code, code3, name, nameEn FROM languages")
 	helpers.CheckErr(err)
-	defer rows.Close()
+	defer helpers.CloseRows(rows)
 
 	for rows.Next() {
 		err := rows.Scan(

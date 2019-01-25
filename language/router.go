@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func LanguageRouter() http.Handler {
+func RouterLanguage() http.Handler {
 	r := chi.NewRouter()
 	r.Post("/", createLanguage)
 	r.Get("/{languageID}", getLanguage)

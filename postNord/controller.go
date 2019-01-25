@@ -59,7 +59,7 @@ func (form *OrderPickupForm) MakeOrderPickup() {
 
 	f, err := os.OpenFile("./logs/Order_"+form.Order.OrderReference+"_log.json", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 	helpers.CheckErr(err)
-	defer f.Close()
+	defer helpers.CloseRows(f)
 
 	log.SetOutput(f)
 

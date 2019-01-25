@@ -311,7 +311,7 @@ func GetAllCustomerOrderHistory(customerId int) (customerHistoryArray []History)
 func GetOrder(orderId int) (order History) {
 	db, err := config.Conf.GetDb()
 	helpers.PanicErr(err)
-	err = db.QueryRow("SELECT * FROM order WHERE id = ?", orderId).Scan(&order.ID,
+	err = db.QueryRow("SELECT * FROM `order` WHERE id = ?", orderId).Scan(&order.ID,
 		&order.AppliedRuleIds,
 		&order.BaseCurrencyCode,
 		&order.BaseDiscountAmount,
@@ -374,7 +374,7 @@ func GetOrder(orderId int) (order History) {
 func RemoveOrder(orderId int) {
 	db, err := config.Conf.GetDb()
 	helpers.PanicErr(err)
-	_, err = db.Exec("DELETE FROM order WHERE id = ?", orderId)
+	_, err = db.Exec("DELETE FROM `order` WHERE id = ?", orderId)
 	helpers.PanicErr(err)
 }
 

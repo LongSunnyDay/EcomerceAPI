@@ -49,7 +49,7 @@ func getShippingMethodsFromDb() methods {
 		"price_incl_tax" +
 		" FROM shippingMethods WHERE available = true")
 	var methods []Method
-	defer rows.Close()
+	defer helpers.CloseRows(rows)
 	for rows.Next() {
 		var method Method
 		if err := rows.Scan(&method.CarrierCode, &method.MethodCode, &method.CarrierTitle, &method.MethodTitle, &method.Amount,

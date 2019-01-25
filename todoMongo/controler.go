@@ -57,7 +57,8 @@ func GetAllTodos() []m.Todo {
 	}
 	helpers.PanicErr(err)
 
-	cur.Close(context.Background())
+	err = cur.Close(context.Background())
+	helpers.PanicErr(err)
 	return elements
 }
 

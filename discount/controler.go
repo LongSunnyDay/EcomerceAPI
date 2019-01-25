@@ -74,7 +74,7 @@ func getDiscountList(w http.ResponseWriter, r *http.Request) {
 
 	rows, err := db.Query("SELECT id, sku, discountPercent, discountAmount FROM discount")
 	helpers.CheckErr(err)
-	defer rows.Close()
+	defer helpers.CloseRows(rows)
 
 	for rows.Next() {
 		err := rows.Scan(
@@ -173,7 +173,7 @@ func getCouponList(w http.ResponseWriter, r *http.Request) {
 
 	rows, err := db.Query("SELECT id, code, discountPercent, discountAmount, expirationDate, usageLimit, timesUsed, createdAt FROM coupon")
 	helpers.CheckErr(err)
-	defer rows.Close()
+	defer helpers.CloseRows(rows)
 
 	for rows.Next() {
 		err := rows.Scan(

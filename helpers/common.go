@@ -25,6 +25,9 @@ type (
 		Result interface{} `json:"result,omitempty"`
 		Meta   interface{} `json:"meta,omitempty"`
 	}
+	Closer interface {
+		Close() error
+	}
 )
 
 func PanicErr(err error) {
@@ -117,4 +120,9 @@ func CheckIfRowExistsInMysql(dataBaseName *sql.DB, tableName string, fieldName s
 	PanicErr(err)
 
 	return value
+}
+
+func CloseRows(rows Closer)  {
+	err := rows.Close()
+	PanicErr(err)
 }

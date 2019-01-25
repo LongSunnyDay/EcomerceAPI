@@ -10,6 +10,17 @@ const (
 	MySecret = "SenelisMegstaMociutesApvalumus"
 )
 
+var (
+	Flags FlagSettings
+	Conf  *Config
+
+	db         *sql.DB
+	dbUri      string
+	driverName string
+
+	mongoDB *mongo.Database
+)
+
 type (
 	DbConfig struct {
 		Server     string `yaml:"server"`
@@ -42,15 +53,3 @@ type (
 		LogFile    string
 	}
 )
-
-var (
-	Flags FlagSettings
-	Conf  *Config
-
-	db         *sql.DB
-	dbUri      string
-	driverName string
-
-	mongoDB *mongo.Database
-)
-
