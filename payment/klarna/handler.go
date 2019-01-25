@@ -2,7 +2,6 @@ package klarna
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/Flaconi/go-klarna"
 	"go-api-ws/helpers"
 	"net/http"
@@ -37,7 +36,7 @@ func CreateSession(w http.ResponseWriter, r *http.Request) {
 	ps, err := paymentSrv.CreateNewSession(&request)
 	helpers.PanicErr(err)
 
-	fmt.Println(&ps.PaymentMethodCategories)
+	//fmt.Println(&ps.PaymentMethodCategories)
 
 	helpers.WriteResultWithStatusCode(w, ps, http.StatusOK)
 }

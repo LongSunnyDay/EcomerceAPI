@@ -32,19 +32,28 @@ const userRole = "user"
 // Get Order History
 // Path: /api/user/order-history
 func getOrderHistory(w http.ResponseWriter, r *http.Request) {
+
 	urlToken, err := helpers.GetTokenFromUrl(r)
 	helpers.PanicErr(err)
-	token, _ := auth.ParseToken(urlToken)
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		if claims.VerifyExpiresAt(time.Now().Unix(), true) {
+
+	token := auth.ParseToken(urlToken)
+
+	claims, err := auth.GetTokenClaims(token)
+	helpers.CheckErr(err)
+
+	if err != nil {
+		helpers.WriteResultWithStatusCode(w, "Invalid token", http.StatusForbidden)
+	} else {
+		if auth.CheckIfTokenIsNotExpired(claims) {
+
 			orderHistory := getUserOrderHistoryFromMongo(claims["sub"].(string))
 			response := helpers.Response{
 				Code:   http.StatusOK,
 				Result: orderHistory}
 			response.SendResponse(w)
+		} else {
+			helpers.WriteResultWithStatusCode(w, "Token is expired", http.StatusForbidden)
 		}
-	} else {
-		helpers.WriteResultWithStatusCode(w, "Invalid token", http.StatusForbidden)
 	}
 }
 
@@ -53,9 +62,15 @@ func getOrderHistory(w http.ResponseWriter, r *http.Request) {
 func meEndpoint(w http.ResponseWriter, r *http.Request) {
 	urlToken, err := helpers.GetTokenFromUrl(r)
 	helpers.PanicErr(err)
-	token, _ := auth.ParseToken(urlToken)
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		if claims.VerifyExpiresAt(time.Now().Unix(), true) {
+	token := auth.ParseToken(urlToken)
+
+	claims, err := auth.GetTokenClaims(token)
+	helpers.CheckErr(err)
+
+	if err != nil {
+		helpers.WriteResultWithStatusCode(w, "Invalid token", http.StatusBadRequest)
+	} else {
+		if auth.CheckIfTokenIsNotExpired(claims) {
 			userId, err := strconv.Atoi(claims["sub"].(string))
 			helpers.PanicErr(err)
 			userId64 := int64(userId)
@@ -68,8 +83,6 @@ func meEndpoint(w http.ResponseWriter, r *http.Request) {
 		} else {
 			helpers.WriteResultWithStatusCode(w, "Token expired", http.StatusForbidden)
 		}
-	} else {
-		helpers.WriteResultWithStatusCode(w, "Invalid token", http.StatusBadRequest)
 	}
 }
 
@@ -82,21 +95,6 @@ func registerUser(w http.ResponseWriter, r *http.Request) {
 	if validationResult.Valid() {
 		id := insertUserIntoMySQL(user)
 		customer := GetUserFromMySQLById(id)
-		//userInfo := CustomerData{
-		//	Address:              []*Address{},
-		//	CreatedAt:              time.Now().Unix(),
-		//	CreatedIn:              "Default Store View",
-		//	DisableAutoGroupChange: 0,
-		//	GroupID:                1,
-		//	ID:                     user.ID,
-		//	WebsiteID:              1,
-		//	UpdatedAt:              time.Now().Unix(),
-		//	StoreID:                1,
-		//	FirstName:              user.Customer.FirstName,
-		//	LastName:               user.Customer.LastName,
-		//	Email:                  user.Customer.Email,
-		//}
-		//insertUserIntoMongo(userInfo)
 		cart.CreateCartInMongoDB(user.ID)
 		response := helpers.Response{
 			Code:   http.StatusOK,
@@ -113,7 +111,7 @@ func updateUser(w http.ResponseWriter, r *http.Request) {
 	var user UpdatedCustomer
 	err := json.NewDecoder(r.Body).Decode(&user)
 	helpers.PanicErr(err)
-	//fmt.Printf("%+v\n",user)
+
 	for i := range user.UpdateUser.Addresses {
 		user.UpdateUser.Addresses[i].InsertOrUpdateAddressIntoMySQL(user.UpdateUser.ID)
 	}
@@ -133,7 +131,7 @@ func updateUser(w http.ResponseWriter, r *http.Request) {
 func refreshToken(w http.ResponseWriter, req *http.Request) {
 	var jsonBody map[string]string
 	_ = json.NewDecoder(req.Body).Decode(&jsonBody)
-	token, _ := auth.ParseToken(jsonBody["refreshToken"])
+	token := auth.ParseToken(jsonBody["refreshToken"])
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		if claims.VerifyExpiresAt(time.Now().Unix(), true) {
 
@@ -178,14 +176,9 @@ func loginEndpoint(w http.ResponseWriter, req *http.Request) {
 
 	if validationResult.Valid() {
 		userFromDb := getUserFromMySQLByEmail(userLogin.Username)
-
 		if checkPasswordHash(pswd, userFromDb.Password) {
 
-			//role := roleByGroupId(userFromDb.GroupId)
-
-			//authToken := auth.GetNewAuthToken(userFromDb.ID, role)
 			authToken := auth.GetNewAuthToken(userFromDb.ID, userFromDb.GroupId)
-
 			authTokenString, err := authToken.SignedString([]byte(config.MySecret))
 			helpers.PanicErr(err)
 

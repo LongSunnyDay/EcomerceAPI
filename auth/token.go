@@ -8,15 +8,30 @@ import (
 	"time"
 )
 
-func ParseToken(tokenString string) (*jwt.Token, error) {
+func ParseToken(tokenString string) *jwt.Token {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("there is an error")
+			return nil, fmt.Errorf("there is an error when parsing token")
 		}
 		return []byte(config.MySecret), nil
 	})
 	helpers.PanicErr(err)
-	return token, nil
+	return token
+}
+
+func GetTokenClaims(token *jwt.Token) (jwt.MapClaims, error) {
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		return claims, nil
+	} else {
+		return nil, fmt.Errorf("something whent wrong then mapping claims")
+	}
+}
+
+func CheckIfTokenIsNotExpired(claims jwt.MapClaims) bool {
+	if claims.VerifyExpiresAt(time.Now().Unix(), true) {
+		return true
+	}
+	return false
 }
 
 func GetNewAuthToken(sub string, groupId int) *jwt.Token {
