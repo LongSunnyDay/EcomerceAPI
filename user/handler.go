@@ -2,7 +2,6 @@ package user
 
 import (
 	"encoding/json"
-	"github.com/dgrijalva/jwt-go"
 	"go-api-ws/addresses"
 	"go-api-ws/auth"
 	"go-api-ws/cart"
@@ -11,7 +10,6 @@ import (
 	"go-api-ws/helpers"
 	"net/http"
 	"strconv"
-	"time"
 )
 
 var userModule core.ApiModule
@@ -132,14 +130,17 @@ func refreshToken(w http.ResponseWriter, req *http.Request) {
 	var jsonBody map[string]string
 	_ = json.NewDecoder(req.Body).Decode(&jsonBody)
 	token := auth.ParseToken(jsonBody["refreshToken"])
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		if claims.VerifyExpiresAt(time.Now().Unix(), true) {
+
+	claims, err := auth.GetTokenClaims(token)
+	helpers.CheckErr(err)
+
+	if err != nil {
+		helpers.WriteResultWithStatusCode(w, "Invalid token", http.StatusBadRequest)
+	} else {
+		if auth.CheckIfTokenIsNotExpired(claims) {
 
 			groupId := GetGroupIdFromMySQLById(claims["sub"].(int))
 
-			//role := roleByGroupId(groupId)
-
-			//authToken := auth.GetNewAuthToken(claims["sub"].(string), role)
 			authToken := auth.GetNewAuthToken(claims["sub"].(string), groupId)
 
 			authTokenString, err := authToken.SignedString([]byte(config.MySecret))
@@ -159,8 +160,6 @@ func refreshToken(w http.ResponseWriter, req *http.Request) {
 		} else {
 			helpers.WriteResultWithStatusCode(w, "Token expired", http.StatusForbidden)
 		}
-	} else {
-		helpers.WriteResultWithStatusCode(w, "Invalid token", http.StatusBadRequest)
 	}
 }
 

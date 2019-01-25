@@ -190,6 +190,7 @@ func (transitData TransitTimeForm) PostTransitData() *http.Request {
 	return req
 }
 
+//noinspection GoRedundantTypeDeclInCompositeLit
 func (form *OrderPickupForm) MakeOrderPickup() {
 
 	f, err := os.OpenFile("./logs/Order_"+ form.Order.OrderReference + "_log.json", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)

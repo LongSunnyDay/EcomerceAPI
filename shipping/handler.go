@@ -8,7 +8,7 @@ import (
 )
 
 func AddShippingMethods(w http.ResponseWriter, r *http.Request) {
-	var methods []method
+	var methods []Method
 	_ = json.NewDecoder(r.Body).Decode(&methods)
 	validationResult := helpers.CheckJSONSchemaWithGoStruct("file://shipping/jsonSchemaModels/add-shipping-methods.json",
 		methods)
@@ -32,9 +32,9 @@ func GetShippingMethods(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateShippingMethod(w http.ResponseWriter, r *http.Request) {
-	var method method
+	var method Method
 	_ = json.NewDecoder(r.Body).Decode(&method)
-	validationResult := helpers.CheckJSONSchemaWithGoStruct("file://shipping/jsonSchemaModels/update-shipping-method.json",
+	validationResult := helpers.CheckJSONSchemaWithGoStruct("file://shipping/jsonSchemaModels/update-shipping-Method.json",
 		method)
 	if validationResult.Valid() {
 		method.updatePaymentMethodInDb()

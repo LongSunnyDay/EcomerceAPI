@@ -47,13 +47,15 @@ func GetAndIncreaseQuoteCounterInMySQL() (value int64) {
 
 	err = tx.QueryRow("SELECT value FROM counters WHERE name = ?", quoteCounter).Scan(&value)
 	if err != nil {
-		tx.Rollback()
+		helpers.CheckErr(err)
+		err = tx.Rollback()
 		helpers.PanicErr(err)
 	}
 
 	_, err = tx.Exec("UPDATE counters SET value = value + 1 WHERE name = ?", quoteCounter)
 	if err != nil {
-		tx.Rollback()
+		helpers.CheckErr(err)
+		err = tx.Rollback()
 		helpers.PanicErr(err)
 	}
 

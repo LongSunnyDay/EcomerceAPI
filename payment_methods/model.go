@@ -39,7 +39,8 @@ func getPaymentMethodsFromMongo() []Method {
 		helpers.PanicErr(err)
 		paymentMethods = append(paymentMethods, paymentMethod)
 	}
-	cur.Close(context.Background())
+	err = cur.Close(context.Background())
+	helpers.CheckErr(err)
 	return paymentMethods
 }
 

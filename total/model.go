@@ -143,8 +143,8 @@ func (t *Totals) GetDiscounts(cartId string){
 }
 
 func (t *Totals) GetItems(cartId string) {
-	cart := cart.GetUserCartFromMongoByID(cartId)
-	for _, item := range cart.Items {
+	userCart := cart.GetUserCartFromMongoByID(cartId)
+	for _, item := range userCart.Items {
 		totalsItem := Item{
 			SKU: item.SKU,
 			ItemId: item.ItemID,
@@ -224,6 +224,7 @@ func (t *Totals) GetShipping(information AddressData) {
 	t.BaseShippingInclTax = method.PriceInclTax
 }
 
+//noinspection GoRedundantTypeDeclInCompositeLit,GoRedundantTypeDeclInCompositeLit
 func (t *Totals) CalculateGrandtotal(rules tax.Rules) {
 	for _, item := range t.Items {
 		t.BaseTaxAmount = t.BaseTaxAmount + item.TaxAmount

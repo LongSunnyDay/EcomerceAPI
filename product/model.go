@@ -174,7 +174,8 @@ func GetProductFromSolrBySKU(sku string) ConfigurableProductStruct {
 		"query": "+_type:product +sku:'" + sku + "'",
 		"limit": 1}
 	requestBytes := new(bytes.Buffer)
-	json.NewEncoder(requestBytes).Encode(request)
+	err := json.NewEncoder(requestBytes).Encode(request)
+	helpers.PanicErr(err)
 	resp, err := http.Post(
 		attribute.SolrQueryUrl,
 		attribute.ContentType,
@@ -182,7 +183,8 @@ func GetProductFromSolrBySKU(sku string) ConfigurableProductStruct {
 	helpers.PanicErr(err)
 	b, _ := ioutil.ReadAll(resp.Body)
 	var solrResp solrResponse
-	json.Unmarshal(b, &solrResp)
+	err = json.Unmarshal(b, &solrResp)
+	helpers.PanicErr(err)
 	if solrResp.Response.NumFound > 0 {
 		return solrResp.Response.Docs[0]
 	}

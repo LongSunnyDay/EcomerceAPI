@@ -1,6 +1,9 @@
 package transaction
 
-import "database/sql"
+import (
+	"database/sql"
+	"go-api-ws/helpers"
+)
 
 type Transaction interface {
 	Exec(query string, args ...interface{}) (sql.Result, error)
@@ -18,10 +21,12 @@ func WithTransaction(db *sql.DB, fn TxFn) (err error) {
 	}
 	defer func() {
 		if p := recover(); p != nil {
-			tx.Rollback()
+			err := tx.Rollback()
+			helpers.CheckErr(err)
 			panic(p)
 		} else if err != nil {
-			tx.Rollback()
+			err := tx.Rollback()
+			helpers.CheckErr(err)
 		} else {
 			err = tx.Commit()
 		}

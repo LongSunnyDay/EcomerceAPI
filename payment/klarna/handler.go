@@ -10,9 +10,9 @@ import (
 )
 
 const (
-	KlarnaTestingApiEndpoint = "https://api.playground.klarna.com"
-	user                     = "PK05992_f8487a01c7bd"
-	pass                     = "GbLTYA8kmHMH2kty"
+	TestingApiEndpoint = "https://api.playground.klarna.com"
+	user               = "PK05992_f8487a01c7bd"
+	pass               = "GbLTYA8kmHMH2kty"
 )
 
 func CreateSession(w http.ResponseWriter, r *http.Request) {
@@ -20,7 +20,7 @@ func CreateSession(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&request)
 	helpers.PanicErr(err)
 
-	uri, err := url.Parse(KlarnaTestingApiEndpoint)
+	uri, err := url.Parse(TestingApiEndpoint)
 	helpers.PanicErr(err)
 
 	conf := go_klarna.Config{
@@ -48,7 +48,7 @@ func CreateOrder(w http.ResponseWriter, r *http.Request) {
 
 	token := r.URL.Query().Get("token")
 
-	uri, err := url.Parse(KlarnaTestingApiEndpoint)
+	uri, err := url.Parse(TestingApiEndpoint)
 	helpers.PanicErr(err)
 
 	conf := go_klarna.Config{

@@ -3,47 +3,38 @@ package cart
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/dgrijalva/jwt-go"
 	"go-api-ws/attribute"
 	"go-api-ws/auth"
 	"go-api-ws/counter"
 	"go-api-ws/helpers"
 	"go-api-ws/product"
 	"net/http"
-	"time"
 )
 
 func createCart(w http.ResponseWriter, r *http.Request) {
-	urlToken := r.URL.Query()["token"][0]
-	if len(urlToken) > 0 {
-		token, _ := auth.ParseToken(urlToken)
-		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-			if claims.VerifyExpiresAt(time.Now().Unix(), true) {
-				//cartID, err := getUserCartIDFromMongo(claims["sub"].(string))
-				//helpers.CheckErr(err)
-				//if err != nil {
-				//	cartID := CreateCartInMongoDB(claims["sub"].(string))
-				//	response := helpers.Response{
-				//		Code:   http.StatusOK,
-				//		Result: cartID}
-				//	response.SendResponse(w)
-				//} else {
-				//	response := helpers.Response{
-				//		Code:   http.StatusOK,
-				//		Result: cartID}
-				//	response.SendResponse(w)
-				//}
+	urlToken, err := helpers.GetTokenFromUrl(r)
+	helpers.CheckErr(err)
 
+	if len(urlToken) > 0 {
+		token := auth.ParseToken(urlToken)
+		claims, err := auth.GetTokenClaims(token)
+		helpers.CheckErr(err)
+
+		if err != nil {
+			helpers.WriteResultWithStatusCode(w, err, http.StatusForbidden)
+		} else {
+			if auth.CheckIfTokenIsNotExpired(claims) {
 				cartID, err := CheckDoesUserHasACart(claims["sub"].(string))
 				if err != nil {
 					fmt.Println(err)
 					cartID = CreateCartInMongoDB(claims["sub"].(string))
 				}
-				fmt.Println(cartID)
 				response := helpers.Response{
 					Code:   http.StatusOK,
 					Result: cartID}
 				response.SendResponse(w)
+			} else {
+				helpers.WriteResultWithStatusCode(w, "Token is expired", http.StatusForbidden)
 			}
 		}
 	} else {
@@ -57,21 +48,31 @@ func createCart(w http.ResponseWriter, r *http.Request) {
 }
 
 func pullCart(w http.ResponseWriter, r *http.Request) {
-	urlUserToken := r.URL.Query()["token"][0]
-	urlCartId := r.URL.Query()["cartId"][0]
+	urlUserToken, err := helpers.GetTokenFromUrl(r)
+	helpers.CheckErr(err)
+
+	urlCartId, err := helpers.GetCartIdFromUrl(r)
+	helpers.CheckErr(err)
+
 	if len(urlUserToken) > 0 {
-		token, _ := auth.ParseToken(urlUserToken)
-		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-			if claims.VerifyExpiresAt(time.Now().Unix(), true) {
+		token := auth.ParseToken(urlUserToken)
+		claims, err := auth.GetTokenClaims(token)
+		helpers.CheckErr(err)
+
+		if err != nil {
+			helpers.WriteResultWithStatusCode(w, err, http.StatusForbidden)
+		} else {
+			if auth.CheckIfTokenIsNotExpired(claims) {
 				cart := GetUserCartFromMongoByID(urlCartId)
 				response := helpers.Response{
 					Code:   http.StatusOK,
 					Result: cart.Items}
 				response.SendResponse(w)
+			} else {
+				helpers.WriteResultWithStatusCode(w, "Token is expired", http.StatusForbidden)
 			}
 		}
 	} else {
-		//cart := getGuestCartFromMongoByID(urlCartId)
 		cart := GetUserCartFromMongoByID(urlCartId)
 		response := helpers.Response{
 			Code:   http.StatusOK,
@@ -81,11 +82,12 @@ func pullCart(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateCart(w http.ResponseWriter, r *http.Request) {
-	//urlUserToken := r.URL.Query()["token"][0]
-	urlCartId := r.URL.Query()["cartId"][0]
+	urlCartId, err := helpers.GetCartIdFromUrl(r)
+	helpers.CheckErr(err)
 
-	var item CartItem
-	_ = json.NewDecoder(r.Body).Decode(&item)
+	var item CustomerCart
+	err = json.NewDecoder(r.Body).Decode(&item)
+	helpers.PanicErr(err)
 	var attributes []attribute.ItemAttribute
 	for _, itemOptions := range item.Item.ProductOption.ExtensionAttributes.ConfigurableItemOptions {
 		attributes = append(attributes, attribute.GetAttributeNameFromSolr(itemOptions.OptionsID, itemOptions.OptionValue))
@@ -100,39 +102,22 @@ func updateCart(w http.ResponseWriter, r *http.Request) {
 	item.Item.Name = productFromSolr.Name
 	item.Item.ItemID = counter.GetAndIncreaseItemIdCounterInMongo()
 
-	//if len(urlUserToken) > 0 {
-		updateUserCartInMongo(urlCartId, item.Item)
-		response := helpers.Response{
-			Code:   http.StatusOK,
-			Result: item.Item}
-		response.SendResponse(w)
-	//}
-	//else {
-	//	updateGuestCartInMongo(urlCartId, item.Item)
-	//	response := helpers.Response{
-	//		Code:   http.StatusOK,
-	//		Result: item.Item}
-	//	response.SendResponse(w)
-	//}
+	updateUserCartInMongo(urlCartId, item.Item)
+	response := helpers.Response{
+		Code:   http.StatusOK,
+		Result: item.Item}
+	response.SendResponse(w)
 }
 
 func deleteFromUserCart(w http.ResponseWriter, r *http.Request) {
-	//urlUserToken := r.URL.Query()["token"][0]
-	urlCartId := r.URL.Query()["cartId"][0]
-	var item CartItem
-	_ = json.NewDecoder(r.Body).Decode(&item)
-
-	//if len(urlUserToken) > 0 {
-		deleteItemFromCartInMongo(urlCartId, item)
-		response := helpers.Response{
-			Code:   http.StatusOK,
-			Result: true}
-		response.SendResponse(w)
-	//} else {
-	//	deleteItemFromGuestCartInMongo(urlCartId, item)
-	//	response := helpers.Response{
-	//		Code:   http.StatusOK,
-	//		Result: true}
-	//	response.SendResponse(w)
-	//}
+	urlCartId, err := helpers.GetCartIdFromUrl(r)
+	helpers.CheckErr(err)
+	var item CustomerCart
+	err = json.NewDecoder(r.Body).Decode(&item)
+	helpers.PanicErr(err)
+	deleteItemFromCartInMongo(urlCartId, item)
+	response := helpers.Response{
+		Code:   http.StatusOK,
+		Result: true}
+	response.SendResponse(w)
 }

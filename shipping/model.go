@@ -11,9 +11,9 @@ import (
 )
 
 type (
-	methods []method
+	methods []Method
 
-	method struct {
+	Method struct {
 		Id           int     `json:"id,omitempty"`
 		CarrierCode  string  `json:"carrier_code"`
 		MethodCode   string  `json:"method_code"`
@@ -36,7 +36,7 @@ type (
 
 var DisConf *DiscountConfig
 
-func (m method) insertToDb() {
+func (m Method) insertToDb() {
 	db, err := config.Conf.GetDb()
 	helpers.PanicErr(err)
 	_, err = db.Exec("INSERT INTO shippingMethods("+
@@ -71,10 +71,10 @@ func getShippingMethodsFromDb() methods {
 		"price_excl_tax, " +
 		"price_incl_tax" +
 		" FROM shippingMethods WHERE available = true")
-	var methods []method
+	var methods []Method
 	defer rows.Close()
 	for rows.Next() {
-		var method method
+		var method Method
 		if err := rows.Scan(&method.CarrierCode, &method.MethodCode, &method.CarrierTitle, &method.MethodTitle, &method.Amount,
 			&method.BaseAmount, &method.Available, &method.ErrorMessage, &method.PriceExclTax, &method.PriceInclTax); err != nil {
 			helpers.PanicErr(err)
@@ -84,7 +84,7 @@ func getShippingMethodsFromDb() methods {
 	return methods
 }
 
-func (m method) updatePaymentMethodInDb() {
+func (m Method) updatePaymentMethodInDb() {
 	db, err := config.Conf.GetDb()
 	helpers.PanicErr(err)
 	_, err = db.Exec("UPDATE shippingMethods s SET "+
@@ -111,11 +111,11 @@ func removePaymentMethodFromDb(id string) {
 	helpers.PanicErr(err)
 }
 
-func GetShippingMethod(shippingCarrier string, shippingMethod string) method {
+func GetShippingMethod(shippingCarrier string, shippingMethod string) Method {
 	fmt.Println(shippingCarrier, "<<<<>>>>", shippingMethod)
 	db, err := config.Conf.GetDb()
 	helpers.PanicErr(err)
-	var method method
+	var method Method
 	err = db.QueryRow("SELECT * FROM shippingMethods WHERE carrier_code = ? AND method_code = ?", shippingCarrier, shippingMethod).
 		Scan(&method.Id, &method.CarrierCode, &method.MethodCode, &method.CarrierTitle, &method.MethodTitle,
 			&method.Amount, &method.BaseAmount, &method.Available, &method.ErrorMessage, &method.PriceExclTax, &method.PriceInclTax)

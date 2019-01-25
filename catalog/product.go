@@ -54,13 +54,15 @@ func ApiProductHandler(w http.ResponseWriter, r *http.Request) {
 	product := getProductById(productId)
 	result, err := json.Marshal(product)
 	checkErr(err)
-	w.Write(result)
+	_, err = w.Write(result)
+	helpers.PanicErr(err)
 }
 
 func ApiProductListHandler(w http.ResponseWriter, req *http.Request) {
 	result, err := json.Marshal(productList)
 	checkErr(err)
-	w.Write(result)
+	_, err = w.Write(result)
+	helpers.PanicErr(err)
 }
 
 // Product model methods

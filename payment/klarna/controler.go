@@ -3,7 +3,7 @@ package klarna
 
 
 func GetClient() {
-	//uri, _ := url.Parse(KlarnaTestingApiEndpoint)
+	//uri, _ := url.Parse(TestingApiEndpoint)
 	//conf := go_klarna.Config{
 	//	BaseURL:     uri,
 	//	Timeout:     time.Second * 10,

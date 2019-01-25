@@ -5,7 +5,7 @@ import (
 	"github.com/go-chi/chi"
 )
 
-func DiscountRouter() http.Handler {
+func RouterDiscount() http.Handler {
 	r := chi.NewRouter()
 	r.Post("/", createDiscount)
 	r.Get("/{discountID}", getDiscount)

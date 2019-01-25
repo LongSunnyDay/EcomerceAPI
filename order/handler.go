@@ -139,7 +139,7 @@ func PlaceOrder(w http.ResponseWriter, r *http.Request) {
 func GetCustomerOrderHistory(w http.ResponseWriter, r *http.Request) {
 	urlToken, err := helpers.GetTokenFromUrl(r)
 	helpers.PanicErr(err)
-	token, err := auth.ParseToken(urlToken)
+	token := auth.ParseToken(urlToken)
 	helpers.PanicErr(err)
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		subInt, err := strconv.Atoi(claims["sub"].(string))

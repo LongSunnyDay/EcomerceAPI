@@ -7,6 +7,7 @@ import (
 	"go-api-ws/config"
 	"go-api-ws/currency"
 	"go-api-ws/discount"
+	"go-api-ws/helpers"
 	"go-api-ws/language"
 	"go-api-ws/order"
 	"go-api-ws/payment/klarna"
@@ -29,8 +30,6 @@ func init() {
 
 func main() {
 
-
-
 	klarna.GetClient()
 
 	r := chi.NewRouter()
@@ -45,10 +44,11 @@ func main() {
 	r.Mount("/api/totals", total.RoutesTotal())
 	r.Mount("/api/order", order.RouterOrder())
 	r.Mount("/api/product", product.RouterProduct())
-	r.Mount("/api/discount", discount.DiscountRouter())
+	r.Mount("/api/discount", discount.RouterDiscount())
 	r.Mount("/api/cart/apply-coupon", discount.CouponRouter())
 	r.Mount("/api/payment/paypal", paypal.RoutesPaypal())
 	r.Mount("/api/payment/klarna", klarna.RouterKlarna())
 	r.Mount("/api/postnord", postNord.RouterPostNord())
-	http.ListenAndServe(":8080", r)
+	err := http.ListenAndServe(":8080", r)
+	helpers.PanicErr(err)
 }

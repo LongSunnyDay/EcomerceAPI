@@ -15,8 +15,7 @@ func GetTotals(w http.ResponseWriter, r *http.Request) {
 	urlCartId := r.URL.Query()["cartId"][0]
 	var groupId int64
 	if len(urlToken) > 0 {
-		token, err := auth.ParseToken(urlToken)
-		helpers.PanicErr(err)
+		token := auth.ParseToken(urlToken)
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 			if claims.VerifyExpiresAt(time.Now().Unix(), true) {
 				groupIdFloat := claims["groupId"].(float64)
@@ -46,8 +45,7 @@ func GetTotalsWithPaymentMethods(w http.ResponseWriter, r *http.Request) {
 	urlCartId := r.URL.Query()["cartId"][0]
 	var groupId int64
 	if len(urlToken) > 0 {
-		token, err := auth.ParseToken(urlToken)
-		helpers.PanicErr(err)
+		token := auth.ParseToken(urlToken)
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 			if claims.VerifyExpiresAt(time.Now().Unix(), true) {
 				groupIdFloat := claims["groupId"].(float64)
