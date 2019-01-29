@@ -3,6 +3,7 @@ package attribute
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"go-api-ws/helpers"
 	"io/ioutil"
 	"net/http"
@@ -26,6 +27,7 @@ func GetAttributeNameFromSolr(attributeId string, attributeValue string) ItemAtt
 	var solrResp solrResponse
 	err = json.Unmarshal(b, &solrResp)
 	helpers.PanicErr(err)
+	fmt.Println( solrResp.Response.NumFound)
 
 	if solrResp.Response.NumFound == 1 {
 		itemAttribute := ItemAttribute{

@@ -2,6 +2,7 @@ package user
 
 import (
 	"encoding/json"
+	"fmt"
 	"go-api-ws/addresses"
 	"go-api-ws/auth"
 	"go-api-ws/cart"
@@ -30,7 +31,7 @@ const userRole = "user"
 // Get Order History
 // Path: /api/user/order-history
 func getOrderHistory(w http.ResponseWriter, r *http.Request) {
-
+	fmt.Println("Get order history")
 	urlToken, err := helpers.GetTokenFromUrl(r)
 	helpers.PanicErr(err)
 

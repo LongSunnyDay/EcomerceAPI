@@ -1,7 +1,7 @@
 package attribute
 
 const (
-	SolrQueryUrl = "http://localhost:8983/solr/storefrontCore/query"
+	SolrQueryUrl = "http://192.168.0.2:8983/solr/storefrontCore/query"
 	ContentType  = "application/json; charset=utf-8"
 )
 

@@ -84,7 +84,7 @@ func (m Method) updatePaymentMethodInDb() {
 func removePaymentMethodFromDb(id string) {
 	db, err := config.Conf.GetDb()
 	helpers.PanicErr(err)
-	_, err = db.Exec("DELETE FROM shippingMethods  WHERE Id = ?", id)
+	_, err = db.Exec("DELETE FROM shipping_methods  WHERE Id = ?", id)
 	helpers.PanicErr(err)
 }
 
@@ -92,7 +92,7 @@ func GetShippingMethod(shippingCarrier string, shippingMethod string) Method {
 	db, err := config.Conf.GetDb()
 	helpers.PanicErr(err)
 	var method Method
-	err = db.QueryRow("SELECT * FROM shippingMethods WHERE carrier_code = ? AND method_code = ?", shippingCarrier, shippingMethod).
+	err = db.QueryRow("SELECT * FROM shipping_methods WHERE carrier_code = ? AND method_code = ?", shippingCarrier, shippingMethod).
 		Scan(&method.Id, &method.CarrierCode, &method.MethodCode, &method.CarrierTitle, &method.MethodTitle,
 			&method.Amount, &method.BaseAmount, &method.Available, &method.ErrorMessage, &method.PriceExclTax, &method.PriceInclTax)
 	helpers.PanicErr(err)

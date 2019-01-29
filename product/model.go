@@ -75,7 +75,7 @@ type (
 		Type                           string        `json:"_type"`
 		Score                          int           `json:"_score"`
 		DocType                        string        `json:"doc_type"`
-		ID                             int           `json:"id"`
+		ID                             string           `json:"id"`
 		Sku                            string        `json:"sku"`
 		Name                           string        `json:"name"`
 		AttributeSetID                 int           `json:"attribute_set_id"`
@@ -125,13 +125,13 @@ type (
 		Image                          string        `json:"image"`
 		SmallImage                     string        `json:"small_image"`
 		Thumbnail                      string        `json:"thumbnail"`
-		CategoryIds                    []string      `json:"category_ids"`
+		CategoryIds                    []int      `json:"category_ids"`
 		OptionsContainer               string        `json:"options_container"`
-		RequiredOptions                string        `json:"required_options"`
-		HasOptions                     string        `json:"has_options"`
+		RequiredOptions                []int        `json:"required_options"`
+		HasOptions                     []int        `json:"has_options"`
 		URLKey                         string        `json:"url_key"`
 		MsrpDisplayActualPriceType     string        `json:"msrp_display_actual_price_type"`
-		TaxClassID                     string        `json:"tax_class_id,omitempty"`
+		TaxClassID                     int        `json:"tax_class_id,omitempty"`
 		Material                       string        `json:"material"`
 		EcoCollection                  string        `json:"eco_collection"`
 		PerformanceFabric              string        `json:"performance_fabric"`
@@ -139,7 +139,7 @@ type (
 		New                            string        `json:"new"`
 		Sale                           string        `json:"sale"`
 		Pattern                        string        `json:"pattern"`
-		Climate                        string        `json:"climate"`
+		Climate                        []string        `json:"climate"`
 		ChildDocuments                 []interface{} `json:"_childDocuments_,omitempty"`
 	}
 
