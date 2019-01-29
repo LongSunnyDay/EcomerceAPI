@@ -15,7 +15,8 @@ func createCurrency(w http.ResponseWriter, r *http.Request) {
 	var schemaLoader = gojsonschema.NewReferenceLoader("file://currency/models/currencySchema.json")
 	var currency m.Currency
 	var currencies []m.Currency
-	_ = json.NewDecoder(r.Body).Decode(&currency)
+	err := json.NewDecoder(r.Body).Decode(&currency)
+	helpers.CheckErr(err)
 	documentLoader := gojsonschema.NewGoLoader(currency)
 	result, err := gojsonschema.Validate(schemaLoader, documentLoader)
 	helpers.PanicErr(err)

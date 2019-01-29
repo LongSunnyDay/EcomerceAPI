@@ -2,7 +2,7 @@ package models
 
 type Coupon struct {
 	Id              int       `json:"id,omitempty"`
-	Code              string       `json:"code,omitempty"`
+	Code            string       `json:"code,omitempty"`
 	DiscountPercent float64   `json:"discountPercent,omitempty"`
 	DiscountAmount  float64   `json:"discountAmount,omitempty"`
 	ExpirationDate  string `json:"expirationDate,omitempty"`
