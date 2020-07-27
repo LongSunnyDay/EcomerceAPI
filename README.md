@@ -1,3 +1,3 @@
-# go-api-ws
+# Golang Vue-Storefront api
 
-RESTful web microservices for E-commerce
+RESTful microservices api for Vue-Storefront E-Comerce.
